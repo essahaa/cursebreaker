@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class MovableTileDrag : MonoBehaviour
 {
@@ -50,6 +48,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void OnMouseDown()
     {
+
         // Raycast to detect which tile was clicked.
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -58,6 +57,7 @@ public class MovableTileDrag : MonoBehaviour
 
         if (hit.collider != null)
         {
+
             Debug.Log("Hit object name: " + hit.collider.gameObject.name);
             // Check if the clicked object is a movable tile.
             if (hit.collider.gameObject.CompareTag("MovableTile"))
@@ -76,11 +76,11 @@ public class MovableTileDrag : MonoBehaviour
                 Debug.Log("rowindex " + selectedTile.GetComponent<MovableTile>().Row + " colindex " + selectedTile.GetComponent<MovableTile>().Column + " currentmovetype: " + currentMoveType);
 
                 // Find all the movable tiles in the specified row or column.
-                if(currentMoveType == "horizontal")
+                if (currentMoveType == "horizontal")
                 {
                     currentMovableTiles = movableTileGrid.FindMovableTilesInRow(rowIndex);
 
-                    
+
 
                     if (currentMovableTiles != null)
                     {
@@ -95,7 +95,7 @@ public class MovableTileDrag : MonoBehaviour
                                 {
                                     Debug.Log($"currentmovables ({i}, {j}): {element.name}");
                                 }
-                                
+
                             }
                         }
                     }
@@ -104,13 +104,13 @@ public class MovableTileDrag : MonoBehaviour
                         Debug.Log("currentmovabletiles null");
                     }
 
-                    
+
                 }
                 else if (currentMoveType == "vertical")
                 {
                     currentMovableTiles = movableTileGrid.FindMovableTilesInColumn(columnIndex);
 
-                    
+
                 }
 
 
@@ -169,7 +169,7 @@ public class MovableTileDrag : MonoBehaviour
             if (currentMoveType == "horizontal")
             {
                 isRowMoving = true;
-               
+
                 // Horizontal movement (row)
                 MoveRow(rowIndex, offset.x, offset.y);
                 currentMoveType = "vertical";
@@ -194,7 +194,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
 
-                
+
 
             }
             else
@@ -203,7 +203,7 @@ public class MovableTileDrag : MonoBehaviour
 
                 // Vertical movement (column)
                 MoveColumn(columnIndex, offset.x, offset.y);
-                
+
 
                 // Calculate the target position for each tile in the column.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
@@ -224,7 +224,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
 
-                
+
             }
         }
     }
@@ -236,7 +236,7 @@ public class MovableTileDrag : MonoBehaviour
         isRowMoving = false;
         isColumnMoving = false;
 
-        
+
 
         // TODO: Implement snapping logic.
         if (currentMovableTiles.Length > 0)
@@ -282,9 +282,9 @@ public class MovableTileDrag : MonoBehaviour
                         Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
                     }
 
-                    
 
-                   
+
+
 
                 }
             }
@@ -362,8 +362,7 @@ public class MovableTileDrag : MonoBehaviour
 
                     // Mark the row as moving.
                     isRowMoving = true;
-                    currentMoveType = "vertical";
-                    Debug.Log("movetype change: " + currentMoveType);
+
                 }
             }
         }
@@ -402,12 +401,11 @@ public class MovableTileDrag : MonoBehaviour
                             }
                         }
                     }
-                }   
+                }
 
                 // Mark the column as moving.
                 isColumnMoving = true;
-                currentMoveType = "horizontal";
-                Debug.Log("movetype change: " + currentMoveType);
+
             }
         }
     }
