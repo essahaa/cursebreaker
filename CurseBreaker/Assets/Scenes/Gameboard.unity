@@ -155,7 +155,7 @@ MonoBehaviour:
   backgroundTilePrefab: {fileID: 809021098844665488, guid: 6695a87574cba2041ab0838029d9c661, type: 3}
   gridSizeX: 5
   gridSizeY: 5
-  backgroundTileSize: 1.2
+  backgroundTileSize: 1
   minX: -2.4
   maxX: 2.4
   minY: -2.4
