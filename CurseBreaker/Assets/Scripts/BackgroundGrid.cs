@@ -56,11 +56,6 @@ public class BackgroundGrid : MonoBehaviour
             }
         }
 
-        backgroundGrid[0, 0].GetComponent<SpriteRenderer>().color = Color.yellow;
-        backgroundGrid[1, 0].GetComponent<SpriteRenderer>().color = Color.red;
-        backgroundGrid[0, 1].GetComponent<SpriteRenderer>().color = Color.blue;
-        backgroundGrid[0, 4].GetComponent<SpriteRenderer>().color = Color.green;
-        backgroundGrid[4, 0].GetComponent<SpriteRenderer>().color = Color.black;
     }
 
     // Function to get the position of a background grid tile based on its column index.
