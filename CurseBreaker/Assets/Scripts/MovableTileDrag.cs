@@ -235,6 +235,8 @@ public class MovableTileDrag : MonoBehaviour
         isRowMoving = false;
         isColumnMoving = false;
 
+        // Toggle between "horizontal" and "vertical" move types.
+        currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
 
 
         // TODO: Implement snapping logic.
