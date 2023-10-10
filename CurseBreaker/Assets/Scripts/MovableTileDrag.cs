@@ -23,6 +23,7 @@ public class MovableTileDrag : MonoBehaviour
     private bool isDragging = false;
     private bool isRowMoving = false;
     private bool isColumnMoving = false;
+    private bool hasAdjacent = false;
 
     Transform[,] currentMovableTiles;
     private Vector3[,] initialTilePositions;
@@ -68,6 +69,9 @@ public class MovableTileDrag : MonoBehaviour
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
 
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
+
+                hasAdjacent = (currentMoveType == "horizontal") ? movableTileGrid.HasAdjacentMovableTilesInRow(columnIndex, rowIndex) : movableTileGrid.HasAdjacentMovableTilesInColumn(columnIndex, rowIndex);
+                Debug.Log("On naapuri" + hasAdjacent);
 
                 // Store initial X and Y positions for reference.
                 initialX = selectedTile.transform.position.x;
