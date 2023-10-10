@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 2656981301002972305}
   - component: {fileID: 4417188720354989243}
   - component: {fileID: -5664623668447513539}
-  - component: {fileID: 6646231605013432377}
   - component: {fileID: -5703516218831535177}
-  - component: {fileID: -3970985254230485539}
-  - component: {fileID: 7926105692801425901}
+  - component: {fileID: 9136542795970590273}
+  - component: {fileID: 8781617945137421497}
+  - component: {fileID: 6908503980427154240}
   m_Layer: 0
   m_Name: Tile
   m_TagString: MovableTile
@@ -134,18 +134,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &6646231605013432377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1227834004184806325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbad10d9938bf5649ac4fde9d6850c10, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!50 &-5703516218831535177
 Rigidbody2D:
   serializedVersion: 4
@@ -173,7 +161,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &-3970985254230485539
+--- !u!114 &9136542795970590273
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,11 +170,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1227834004184806325}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95b4ef5ed3b9e8f47baea747654e119e, type: 3}
+  m_Script: {fileID: 11500000, guid: b3e5c8dc43cb5674f87f49bf80834d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isAtBoundary: 0
---- !u!114 &7926105692801425901
+--- !u!114 &8781617945137421497
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -195,11 +182,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 1227834004184806325}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0185df1ba718ae41bdbf3d12442aa3d, type: 3}
+  m_Script: {fileID: 11500000, guid: a00e64d407cc8144ebea6291dee2cb6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundGrid: {fileID: 0}
   movableTileGrid: {fileID: 0}
+  currentMoveType: horizontal
   swipeThreshold: 50
   stepSize: 1
   tileSpacing: 0.4
+--- !u!114 &6908503980427154240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227834004184806325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 293384ebb3b8d664eb712bee29dcf1db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isAtBoundary: 0
