@@ -172,8 +172,7 @@ public class MovableTileDrag : MonoBehaviour
 
                 // Horizontal movement (row)
                 MoveRow(rowIndex, offset.x, offset.y);
-                currentMoveType = "vertical";
-                Debug.Log("movetype change: " + currentMoveType);
+
 
                 // Calculate the target position for each tile in the row.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
@@ -241,6 +240,8 @@ public class MovableTileDrag : MonoBehaviour
         // TODO: Implement snapping logic.
         if (currentMovableTiles.Length > 0)
         {
+            movableTiles = currentMovableTiles;
+            movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
             // Snap each tile to the nearest grid position.
             foreach (Transform tile in currentMovableTiles)
             {

@@ -24,7 +24,7 @@ public class MovableTileGrid : MonoBehaviour
         movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
 
         GenerateMovableTiles();
-        
+
     }
 
     void GenerateMovableTiles()
@@ -83,16 +83,33 @@ public class MovableTileGrid : MonoBehaviour
         return movableTiles;
     }
 
+    public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
+    {
+        //empty row or column that has been moved
+        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+        {
+            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+            {
+                Transform cTile = currentMovableTiles[i, j];
+                if (cTile != null && cTile.CompareTag("MovableTile"))
+                {
+                    Debug.Log("currentmovables array, tile found: " + i + " , " + j);
+                    movableTiles[i, j] = null;
+                }
+            }
+        }
+    }
+
     public void UpdateMovableTile(int column, int row, Transform newTile)
     {
-        // Empty the cell first by setting it to null.
+        //empty cell 
         movableTiles[column, row] = null;
         // Update the cell with the new tile.
         movableTiles[column, row] = newTile;
 
         Transform tile = movableTiles[column, row];
 
-        if(tile != null)
+        if (tile != null)
         {
             // Get the MovableTile component of the tile.
             MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
@@ -111,7 +128,7 @@ public class MovableTileGrid : MonoBehaviour
             for (int col = 0; col < backgroundGrid.gridSizeX; col++)
             {
                 // Get the tile at the current position.
-                Transform tile = GetTileAtPosition(col, row);
+                Transform tile = movableTiles[col, row];
 
                 if (tile != null && tile.CompareTag("MovableTile"))
                 {
@@ -162,9 +179,9 @@ public class MovableTileGrid : MonoBehaviour
         {
             for (int col = 0; col < numCols; col++)
             {
-                
-                    tilesInRow[col, rowIndex] = movableTiles[col, rowIndex] != null ? movableTiles[col, rowIndex].transform : null; 
-                
+
+                tilesInRow[col, rowIndex] = movableTiles[col, rowIndex] != null ? movableTiles[col, rowIndex].transform : null;
+
             }
         }
 
@@ -185,9 +202,9 @@ public class MovableTileGrid : MonoBehaviour
         {
             for (int row = 0; row < numRows; row++)
             {
-                
-                    tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row] != null ?movableTiles[columnIndex, row].transform : null;
-                
+
+                tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row] != null ? movableTiles[columnIndex, row].transform : null;
+
             }
         }
 
@@ -264,7 +281,7 @@ public class MovableTileGrid : MonoBehaviour
         return adjacentMovableTilesCount >= 2;
     }
 
-    
+
 
 
 }
