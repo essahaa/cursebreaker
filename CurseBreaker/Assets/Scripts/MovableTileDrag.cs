@@ -15,64 +15,41 @@ public class MovableTileDrag : MonoBehaviour
 
     public string currentMoveType = "horizontal"; // Initialize with a horizontal move
 
-    // Set the drag threshold for detecting a swipe (you can adjust this value).
-    public float swipeThreshold = 50f;
-    public float stepSize = 1.0f;
-    public float tileSpacing = 0.4f;
-
     private bool isDragging = false;
     private bool isRowMoving = false;
     private bool isColumnMoving = false;
-    private bool hasAdjacent = false;
-
-    Transform[,] currentMovableTiles;
+   
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles; // Declare it at the class level.
+    private Transform[,] currentMovableTiles;
 
     private GameObject selectedTile;
-    private int selectedRow;
     private int rowIndex;
     private int columnIndex;
-    private float initialX;
-    private float initialY;
 
     private void Start()
     {
-        // Find the GameObject with the name "BackgroundGridManager" and get its BackgroundGrid component.
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
-        //rowColumnManager = GameObject.Find("RowColumnManager").GetComponent<RowColumnManager>();
-
+ 
         movableTiles = movableTileGrid.movableTiles;
-
     }
 
     private void OnMouseDown()
     {
-
         // Raycast to detect which tile was clicked.
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //movableTiles = movableTileGrid.GetMovableTiles();
-        //initialMousePosition = mouseCurrentPos;
 
         if (hit.collider != null)
         {
-
-            Debug.Log("Hit object name: " + hit.collider.gameObject.name);
             // Check if the clicked object is a movable tile.
             if (hit.collider.gameObject.CompareTag("MovableTile"))
             {
                 selectedTile = hit.collider.gameObject;
 
-                // Calculate the row and column of the selected tile based on its grid position.
+                //get the row and column of the selected tile from MovableTile component
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
-
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
-               
-                // Store initial X and Y positions for reference.
-                initialX = selectedTile.transform.position.x;
-                initialY = selectedTile.transform.position.y;
 
                 Debug.Log("rowindex " + selectedTile.GetComponent<MovableTile>().Row + " colindex " + selectedTile.GetComponent<MovableTile>().Column + " currentmovetype: " + currentMoveType);
 
@@ -81,11 +58,9 @@ public class MovableTileDrag : MonoBehaviour
                 {
                     currentMovableTiles = movableTileGrid.FindMovableTilesInRow(rowIndex);
 
-
-
+                    //Log currentmovables array
                     if (currentMovableTiles != null)
                     {
-                        // Assuming 'array' is your 2D array of type Transform[,]
                         for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
                         {
                             for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
@@ -105,19 +80,15 @@ public class MovableTileDrag : MonoBehaviour
                         Debug.Log("currentmovabletiles null");
                     }
 
-
                 }
                 else if (currentMoveType == "vertical")
                 {
                     currentMovableTiles = movableTileGrid.FindMovableTilesInColumn(columnIndex);
-
-
                 }
 
 
                 if (currentMovableTiles != null)
                 {
-                    // Initialize the 2D array based on the size of the movableTiles array.
                     initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
 
                     // Store the initial positions of all movable tiles in the row or column.
@@ -132,18 +103,11 @@ public class MovableTileDrag : MonoBehaviour
                             }
                         }
                     }
-
-                    // Set the movableTiles array to the currentMovableTiles.
-                    //movableTiles = currentMovableTiles;
                 }
                 else
                 {
                     Debug.Log("currentmovabletiles null");
                 }
-
-
-
-
 
                 // Mark dragging as initiated.
                 isDragging = true;
@@ -155,9 +119,6 @@ public class MovableTileDrag : MonoBehaviour
         }
     }
 
-
-
-
     private void OnMouseDrag()
     {
         if (isDragging)
@@ -166,14 +127,12 @@ public class MovableTileDrag : MonoBehaviour
             Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 offset = mouseCurrentPos - initialMousePosition;
 
-
             if (currentMoveType == "horizontal")
             {
                 isRowMoving = true;
 
                 // Horizontal movement (row)
                 MoveRow(rowIndex, offset.x, offset.y);
-
 
                 // Calculate the target position for each tile in the row.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
@@ -193,9 +152,6 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
-
-
-
             }
             else
             {
@@ -203,7 +159,6 @@ public class MovableTileDrag : MonoBehaviour
 
                 // Vertical movement (column)
                 MoveColumn(columnIndex, offset.x, offset.y);
-
 
                 // Calculate the target position for each tile in the column.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
@@ -223,12 +178,9 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
-
-
             }
         }
     }
-
 
     private void OnMouseUp()
     {
@@ -239,12 +191,13 @@ public class MovableTileDrag : MonoBehaviour
         // Toggle between "horizontal" and "vertical" move types.
         currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
 
-
-        // TODO: Implement snapping logic.
+        // Implement snapping logic.
         if (currentMovableTiles.Length > 0)
         {
+            //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
             movableTiles = currentMovableTiles;
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
+
             // Snap each tile to the nearest grid position.
             foreach (Transform tile in currentMovableTiles)
             {
@@ -277,29 +230,25 @@ public class MovableTileDrag : MonoBehaviour
                         MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
                         movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
 
-                        // Update the Row and Column properties of the MovableTile component.
-                        //movableTileComponent.Row = row;
-                        //movableTileComponent.Column = column;
-
-                        // Now 'row' and 'column' contain the indices of the snapped tile.
                         Debug.Log("Snapped to row: " + row + ", column: " + column + " tile position " + tile.position);
                         Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
                     }
-
-
-
-
-
                 }
             }
-            // Call the method to update row and column data after tile movement.
-            //rowColumnManager.UpdateRowColumnData(movableTiles);
 
+            //Update movableTiles array with new snapped positions
             movableTiles = movableTileGrid.UpdateMovableTilesArray();
-            //movableTiles = movableTileGrid.GetMovableTiles();
 
+            //empty current movable tiles array
+            for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+            {
+                for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                {
+                    currentMovableTiles[i, j] = null;
+                }
+            }
 
-            // Assuming 'array' is your 2D array of type Transform[,]
+            // Log movableTiles array
             for (int i = 0; i < movableTiles.GetLength(0); i++)
             {
                 for (int j = 0; j < movableTiles.GetLength(1); j++)
@@ -317,26 +266,12 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
         }
-
-        //empty current movable tiles array
-        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
-        {
-            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
-            {
-                currentMovableTiles[i, j] = null;
-            }
-        }
-
     }
 
     private void MoveRow(int rowIndex, float xOffset, float yOffset)
     {
         if (isRowMoving && xOffset != 0f && Mathf.Abs(xOffset) > Mathf.Abs(yOffset))
         {
-            float maxMoveDistance = backgroundGrid.backgroundTileSize; // Set your desired maximum move distance here.
-
-            if (Mathf.Abs(xOffset) <= maxMoveDistance)
-            {
                 if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(0) && movableTiles.GetLength(0) > 0 && movableTiles.GetLength(1) > 0)
                 {
                     // Calculate the target X position for each tile in the row incrementally.
@@ -363,12 +298,7 @@ public class MovableTileDrag : MonoBehaviour
                             }
                         }
                     }
-
-                    // Mark the row as moving.
-                    isRowMoving = true;
-
                 }
-            }
         }
     }
 
@@ -376,10 +306,6 @@ public class MovableTileDrag : MonoBehaviour
     {
         if (!isRowMoving || (isColumnMoving && yOffset != 0f && Mathf.Abs(yOffset) > Mathf.Abs(xOffset)))
         {
-            float maxMoveDistance = backgroundGrid.backgroundTileSize; // Set your desired maximum move distance here.
-
-            if (Mathf.Abs(yOffset) <= maxMoveDistance)
-            {
                 if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(1) && movableTiles.GetLength(0) > 0 && movableTiles.GetLength(1) > 0)
                 {
                     for (int row = 0; row < movableTiles.GetLength(0); row++)
@@ -406,11 +332,6 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
-
-                // Mark the column as moving.
-                isColumnMoving = true;
-
-            }
         }
     }
 }
