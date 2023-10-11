@@ -69,12 +69,7 @@ public class MovableTileDrag : MonoBehaviour
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
 
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
-                /*
-                 VARO SAATTAA MENNÄ JYNTTÄÄÄN KOKO HOMMA
-
-                hasAdjacent = (currentMoveType == "horizontal") ? movableTileGrid.HasAdjacentMovableTilesInRow(columnIndex, rowIndex) : movableTileGrid.HasAdjacentMovableTilesInColumn(columnIndex, rowIndex);
-                Debug.Log("On naapuri" + hasAdjacent);
-                */
+               
                 // Store initial X and Y positions for reference.
                 initialX = selectedTile.transform.position.x;
                 initialY = selectedTile.transform.position.y;
