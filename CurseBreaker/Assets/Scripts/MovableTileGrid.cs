@@ -107,7 +107,7 @@ public class MovableTileGrid : MonoBehaviour
                 {
                     // Update the movableTiles array.
                     movableTiles[col, row] = tile;
-                    Debug.Log("updating array, tile found: " + col + " , " + row);
+                    //Debug.Log("updating array, tile found: " + col + " , " + row);
                 }
                 else
                 {

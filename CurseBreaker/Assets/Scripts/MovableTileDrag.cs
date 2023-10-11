@@ -205,6 +205,8 @@ public class MovableTileDrag : MonoBehaviour
         isRowMoving = false;
         isColumnMoving = false;
 
+        bool samePlace = false;
+
         // Implement snapping logic.
         if (!allElementsNull)
         {
@@ -212,9 +214,7 @@ public class MovableTileDrag : MonoBehaviour
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
-            // Toggle between "horizontal" and "vertical" move types.
-            currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-            Debug.Log("movetype change: " + currentMoveType);
+            
 
 
             // Snap each tile to the nearest grid position.
@@ -242,17 +242,43 @@ public class MovableTileDrag : MonoBehaviour
                     // Set the tile's position to the snapped position.
                     tile.position = snappedPosition;
 
+                    // Get the MovableTile component of the tile.
+                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+
+
+                    if (column == movableTileComponent.Column && row == movableTileComponent.Row)
+                    {
+                        samePlace = true;
+                        Debug.Log("sama paikka missä oli, column: " + tile.position.x + " , " + movableTileComponent.Column + " rowi " + tile.position.y + " , " + movableTileComponent.Row);
+  
+                    }
+                    
+
                     // Ensure that row and column are within valid bounds
                     if (column >= 0 && column < backgroundGrid.gridSizeX && row >= 0 && row < backgroundGrid.gridSizeY)
                     {
-                        // Get the MovableTile component of the tile.
-                        MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
                         movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
 
                         Debug.Log("Snapped to row: " + row + ", column: " + column + " tile position " + tile.position);
                         Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
                     }
+
+                    
+
+                    
                 }
+            }
+
+            if(samePlace)
+            {
+                currentMoveType = (currentMoveType == "horizontal") ? "horizontal" : "vertical";
+                Debug.Log("movetype still same: " + currentMoveType);
+            }
+            else
+            {
+                // Toggle between "horizontal" and "vertical" move types.
+                currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
+                Debug.Log("movetype change: " + currentMoveType);
             }
 
             //Update movableTiles array with new snapped positions
