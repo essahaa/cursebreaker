@@ -7,7 +7,6 @@ public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
     public BackgroundGrid backgroundGrid;
-    //public RowColumnManager rowColumnManager;
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
 
@@ -18,9 +17,7 @@ public class MovableTileGrid : MonoBehaviour
 
     void Start()
     {
-        // Find the GameObject with the name "BackgroundGridManager" and get its BackgroundGrid component.
         backgroundGrid = GameObject.Find("BackgroundGridManager").GetComponent<BackgroundGrid>();
-        //rowColumnManager = GameObject.Find("RowColumnManager").GetComponent<RowColumnManager>();
         movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
 
         GenerateMovableTiles();
@@ -52,34 +49,10 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        // After generating the grid...
-        //rowColumnManager.InitializeRowColumnDataFromTiles(movableTiles);
     }
 
     public Transform[,] GetMovableTiles()
     {
-        //UpdateMovableTilesArray(); // Call a method to update the array if needed.
-        if (movableTiles != null)
-        {
-            /*
-            // Assuming 'array' is your 2D array of type Transform[,]
-            for (int i = 0; i < movableTiles.GetLength(0); i++)
-            {
-                for (int j = 0; j < movableTiles.GetLength(1); j++)
-                {
-                    Transform element = movableTiles[i, j];
-
-                    if (element != null)
-                    {
-                        Debug.Log($"movables after update [col, row] ({i}, {j}): {element.name}");
-                    }
-                    else
-                    {
-                        Debug.Log($"tile at ({i}, {j}): null");
-                    }
-                }
-            }*/
-        }
         return movableTiles;
     }
 
