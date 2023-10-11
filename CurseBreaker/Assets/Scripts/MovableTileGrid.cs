@@ -139,8 +139,91 @@ public class MovableTileGrid : MonoBehaviour
         return null;
     }
 
+    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
+    {
+        Debug.Log("rowindex in findmovable " + rowIndex);
+
+        int numRows = movableTiles.GetLength(1);
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        Transform[,] tilesInRow = new Transform[numCols, numRows];
+
+        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+
+        if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
+        {
+            for (int col = 0; col < numCols; col++)
+            {
+                if (movableTiles[col, rowIndex] != null)
+                {
+                    // Check if the tile has an adjacent tile to the left or right.
+                    bool hasLeftAdjacent = (col > 0 && movableTiles[col - 1, rowIndex] != null);
+                    bool hasRightAdjacent = (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null);
+
+                    if (hasLeftAdjacent || hasRightAdjacent)
+                    {
+                        // Include this tile in the movable row.
+                        tilesInRow[col, rowIndex] = movableTiles[col, rowIndex];
+                        foundAdjacentTile = true; // Set the flag to true.
+
+                    }
+                    else if (foundAdjacentTile)
+                    {
+                        // Exclude this tile as it's alone after an adjacent tile.
+                        tilesInRow[col, rowIndex] = null;
+                    }
+                }
+            }
+        }
+
+        return tilesInRow;
+    }
+
+
+
+
+    // Function to find and return movable tiles in a specified column.
+    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
+    {
+        Debug.Log("colindex in findmovable " + columnIndex);
+
+        int numRows = movableTiles.GetLength(1); // Assuming movableTiles is in [col, row] format.
+        int numCols = movableTiles.GetLength(0);
+        Transform[,] tilesInColumn = new Transform[numCols, numRows];
+
+        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+
+        if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
+        {
+            for (int row = 0; row < numRows; row++)
+            {
+                if (movableTiles[columnIndex, row] != null)
+                {
+                    // Check if the tile has an adjacent tile above or below.
+                    bool hasAboveAdjacent = (row > 0 && movableTiles[columnIndex, row - 1] != null);
+                    bool hasBelowAdjacent = (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null);
+
+                    if (hasAboveAdjacent || hasBelowAdjacent)
+                    {
+                        // Include this tile in the movable column.
+                        tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row];
+                        foundAdjacentTile = true; // Set the flag to true.
+                    }
+                    else if (foundAdjacentTile)
+                    {
+                        // Exclude this tile as it's alone after an adjacent tile.
+                        tilesInColumn[columnIndex, row] = null;
+                    }
+                }
+            }
+        }
+
+        return tilesInColumn;
+    }
+
+
+
     // Function to find and return movable tiles in a specified row.
-    public Transform[,] FindMovableTilesInRow(int rowIndex)
+    public Transform[,] FindAllMovableTilesInRow(int rowIndex)
     {
         Debug.Log("rowindex in findmovable " + rowIndex);
 
@@ -163,7 +246,7 @@ public class MovableTileGrid : MonoBehaviour
 
 
     // Function to find and return movable tiles in a specified column.
-    public Transform[,] FindMovableTilesInColumn(int columnIndex)
+    public Transform[,] FindAllMovableTilesInColumn(int columnIndex)
     {
         Debug.Log("colindex in findmovable " + columnIndex);
 
@@ -183,8 +266,6 @@ public class MovableTileGrid : MonoBehaviour
 
         return tilesInColumn;
     }
-
-
 
 
 

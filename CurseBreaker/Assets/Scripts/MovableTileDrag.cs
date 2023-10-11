@@ -13,12 +13,13 @@ public class MovableTileDrag : MonoBehaviour
     private Vector3 initialMousePosition;
     private Vector3 initialTilePosition;
 
-    public string currentMoveType = "horizontal"; // Initialize with a horizontal move
+    private string currentMoveType = "horizontal"; // Initialize with a horizontal move
 
     private bool isDragging = false;
     private bool isRowMoving = false;
     private bool isColumnMoving = false;
-   
+    private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
+
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles; // Declare it at the class level.
     private Transform[,] currentMovableTiles;
@@ -56,38 +57,54 @@ public class MovableTileDrag : MonoBehaviour
                 // Find all the movable tiles in the specified row or column.
                 if (currentMoveType == "horizontal")
                 {
-                    currentMovableTiles = movableTileGrid.FindMovableTilesInRow(rowIndex);
+                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInRow(rowIndex);
 
-                    //Log currentmovables array
-                    if (currentMovableTiles != null)
-                    {
-                        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
-                        {
-                            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
-                            {
-                                Transform element = currentMovableTiles[i, j];
-
-                                if (element != null)
-                                {
-                                    Debug.Log($"currentmovables ({i}, {j}): {element.name}");
-                                }
-
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("currentmovabletiles null");
-                    }
+                    
 
                 }
                 else if (currentMoveType == "vertical")
                 {
-                    currentMovableTiles = movableTileGrid.FindMovableTilesInColumn(columnIndex);
+                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInColumn(columnIndex);
                 }
 
+                //checks if there are non null objects in current movables array
+                
+                for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+                {
+                    for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                    {
+                        if (currentMovableTiles[i,j] != null) 
+                        {
+                            allElementsNull = false;
+                            break;  // No need to continue checking once a non-null element is found.
+                        }
+                    }
+                    
+                }
 
-                if (currentMovableTiles != null)
+                //Log currentmovables array
+                if (!allElementsNull)
+                {
+                    for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                        {
+                            Transform element = currentMovableTiles[i, j];
+
+                            if (element != null)
+                            {
+                                Debug.Log($"currentmovables ({i}, {j}): {element.name}");
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("currentmovabletiles null");
+                }
+
+                if (!allElementsNull)
                 {
                     initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
 
@@ -121,7 +138,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        if (isDragging)
+        if (isDragging && !allElementsNull)
         {
             // Calculate the offset based on the initial mouse and tile positions.
             Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -188,15 +205,17 @@ public class MovableTileDrag : MonoBehaviour
         isRowMoving = false;
         isColumnMoving = false;
 
-        // Toggle between "horizontal" and "vertical" move types.
-        currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-
         // Implement snapping logic.
-        if (currentMovableTiles.Length > 0)
+        if (!allElementsNull)
         {
             //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
-            movableTiles = currentMovableTiles;
+            movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
+
+            // Toggle between "horizontal" and "vertical" move types.
+            currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
+            Debug.Log("movetype change: " + currentMoveType);
+
 
             // Snap each tile to the nearest grid position.
             foreach (Transform tile in currentMovableTiles)
@@ -248,6 +267,8 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
 
+            allElementsNull = false;
+            /*
             // Log movableTiles array
             for (int i = 0; i < movableTiles.GetLength(0); i++)
             {
@@ -265,6 +286,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
             }
+            */
         }
     }
 
