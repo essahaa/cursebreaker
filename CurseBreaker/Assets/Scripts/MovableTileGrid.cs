@@ -7,7 +7,6 @@ public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
     public BackgroundGrid backgroundGrid;
-    //public RowColumnManager rowColumnManager;
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
 
@@ -18,9 +17,7 @@ public class MovableTileGrid : MonoBehaviour
 
     void Start()
     {
-        // Find the GameObject with the name "BackgroundGridManager" and get its BackgroundGrid component.
         backgroundGrid = GameObject.Find("BackgroundGridManager").GetComponent<BackgroundGrid>();
-        //rowColumnManager = GameObject.Find("RowColumnManager").GetComponent<RowColumnManager>();
         movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
 
         GenerateMovableTiles();
@@ -52,34 +49,10 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        // After generating the grid...
-        //rowColumnManager.InitializeRowColumnDataFromTiles(movableTiles);
     }
 
     public Transform[,] GetMovableTiles()
     {
-        //UpdateMovableTilesArray(); // Call a method to update the array if needed.
-        if (movableTiles != null)
-        {
-            /*
-            // Assuming 'array' is your 2D array of type Transform[,]
-            for (int i = 0; i < movableTiles.GetLength(0); i++)
-            {
-                for (int j = 0; j < movableTiles.GetLength(1); j++)
-                {
-                    Transform element = movableTiles[i, j];
-
-                    if (element != null)
-                    {
-                        Debug.Log($"movables after update [col, row] ({i}, {j}): {element.name}");
-                    }
-                    else
-                    {
-                        Debug.Log($"tile at ({i}, {j}): null");
-                    }
-                }
-            }*/
-        }
         return movableTiles;
     }
 
@@ -134,7 +107,7 @@ public class MovableTileGrid : MonoBehaviour
                 {
                     // Update the movableTiles array.
                     movableTiles[col, row] = tile;
-                    Debug.Log("updating array, tile found: " + col + " , " + row);
+                    //Debug.Log("updating array, tile found: " + col + " , " + row);
                 }
                 else
                 {
@@ -166,8 +139,91 @@ public class MovableTileGrid : MonoBehaviour
         return null;
     }
 
+    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
+    {
+        Debug.Log("rowindex in findmovable " + rowIndex);
+
+        int numRows = movableTiles.GetLength(1);
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        Transform[,] tilesInRow = new Transform[numCols, numRows];
+
+        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+
+        if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
+        {
+            for (int col = 0; col < numCols; col++)
+            {
+                if (movableTiles[col, rowIndex] != null)
+                {
+                    // Check if the tile has an adjacent tile to the left or right.
+                    bool hasLeftAdjacent = (col > 0 && movableTiles[col - 1, rowIndex] != null);
+                    bool hasRightAdjacent = (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null);
+
+                    if (hasLeftAdjacent || hasRightAdjacent)
+                    {
+                        // Include this tile in the movable row.
+                        tilesInRow[col, rowIndex] = movableTiles[col, rowIndex];
+                        foundAdjacentTile = true; // Set the flag to true.
+
+                    }
+                    else if (foundAdjacentTile)
+                    {
+                        // Exclude this tile as it's alone after an adjacent tile.
+                        tilesInRow[col, rowIndex] = null;
+                    }
+                }
+            }
+        }
+
+        return tilesInRow;
+    }
+
+
+
+
+    // Function to find and return movable tiles in a specified column.
+    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
+    {
+        Debug.Log("colindex in findmovable " + columnIndex);
+
+        int numRows = movableTiles.GetLength(1); // Assuming movableTiles is in [col, row] format.
+        int numCols = movableTiles.GetLength(0);
+        Transform[,] tilesInColumn = new Transform[numCols, numRows];
+
+        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+
+        if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
+        {
+            for (int row = 0; row < numRows; row++)
+            {
+                if (movableTiles[columnIndex, row] != null)
+                {
+                    // Check if the tile has an adjacent tile above or below.
+                    bool hasAboveAdjacent = (row > 0 && movableTiles[columnIndex, row - 1] != null);
+                    bool hasBelowAdjacent = (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null);
+
+                    if (hasAboveAdjacent || hasBelowAdjacent)
+                    {
+                        // Include this tile in the movable column.
+                        tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row];
+                        foundAdjacentTile = true; // Set the flag to true.
+                    }
+                    else if (foundAdjacentTile)
+                    {
+                        // Exclude this tile as it's alone after an adjacent tile.
+                        tilesInColumn[columnIndex, row] = null;
+                    }
+                }
+            }
+        }
+
+        return tilesInColumn;
+    }
+
+
+
     // Function to find and return movable tiles in a specified row.
-    public Transform[,] FindMovableTilesInRow(int rowIndex)
+    public Transform[,] FindAllMovableTilesInRow(int rowIndex)
     {
         Debug.Log("rowindex in findmovable " + rowIndex);
 
@@ -190,7 +246,7 @@ public class MovableTileGrid : MonoBehaviour
 
 
     // Function to find and return movable tiles in a specified column.
-    public Transform[,] FindMovableTilesInColumn(int columnIndex)
+    public Transform[,] FindAllMovableTilesInColumn(int columnIndex)
     {
         Debug.Log("colindex in findmovable " + columnIndex);
 
@@ -210,77 +266,6 @@ public class MovableTileGrid : MonoBehaviour
 
         return tilesInColumn;
     }
-
-    public bool HasAdjacentMovableTilesInRow(int columnIndex, int rowIndex)
-    {
-        int adjacentMovableTilesCount = 0;
-
-        // Define the raycast direction as right.
-        Vector2 raycastDirection = Vector2.right;
-
-        // Perform a raycast from the current tile's position in the specified direction.
-        RaycastHit2D hit = Physics2D.Raycast(movableTiles[columnIndex, rowIndex].position, raycastDirection);
-
-        // Check for adjacent movable tiles to the right.
-        while (hit.collider != null && hit.collider.CompareTag("MovableTile"))
-        {
-            adjacentMovableTilesCount++;
-            // Cast another ray to the right from the last hit position.
-            hit = Physics2D.Raycast(hit.transform.position, raycastDirection);
-        }
-
-        // Reset the raycast direction as left.
-        raycastDirection = Vector2.left;
-
-        // Perform a raycast from the current tile's position in the specified direction.
-        hit = Physics2D.Raycast(movableTiles[columnIndex, rowIndex].position, raycastDirection);
-
-        // Check for adjacent movable tiles to the left.
-        while (hit.collider != null && hit.collider.CompareTag("MovableTile"))
-        {
-            adjacentMovableTilesCount++;
-            // Cast another ray to the left from the last hit position.
-            hit = Physics2D.Raycast(hit.transform.position, raycastDirection);
-        }
-
-        return adjacentMovableTilesCount >= 2;
-    }
-
-    public bool HasAdjacentMovableTilesInColumn(int columnIndex, int rowIndex)
-    {
-        int adjacentMovableTilesCount = 0;
-
-        // Define the raycast direction as up.
-        Vector2 raycastDirection = Vector2.up;
-
-        // Perform a raycast from the current tile's position in the specified direction.
-        RaycastHit2D hit = Physics2D.Raycast(movableTiles[columnIndex, rowIndex].position, raycastDirection);
-
-        // Check for adjacent movable tiles above.
-        while (hit.collider != null && hit.collider.CompareTag("MovableTile"))
-        {
-            adjacentMovableTilesCount++;
-            // Cast another ray upwards from the last hit position.
-            hit = Physics2D.Raycast(hit.transform.position, raycastDirection);
-        }
-
-        // Reset the raycast direction as down.
-        raycastDirection = Vector2.down;
-
-        // Perform a raycast from the current tile's position in the specified direction.
-        hit = Physics2D.Raycast(movableTiles[columnIndex, rowIndex].position, raycastDirection);
-
-        // Check for adjacent movable tiles below.
-        while (hit.collider != null && hit.collider.CompareTag("MovableTile"))
-        {
-            adjacentMovableTilesCount++;
-            // Cast another ray downwards from the last hit position.
-            hit = Physics2D.Raycast(hit.transform.position, raycastDirection);
-        }
-
-        return adjacentMovableTilesCount >= 2;
-    }
-
 
 
 
