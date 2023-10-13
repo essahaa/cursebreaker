@@ -24,9 +24,8 @@ public class MovableTileGrid : MonoBehaviour
 
     }
 
-    void GenerateMovableTiles()
+    public void GenerateMovableTiles()
     {
-
         // Calculate the starting position for the entire grid
         float startX = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeX - 1) / 2;
         float startY = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeY - 1) / 2;
@@ -51,6 +50,23 @@ public class MovableTileGrid : MonoBehaviour
 
     }
 
+    public void DestroyExistingMovableTiles()
+    {
+        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        {
+            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null)
+                {
+                    Destroy(tile.gameObject); // Destroy the existing tile game object.
+                    movableTiles[x, y] = null; // Set the array element to null.
+                }
+            }
+        }
+
+    }
+
     public Transform[,] GetMovableTiles()
     {
         return movableTiles;
@@ -66,7 +82,6 @@ public class MovableTileGrid : MonoBehaviour
                 Transform cTile = currentMovableTiles[i, j];
                 if (cTile != null && cTile.CompareTag("MovableTile"))
                 {
-                    Debug.Log("currentmovables array, tile found: " + i + " , " + j);
                     movableTiles[i, j] = null;
                 }
             }

@@ -187,10 +187,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundGrid: {fileID: 0}
   movableTileGrid: {fileID: 0}
-  currentMoveType: horizontal
-  swipeThreshold: 50
-  stepSize: 1
-  tileSpacing: 0.4
 --- !u!114 &6908503980427154240
 MonoBehaviour:
   m_ObjectHideFlags: 0
