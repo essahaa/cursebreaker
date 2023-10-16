@@ -149,7 +149,6 @@ public class MovableTileDrag : MonoBehaviour
                 isRowMoving = true;
 
                 // Horizontal movement (row)
-                MoveRow(rowIndex, offset.x, offset.y);
 
                 // Calculate the target position for each tile in the row.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
@@ -172,14 +171,14 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
+                
             }
             else
             {
                 isColumnMoving = true;
 
                 // Vertical movement (column)
-                MoveColumn(columnIndex, offset.x, offset.y);
-
+                
                 // Calculate the target position for each tile in the column.
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
                 {
@@ -201,6 +200,7 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
+                
             }
         }
     }
@@ -219,6 +219,7 @@ public class MovableTileDrag : MonoBehaviour
         {
             //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
+
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
 
@@ -268,7 +269,6 @@ public class MovableTileDrag : MonoBehaviour
                             if (otherTilePosition == targetSnappedPosition)
                             {
                                 // There is already a tile in the target snapped position.
-                                // You can handle this situation, e.g., prevent snapping or perform other actions.
 
                                 //move all the tiles back to the position they were
                                 tileInSamePosition = true;
@@ -302,7 +302,6 @@ public class MovableTileDrag : MonoBehaviour
                             Debug.Log("sama paikka missä oli, column: " + tile.position.x + " , " + movableTileComponent.Column + " rowi " + tile.position.y + " , " + movableTileComponent.Row);
 
                         }
-
 
                         // Ensure that row and column are within valid bounds
                         if (column >= 0 && column < backgroundGrid.gridSizeX && row >= 0 && row < backgroundGrid.gridSizeY)
@@ -371,85 +370,6 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
             
-        }
-    }
-
-    private void MoveRow(int rowIndex, float xOffset, float yOffset)
-    {
-        if (isRowMoving && xOffset != 0f && Mathf.Abs(xOffset) > Mathf.Abs(yOffset))
-        {
-            if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(0) && movableTiles.GetLength(0) > 0 && movableTiles.GetLength(1) > 0)
-            {
-                // Calculate the target X position for each tile in the row incrementally.
-                for (int column = 0; column < movableTiles.GetLength(1); column++)
-                {
-                    Transform tile = currentMovableTiles[column, rowIndex];
-
-                    // Check if the tile is not null (it may be empty in some positions).
-                    if (tile != null)
-                    {
-                        // Get the TileCollisionManager component of the tile.
-                        TileCollisionManager tileCollisionManager = tile.GetComponent<TileCollisionManager>();
-
-                        // Check if the tile is at the boundary.
-                        if (!tileCollisionManager.IsAtBoundary())
-                        {
-                            Vector3 targetPosition = initialTilePositions[column, rowIndex] + new Vector3(xOffset, 0f, 0f);
-
-                            // Ensure the tile stays within the background grid boundaries.
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
-
-                            // Move the tile to the target position.
-                            tile.position = targetPosition;
-                        }
-                        /*
-                        else
-                        {
-                            Vector3 targetPosition = initialTilePositions[column, rowIndex];
-
-                            // Ensure the tile stays within the background grid boundaries.
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
-
-                            // Move the tile to the target position.
-                            tile.position = targetPosition;
-                        }
-                        */
-                    }
-                }
-            }
-        }
-    }
-
-    private void MoveColumn(int columnIndex, float xOffset, float yOffset)
-    {
-        if (!isRowMoving || (isColumnMoving && yOffset != 0f && Mathf.Abs(yOffset) > Mathf.Abs(xOffset)))
-        {
-            if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(1) && movableTiles.GetLength(0) > 0 && movableTiles.GetLength(1) > 0)
-            {
-                for (int row = 0; row < movableTiles.GetLength(0); row++)
-                {
-                    Transform tile = movableTiles[columnIndex, row];
-
-                    if (tile != null) // Check if the tile is not null (it may be empty in some positions).
-                    {
-                        // Get the TileCollisionManager component of the tile.
-                        TileCollisionManager tileCollisionManager = tile.GetComponent<TileCollisionManager>();
-
-                        // Check if the tile is at the boundary.
-                        if (!tileCollisionManager.IsAtBoundary())
-                        {
-                            Vector3 targetPosition = initialTilePositions[columnIndex, row] + new Vector3(0f, yOffset, 0f);
-
-                            // Ensure the tile stays within the background grid boundaries.
-                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
-
-                            // Move the tile to the target position.
-                            tile.position = targetPosition;
-
-                        }
-                    }
-                }
-            }
         }
     }
 }
