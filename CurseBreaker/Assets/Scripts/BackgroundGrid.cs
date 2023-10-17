@@ -20,10 +20,10 @@ public class BackgroundGrid : MonoBehaviour
 
     void Start()
     {
-        GenerateBackgroundGrid();
+        GenerateBackgroundGrid(gridSizeX, gridSizeY);
     }
 
-    void GenerateBackgroundGrid()
+    public void GenerateBackgroundGrid(int gridSizeX, int gridSizeY)
     {
         backgroundGrid = new Transform[gridSizeX, gridSizeY];
 
