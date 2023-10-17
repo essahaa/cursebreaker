@@ -59,11 +59,19 @@ public class MovableTileGrid : MonoBehaviour
                 Transform tile = movableTiles[x, y];
                 if (tile != null)
                 {
-                    Destroy(tile.gameObject); // Destroy the existing tile game object.
                     movableTiles[x, y] = null; // Set the array element to null.
                 }
             }
         }
+
+        GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
+        // Loop through and destroy each GameObject
+        foreach (GameObject obj in objectsToDestroy)
+        {
+            Destroy(obj);
+        }
+
+        this.GenerateMovableTiles();
 
     }
 
