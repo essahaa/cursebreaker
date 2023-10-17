@@ -5,11 +5,20 @@ using UnityEngine;
 public class MovableTile : MonoBehaviour
 {
     public static MovableTile Instance;
-    // Add Row and Column properties
+
+    public int Level { get; set; }
+
+    public int GridSizeX { get; set; }
+    public int GridSizeY { get; set; }
     public int Row { get; set; }
     public int Column { get; set; }
 
-    
+    public float X { get; set; }
+    public float Y { get; set; }
 
-   
+    public string TileType { get; set; }
+
+
+
+
 }
