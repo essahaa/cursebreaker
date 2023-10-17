@@ -140,6 +140,7 @@ public class MovableTileDrag : MonoBehaviour
     {
         if (isDragging && !allElementsNull)
         {
+            FindObjectOfType<AudioManager>().Play("liik");
             // Calculate the offset based on the initial mouse and tile positions.
             Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 offset = mouseCurrentPos - initialMousePosition;
