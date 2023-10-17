@@ -21,7 +21,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (string line in csvLines)
         {
-            string[] values = line.Split(','); // Split each line into values.
+            string[] values = line.Split(';'); // Split each line into values.
 
             // Check if the current line corresponds to the target level.
             if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == targetLevel)
