@@ -247,6 +247,7 @@ public class MovableTileDrag : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
+        bool isSnappedToNewPlace = false;
 
         // Implement snapping logic.
         if (!allElementsNull)
@@ -316,8 +317,8 @@ public class MovableTileDrag : MonoBehaviour
                             Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
                         }
 
-                        //Update movableTiles array with new snapped positions
-                        movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                        isSnappedToNewPlace = true;
+                        
 
                     }
                     else
@@ -329,8 +330,16 @@ public class MovableTileDrag : MonoBehaviour
 
                         Debug.Log("movetype still same: " + currentMoveType);
 
+                        isSnappedToNewPlace = false;
+
                     }                  
                 }
+            }
+
+            if(isSnappedToNewPlace)
+            {
+                //Update movableTiles array with new snapped positions
+                movableTiles = movableTileGrid.UpdateMovableTilesArray();
             }
 
             //empty current movable tiles array
