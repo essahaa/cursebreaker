@@ -17,6 +17,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private bool isDragging = false;
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
+    private bool tileInSamePosition = false;
 
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles; // Declare it at the class level.
@@ -159,9 +160,34 @@ public class MovableTileDrag : MonoBehaviour
                             // Ensure the tile stays within the game board's boundaries.
                             targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX); 
 
-                            // Move the tile to the target position.
-                            tile.position = targetPosition;
+
+                            // Iterate through existing tiles to check for collisions.
+                            foreach (Transform otherTile in currentMovableTiles)
+                            {
+                                if (otherTile != null && otherTile != tile) // Check if the tile is not null and not the current tile.
+                                {
+                                    Vector3 otherTilePosition = otherTile.position;
+
+                                    // Check if the other tile's position matches the target snapped position.
+                                    if (otherTilePosition == targetPosition)
+                                    {
+                                        // There is already a tile in the target snapped position.
+                                        //move all the tiles back to the position they were
+                                        tileInSamePosition = true;
+                                        Debug.Log("There is a tile at the target snapped position.");
+                                    }
+                                    else
+                                    {
+                                        //no other tile in target snapped position
+                                        Debug.Log("No other tile at the target snapped position.");
+                                        // Move the tile to the target position.
+                                        tile.position = targetPosition;
+                                    }
+                                }
+                            }
                         }
+
+                        
                     }
                 }
                 
@@ -186,8 +212,30 @@ public class MovableTileDrag : MonoBehaviour
                             // Ensure the tile stays within the game board's boundaries.
                             targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
 
-                            // Move the tile to the target position.
-                            tile.position = targetPosition;
+                            // Iterate through existing tiles to check for collisions.
+                            foreach (Transform otherTile in currentMovableTiles)
+                            {
+                                if (otherTile != null && otherTile != tile) // Check if the tile is not null and not the current tile.
+                                {
+                                    Vector3 otherTilePosition = otherTile.position;
+
+                                    // Check if the other tile's position matches the target snapped position.
+                                    if (otherTilePosition == targetPosition)
+                                    {
+                                        // There is already a tile in the target snapped position.
+                                        //move all the tiles back to the position they were
+                                        tileInSamePosition = true;
+                                        Debug.Log("There is a tile at the target snapped position.");
+                                    }
+                                    else
+                                    {
+                                        //no other tile in target snapped position
+                                        Debug.Log("No other tile at the target snapped position.");
+                                        // Move the tile to the target position.
+                                        tile.position = targetPosition;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -199,9 +247,6 @@ public class MovableTileDrag : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
-
-        bool samePlace = false;
-        bool tileInSamePosition = false;
 
         // Implement snapping logic.
         if (!allElementsNull)
@@ -246,29 +291,6 @@ public class MovableTileDrag : MonoBehaviour
                     int column;
                     int row;
 
-                    // Iterate through existing tiles to check for collisions.
-                    foreach (Transform otherTile in currentMovableTiles)
-                    {
-                        if (otherTile != null && otherTile != tile) // Check if the tile is not null and not the current tile.
-                        {
-                            Vector3 otherTilePosition = otherTile.position;
-
-                            // Check if the other tile's position matches the target snapped position.
-                            if (otherTilePosition == targetSnappedPosition)
-                            {
-                                // There is already a tile in the target snapped position.
-                                //move all the tiles back to the position they were
-                                tileInSamePosition = true;
-                                Debug.Log("There is a tile at the target snapped position.");
-                            }
-                            else
-                            {
-                                //no other tile in target snapped position
-                                Debug.Log("No other tile at the target snapped position.");
-                            }
-                        }
-                    }
-
                     // Get the MovableTile component of the tile.
                     MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
 
@@ -281,52 +303,35 @@ public class MovableTileDrag : MonoBehaviour
                         // Set the tile's position to the snapped position.
                         tile.position = targetSnappedPosition;
 
-                        if (column == movableTileComponent.Column && row == movableTileComponent.Row)
-                        {
-                            samePlace = true;
-                            Debug.Log("sama paikka missä oli, column: " + tile.position.x + " , " + movableTileComponent.Column + " rowi " + tile.position.y + " , " + movableTileComponent.Row);
-
-                        }
+                        // Toggle between "horizontal" and "vertical" move types.
+                        currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
+                        Debug.Log("movetype change: " + currentMoveType);
 
                         // Ensure that row and column are within valid bounds
                         if (column >= 0 && column < backgroundGrid.gridSizeX && row >= 0 && row < backgroundGrid.gridSizeY)
                         {
                             movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
-                            //movableTiles = movableTileGrid.UpdateMovableTilesArray();
 
                             Debug.Log("Snapped to row: " + row + ", column: " + column + " tile position " + tile.position);
                             Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
                         }
+
+                        //Update movableTiles array with new snapped positions
+                        movableTiles = movableTileGrid.UpdateMovableTilesArray();
 
                     }
                     else
                     {
                         tile.position = initialTilePositions[movableTileComponent.Column, movableTileComponent.Row];
                         movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, movableTileComponent.transform);
-                        movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                        
                         Debug.Log("tile position in snap " + tile.position + "movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
 
-                    }
+                        Debug.Log("movetype still same: " + currentMoveType);
 
-                    //movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                    }                  
                 }
-
             }
-
-            if (samePlace)
-            {
-                currentMoveType = (currentMoveType == "horizontal") ? "horizontal" : "vertical";
-                Debug.Log("movetype still same: " + currentMoveType);
-            }
-            else
-            {
-                // Toggle between "horizontal" and "vertical" move types.
-                currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-                Debug.Log("movetype change: " + currentMoveType);
-            }
-
-            //Update movableTiles array with new snapped positions
-            movableTiles = movableTileGrid.UpdateMovableTilesArray();
 
             //empty current movable tiles array
             for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
@@ -338,26 +343,8 @@ public class MovableTileDrag : MonoBehaviour
             }
 
             allElementsNull = false;
+            tileInSamePosition = false;
             
-            /*
-            // Log movableTiles array
-            for (int i = 0; i < movableTiles.GetLength(0); i++)
-            {
-                for (int j = 0; j < movableTiles.GetLength(1); j++)
-                {
-                    Transform element = movableTiles[i, j];
-
-                    if (element != null)
-                    {
-                        Debug.Log($"On mouse up ({i}, {j}): {element.name}");
-                    }
-                    else
-                    {
-                        Debug.Log($"On mouse up ({i}, {j}): null");
-                    }
-                }
-            }
-            */ 
         }
     }
 }
