@@ -71,7 +71,7 @@ public class MovableTileGrid : MonoBehaviour
             Destroy(obj);
         }
 
-        this.GenerateMovableTiles();
+        GenerateMovableTiles();
 
     }
 
@@ -115,7 +115,6 @@ public class MovableTileGrid : MonoBehaviour
 
     }
 
-
     public Transform[,] UpdateMovableTilesArray()
     {
 
@@ -129,37 +128,72 @@ public class MovableTileGrid : MonoBehaviour
                 if (tile != null && tile.CompareTag("MovableTile"))
                 {
                     // Update the movableTiles array.
-                    movableTiles[col, row] = tile;
-                    //Debug.Log("updating array, tile found: " + col + " , " + row);
+                    movableTiles[col, row] = tile.transform;
                 }
                 else
                 {
                     movableTiles[col, row] = null;
                 }
+
+                if (tile != null && tile.CompareTag("MovableTile") && CheckNeighbours(col, row) != true)
+                {
+                    //no neighbors found, destroy tile
+                    Debug.Log("destroy tile " + col + " , " + row);
+                    GameObject destroyTile = tile.gameObject; // Get the GameObject.
+                    Destroy(destroyTile);
+                }
+               
             }
         }
 
         return movableTiles;
     }
 
-
-    public Transform GetTileAtPosition(int column, int row)
+    private bool CheckNeighbours(int col, int row)
     {
+        bool hasMovableTile = false;
 
-        // Ensure row and column are within valid bounds.
-        if (row >= 0 && row < backgroundGrid.gridSizeY && column >= 0 && column < backgroundGrid.gridSizeX)
+        // Check the right neighbor
+        if (col < backgroundGrid.gridSizeX - 1)
         {
-            Transform tile = movableTiles[column, row];
-
-            // Check if the tile is not null and has the "MovableTile" tag.
-            if (tile != null && tile.CompareTag("MovableTile"))
+            Transform rightNeighbor = movableTiles[col + 1, row];
+            if (rightNeighbor != null && rightNeighbor.CompareTag("MovableTile"))
             {
-                return tile;
+                hasMovableTile = true;
             }
         }
 
-        // Return null if the tile doesn't meet the criteria.
-        return null;
+        // Check the left neighbor
+        if (col > 0)
+        {
+            Transform leftNeighbor = movableTiles[col - 1, row];
+            if (leftNeighbor != null && leftNeighbor.CompareTag("MovableTile"))
+            {
+                hasMovableTile = true;
+            }
+        }
+
+        // Check the upper neighbor
+        if (row < backgroundGrid.gridSizeY - 1)
+        {
+            Transform upperNeighbor = movableTiles[col, row + 1];
+            if (upperNeighbor != null && upperNeighbor.CompareTag("MovableTile"))
+            {
+                hasMovableTile = true;
+            }
+        }
+
+        // Check the lower neighbor
+        if (row > 0)
+        {
+            Transform lowerNeighbor = movableTiles[col, row - 1];
+            if (lowerNeighbor != null && lowerNeighbor.CompareTag("MovableTile"))
+            {
+                hasMovableTile = true;
+            }
+        }
+
+        return hasMovableTile;
     }
 
     public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)

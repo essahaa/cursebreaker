@@ -16,8 +16,6 @@ public class MovableTileDrag : MonoBehaviour
     private string currentMoveType = "horizontal"; // Initialize with a horizontal move
 
     private bool isDragging = false;
-    private bool isRowMoving = false;
-    private bool isColumnMoving = false;
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
 
     private Vector3[,] initialTilePositions;
@@ -58,9 +56,6 @@ public class MovableTileDrag : MonoBehaviour
                 if (currentMoveType == "horizontal")
                 {
                     currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInRow(rowIndex);
-
-
-
                 }
                 else if (currentMoveType == "vertical")
                 {
@@ -79,7 +74,6 @@ public class MovableTileDrag : MonoBehaviour
                             break;  // No need to continue checking once a non-null element is found.
                         }
                     }
-
                 }
 
                 //Log currentmovables array
@@ -147,8 +141,6 @@ public class MovableTileDrag : MonoBehaviour
 
             if (currentMoveType == "horizontal")
             {
-                isRowMoving = true;
-
                 // Horizontal movement (row)
 
                 // Calculate the target position for each tile in the row.
@@ -176,8 +168,6 @@ public class MovableTileDrag : MonoBehaviour
             }
             else
             {
-                isColumnMoving = true;
-
                 // Vertical movement (column)
                 
                 // Calculate the target position for each tile in the column.
@@ -209,8 +199,6 @@ public class MovableTileDrag : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
-        isRowMoving = false;
-        isColumnMoving = false;
 
         bool samePlace = false;
         bool tileInSamePosition = false;
@@ -222,7 +210,6 @@ public class MovableTileDrag : MonoBehaviour
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
 
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
-
 
             // Log cmovableTiles array
             for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
@@ -270,7 +257,6 @@ public class MovableTileDrag : MonoBehaviour
                             if (otherTilePosition == targetSnappedPosition)
                             {
                                 // There is already a tile in the target snapped position.
-
                                 //move all the tiles back to the position they were
                                 tileInSamePosition = true;
                                 Debug.Log("There is a tile at the target snapped position.");
@@ -279,8 +265,6 @@ public class MovableTileDrag : MonoBehaviour
                             {
                                 //no other tile in target snapped position
                                 Debug.Log("No other tile at the target snapped position.");
-                                
-
                             }
                         }
                     }
@@ -308,6 +292,7 @@ public class MovableTileDrag : MonoBehaviour
                         if (column >= 0 && column < backgroundGrid.gridSizeX && row >= 0 && row < backgroundGrid.gridSizeY)
                         {
                             movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
+                            //movableTiles = movableTileGrid.UpdateMovableTilesArray();
 
                             Debug.Log("Snapped to row: " + row + ", column: " + column + " tile position " + tile.position);
                             Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
@@ -318,11 +303,12 @@ public class MovableTileDrag : MonoBehaviour
                     {
                         tile.position = initialTilePositions[movableTileComponent.Column, movableTileComponent.Row];
                         movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, movableTileComponent.transform);
-                        Debug.Log("tile position in snap " + tile.position);
+                        movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                        Debug.Log("tile position in snap " + tile.position + "movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
 
                     }
 
-
+                    //movableTiles = movableTileGrid.UpdateMovableTilesArray();
                 }
 
             }
@@ -353,6 +339,7 @@ public class MovableTileDrag : MonoBehaviour
 
             allElementsNull = false;
             
+            /*
             // Log movableTiles array
             for (int i = 0; i < movableTiles.GetLength(0); i++)
             {
@@ -370,7 +357,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
             }
-            
+            */ 
         }
     }
 }
