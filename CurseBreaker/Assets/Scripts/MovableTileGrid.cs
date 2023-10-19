@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
+    public GameObject evilTilePrefab;
     public BackgroundGrid backgroundGrid;
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
@@ -45,34 +48,54 @@ public class MovableTileGrid : MonoBehaviour
                 // Assign row and column indices to the tile
                 tile.GetComponent<MovableTile>().Row = y;
                 tile.GetComponent<MovableTile>().Column = x;
+                tile.GetComponent<MovableTile>().TileType = "Normal";
             }
         }
+
+        Vector2 position2 = new Vector2(
+                    startX + 1 * backgroundGrid.backgroundTileSize,
+                    startY + 1 * backgroundGrid.backgroundTileSize
+                );
+        // Instantiate the new tile prefab at the specified position.
+        GameObject newTile = Instantiate(evilTilePrefab, position2, Quaternion.identity);
+
+        // Destroy the old movableTilePrefab you want to replace.
+        Destroy(movableTiles[1, 1].gameObject);
+
+        // Update the movableTiles array to reference the new tile's transform.
+        movableTiles[1, 1] = newTile.transform;
+
+        // Assign the row and column indices to the new tile.
+        newTile.GetComponent<MovableTile>().Row = 1;
+        newTile.GetComponent<MovableTile>().Column = 1;
+        newTile.GetComponent<MovableTile>().TileType = "Evil";
+
 
     }
 
     public void DestroyExistingMovableTiles()
     {
+        // Clear the references in the movableTiles array.
         for (int x = 0; x < backgroundGrid.gridSizeX; x++)
         {
             for (int y = 0; y < backgroundGrid.gridSizeY; y++)
             {
-                Transform tile = movableTiles[x, y];
-                if (tile != null)
-                {
-                    movableTiles[x, y] = null; // Set the array element to null.
-                }
+                movableTiles[x, y] = null;
             }
         }
 
+        // Find and destroy game objects with the "MovableTile" and "EvilTile" tags.
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
+        objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
+
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
         {
             Destroy(obj);
         }
 
+        // Generate new movable tiles (and evil tiles if needed).
         GenerateMovableTiles();
-
     }
 
     public Transform[,] GetMovableTiles()
@@ -88,7 +111,7 @@ public class MovableTileGrid : MonoBehaviour
             for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
             {
                 Transform cTile = currentMovableTiles[i, j];
-                if (cTile != null && cTile.CompareTag("MovableTile"))
+                if (cTile != null && (cTile.CompareTag("MovableTile") || cTile.CompareTag("EvilTile")))
                 {
                     movableTiles[i, j] = null;
                 }
@@ -125,7 +148,7 @@ public class MovableTileGrid : MonoBehaviour
                 // Get the tile at the current position.
                 Transform tile = movableTiles[col, row];
 
-                if (tile != null && tile.CompareTag("MovableTile"))
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
                 {
                     // Update the movableTiles array.
                     movableTiles[col, row] = tile.transform;
@@ -135,7 +158,7 @@ public class MovableTileGrid : MonoBehaviour
                     movableTiles[col, row] = null;
                 }
 
-                if (tile != null && tile.CompareTag("MovableTile") && CheckNeighbours(col, row) != true)
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && CheckNeighbours(col, row) != true)
                 {
                     //no neighbors found, destroy tile
                     Debug.Log("destroy tile " + col + " , " + row);
@@ -157,7 +180,7 @@ public class MovableTileGrid : MonoBehaviour
         if (col < backgroundGrid.gridSizeX - 1)
         {
             Transform rightNeighbor = movableTiles[col + 1, row];
-            if (rightNeighbor != null && rightNeighbor.CompareTag("MovableTile"))
+            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
             {
                 hasMovableTile = true;
             }
@@ -167,7 +190,7 @@ public class MovableTileGrid : MonoBehaviour
         if (col > 0)
         {
             Transform leftNeighbor = movableTiles[col - 1, row];
-            if (leftNeighbor != null && leftNeighbor.CompareTag("MovableTile"))
+            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile")))
             {
                 hasMovableTile = true;
             }
@@ -177,7 +200,7 @@ public class MovableTileGrid : MonoBehaviour
         if (row < backgroundGrid.gridSizeY - 1)
         {
             Transform upperNeighbor = movableTiles[col, row + 1];
-            if (upperNeighbor != null && upperNeighbor.CompareTag("MovableTile"))
+            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
             {
                 hasMovableTile = true;
             }
@@ -187,7 +210,7 @@ public class MovableTileGrid : MonoBehaviour
         if (row > 0)
         {
             Transform lowerNeighbor = movableTiles[col, row - 1];
-            if (lowerNeighbor != null && lowerNeighbor.CompareTag("MovableTile"))
+            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile")))
             {
                 hasMovableTile = true;
             }
