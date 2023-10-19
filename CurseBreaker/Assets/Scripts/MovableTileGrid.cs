@@ -391,6 +391,56 @@ public class MovableTileGrid : MonoBehaviour
         return tilesInColumn;
     }
 
+    public bool CheckUniformGroup()
+    {
+        // Create a boolean grid to mark visited tiles.
+        bool[,] visited = new bool[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY];
+
+        // Find the first unvisited MovableTile.
+        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        {
+            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
+                {
+                    bool isConnected = CheckConnectedGroup(x, y, visited);
+                    if (!isConnected)
+                    {
+                        Debug.Log("Game Over - The group is not uniform.");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // All movable tiles form a uniform group.
+        return true;
+    }
+
+    private bool CheckConnectedGroup(int x, int y, bool[,] visited)
+    {
+        // If the tile is out of bounds or already visited, return true.
+        if (x < 0 || x >= backgroundGrid.gridSizeX || y < 0 || y >= backgroundGrid.gridSizeY || visited[x, y])
+            return true;
+
+        // Mark the tile as visited.
+        visited[x, y] = true;
+
+        // Check neighbors (up, down, left, right).
+        bool isConnected = false;
+        Transform tile = movableTiles[x, y];
+        if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+        {
+            isConnected = true;
+            isConnected &= CheckConnectedGroup(x - 1, y, visited);
+            isConnected &= CheckConnectedGroup(x + 1, y, visited);
+            isConnected &= CheckConnectedGroup(x, y - 1, visited);
+            isConnected &= CheckConnectedGroup(x, y + 1, visited);
+        }
+
+        return isConnected;
+    }
 
 
 }

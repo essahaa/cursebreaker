@@ -210,6 +210,7 @@ public class MovableTileDrag : MonoBehaviour
     {
         isDragging = false;
         bool isSnappedToNewPlace = false;
+        movableTileGrid.CheckUniformGroup();
 
         if (!allElementsNull)
         {
