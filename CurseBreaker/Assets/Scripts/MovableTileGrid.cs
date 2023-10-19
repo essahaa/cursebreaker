@@ -59,6 +59,7 @@ public class MovableTileGrid : MonoBehaviour
                 );
         // Instantiate the new tile prefab at the specified position.
         GameObject newTile = Instantiate(evilTilePrefab, position2, Quaternion.identity);
+        newTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
 
         // Destroy the old movableTilePrefab you want to replace.
         Destroy(movableTiles[1, 1].gameObject);
