@@ -164,8 +164,24 @@ public class MovableTileGrid : MonoBehaviour
                 {
                     //no neighbors found, destroy tile
                     Debug.Log("destroy tile " + col + " , " + row);
-                    GameObject destroyTile = tile.gameObject; // Get the GameObject.
-                    Destroy(destroyTile);
+
+                    movableTiles[col, row] = null;
+
+                    GameObject tileToDestroy = tile.gameObject; // Get the GameObject.
+                    Destroy(tileToDestroy);
+
+                    if(tile.CompareTag("MovableTile"))
+                    {
+                        Debug.Log("level failed");
+                    }
+                    else
+                    {
+                        if(CountEvilTiles() == 0)
+                        {
+                            Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                        }
+                        
+                    }
                 }
                
             }
@@ -173,6 +189,32 @@ public class MovableTileGrid : MonoBehaviour
 
         return movableTiles;
     }
+
+    private int CountEvilTiles()
+    {
+        int count = 0;
+
+        for (int row = 0; row < backgroundGrid.gridSizeY; row++)
+        {
+            for (int col = 0; col < backgroundGrid.gridSizeX; col++)
+            {
+                Transform movableTile = movableTiles[col, row];
+
+                if (movableTile != null)
+                {
+                    MovableTile movableTileComponent = movableTile.GetComponent<MovableTile>();
+
+                    if (movableTileComponent != null && movableTileComponent.TileType == "Evil")
+                    {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
 
     private bool CheckNeighbours(int col, int row)
     {
