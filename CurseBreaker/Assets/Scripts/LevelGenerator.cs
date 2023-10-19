@@ -29,14 +29,15 @@ public class LevelGenerator : MonoBehaviour
                 // Parse data from the CSV line.
                 int column = int.Parse(values[1]);
                 int row = int.Parse(values[2]);
-                float x = float.Parse(values[3]);
-                float y = float.Parse(values[4]);
+                float x = float.Parse(values[3]) / 10;
+                float y = float.Parse(values[4]) / 10;
                 string tileType = values[5];
                 int gridSizeX = int.Parse(values[6]);
                 int gridSizeY = int.Parse(values[7]);
 
                 GameObject tilePrefab = GetTilePrefab(tileType);
 
+                Debug.Log("x " + x + " y " + y);
                 // Instantiate movable tiles based on the data.
                 Vector3 position = new Vector3(x, y, 0f);
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
