@@ -43,6 +43,7 @@ public class MovableTileGrid : MonoBehaviour
                 );
 
                 GameObject tile = Instantiate(movableTilePrefab, position, Quaternion.identity);
+                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
                 movableTiles[x, y] = tile.transform;
 
                 // Assign row and column indices to the tile
