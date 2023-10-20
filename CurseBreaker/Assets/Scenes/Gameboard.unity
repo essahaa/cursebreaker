@@ -721,6 +721,7 @@ MonoBehaviour:
   movableTilePrefab: {fileID: 1227834004184806325, guid: 28bb514d19801a046a88fd075b01e46a, type: 3}
   evilTilePrefab: {fileID: 8340316894529563072, guid: 890320a7e537bbc47a70ee8a0c1b55e8, type: 3}
   backgroundGrid: {fileID: 714775789}
+  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   movableTileSize: 1
   startColumn: 0
   startRow: 0
@@ -1004,7 +1005,7 @@ Transform:
   m_GameObject: {fileID: 1889752378}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 2.88, y: 2.88, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
