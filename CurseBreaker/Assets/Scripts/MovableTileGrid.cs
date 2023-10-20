@@ -11,66 +11,94 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject evilTilePrefab;
     public BackgroundGrid backgroundGrid;
 
+    public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
+
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
 
     public int startColumn = 0; // Set the starting column index.
     public int startRow = 0;    // Set the starting row index.
 
+    private int targetLevel = 2; // The level you want to generate.
+
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
     void Start()
     {
-        backgroundGrid = GameObject.Find("BackgroundGridManager").GetComponent<BackgroundGrid>();
+        backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+
         movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
 
-        GenerateMovableTiles();
+        backgroundGrid.GenerateBackgroundGrid(backgroundGrid.gridSizeX, backgroundGrid.gridSizeY);
+
+        ReadLevelDataFromCSV(csvFile);
 
     }
 
-    public void GenerateMovableTiles()
+    public void ReadLevelDataFromCSV(TextAsset csvText)
     {
-        // Calculate the starting position for the entire grid
-        float startX = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeX - 1) / 2;
-        float startY = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeY - 1) / 2;
+        string[] csvLines = csvText.text.Split('\n'); // Split the CSV file into lines.
 
-        for (int x = 1; x <= 3; x++)
+        foreach (string line in csvLines)
         {
-            for (int y = 1; y <= 3; y++)
+            string[] values = line.Split(';'); // Split each line into values.
+
+            // Check if the current line corresponds to the target level.
+            if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == targetLevel)
             {
-                Vector2 position = new Vector2(
-                    startX + x * backgroundGrid.backgroundTileSize,
-                    startY + y * backgroundGrid.backgroundTileSize
-                );
+                Debug.Log("level " + values[0] + "targetlevel " + targetLevel);
+                // Parse data from the CSV line.
+                int column = int.Parse(values[1]);
+                int row = int.Parse(values[2]);
+                string tileType = values[3];
+                int gridSizeX = int.Parse(values[4]);
+                int gridSizeY = int.Parse(values[5]);
 
-                GameObject tile = Instantiate(movableTilePrefab, position, Quaternion.identity);
-                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
-                movableTiles[x, y] = tile.transform;
-
-                // Assign row and column indices to the tile
-                tile.GetComponent<MovableTile>().Row = y;
-                tile.GetComponent<MovableTile>().Column = x;
-                tile.GetComponent<MovableTile>().TileType = "Normal";
+                GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
             }
         }
+    }
 
-        Vector2 position2 = new Vector2(
-                    startX + 1 * backgroundGrid.backgroundTileSize,
-                    startY + 1 * backgroundGrid.backgroundTileSize
-                );
-        // Instantiate the new tile prefab at the specified position.
-        GameObject newTile = Instantiate(evilTilePrefab, position2, Quaternion.identity);
-        newTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
+    GameObject GetTilePrefab(string tileType)
+    {
+        // Choose the appropriate prefab based on the tileType.
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            // Add more cases for other tile types as needed.
+            default:
+                return movableTilePrefab; // Default to a fallback prefab.
+        }
+    }
 
-        // Destroy the old movableTilePrefab you want to replace.
-        Destroy(movableTiles[1, 1].gameObject);
+    void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
+    {
+        backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+        GameObject tilePrefab = GetTilePrefab(tileType);
 
-        // Update the movableTiles array to reference the new tile's transform.
-        movableTiles[1, 1] = newTile.transform;
 
-        // Assign the row and column indices to the new tile.
-        newTile.GetComponent<MovableTile>().Row = 1;
-        newTile.GetComponent<MovableTile>().Column = 1;
-        newTile.GetComponent<MovableTile>().TileType = "Evil";
+        if (column <= gridSizeX && row <= gridSizeY)
+        {
+            //Vector2 position = new Vector2(x, y);
+            Vector2 position = new Vector2(
+                        column * backgroundGrid.backgroundTileSize,
+                        row * backgroundGrid.backgroundTileSize
+                    );
+
+            GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+            tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+            movableTiles[column, row] = tile.transform;
+
+            MovableTile tileData = tile.GetComponent<MovableTile>();
+            tileData.Level = targetLevel;
+            tileData.Row = row;
+            tileData.Column = column;
+            tileData.TileType = tileType;
+            tileData.GridSizeX = gridSizeX;
+            tileData.GridSizeY = gridSizeY;
+        }
 
 
     }
@@ -97,7 +125,7 @@ public class MovableTileGrid : MonoBehaviour
         }
 
         // Generate new movable tiles (and evil tiles if needed).
-        GenerateMovableTiles();
+        ReadLevelDataFromCSV(csvFile);
     }
 
     public Transform[,] GetMovableTiles()

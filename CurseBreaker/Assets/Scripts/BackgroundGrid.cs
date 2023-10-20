@@ -44,10 +44,10 @@ public class BackgroundGrid : MonoBehaviour
             backgroundTileSize = gridWidth / gridSizeX;
 
             //set boundaries
-            float boundary = gridWidth / 2 - backgroundTileSize / 2;
-            minX = -boundary;
+            float boundary = gridWidth  - backgroundTileSize ;
+            minX = 0;
             maxX = boundary;
-            minY = -boundary;
+            minY = 0;
             maxY = boundary;
         }
     }
@@ -62,10 +62,7 @@ public class BackgroundGrid : MonoBehaviour
         float totalWidth = gridSizeX * tileWidth;
         float totalHeight = gridSizeY * tileHeight;
         
-        Vector2 startPosition = new Vector2(
-            -(totalWidth - tileWidth) / 2,
-            -(totalHeight - tileHeight) / 2
-        );
+        Vector2 startPosition = new Vector2(0,0);
 
         for (int x = 0; x < gridSizeX; x++)
         {
