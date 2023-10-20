@@ -210,7 +210,6 @@ public class MovableTileDrag : MonoBehaviour
     {
         isDragging = false;
         bool isSnappedToNewPlace = false;
-        movableTileGrid.CheckUniformGroup();
 
         if (!allElementsNull)
         {
@@ -279,6 +278,7 @@ public class MovableTileDrag : MonoBehaviour
                 // Toggle between "horizontal" and "vertical" move types.
                 currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                 Debug.Log("movetype change: " + currentMoveType);
+                movableTileGrid.IsMovableTilesGroupConnected();
             }
             else
             {
@@ -294,7 +294,7 @@ public class MovableTileDrag : MonoBehaviour
                     currentMovableTiles[i, j] = null;
                 }
             }
-
+            
             allElementsNull = false;
             tileInSamePosition = false;
             

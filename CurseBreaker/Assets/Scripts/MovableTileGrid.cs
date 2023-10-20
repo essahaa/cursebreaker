@@ -391,12 +391,33 @@ public class MovableTileGrid : MonoBehaviour
         return tilesInColumn;
     }
 
-    public bool CheckUniformGroup()
+    public bool IsMovableTilesGroupConnected()
     {
-        // Create a boolean grid to mark visited tiles.
+        // Create a 2D array to keep track of visited tiles.
         bool[,] visited = new bool[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY];
 
-        // Find the first unvisited MovableTile.
+        // Find the first MovableTile as the starting point for traversal.
+        Transform startTile = null;
+        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        {
+            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+                {
+                    startTile = tile;
+                    break;
+                }
+            }
+            if (startTile != null) break;
+        }
+
+        if (startTile == null) return true; // No MovableTiles are present, group is still "connected."
+
+        // Perform a depth-first search (DFS) to traverse and mark connected tiles.
+        bool result = DepthFirstSearch(startTile, visited);
+
+        // Check if there are any unvisited MovableTiles.
         for (int x = 0; x < backgroundGrid.gridSizeX; x++)
         {
             for (int y = 0; y < backgroundGrid.gridSizeY; y++)
@@ -404,43 +425,70 @@ public class MovableTileGrid : MonoBehaviour
                 Transform tile = movableTiles[x, y];
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
                 {
-                    bool isConnected = CheckConnectedGroup(x, y, visited);
-                    if (!isConnected)
-                    {
-                        Debug.Log("Game Over - The group is not uniform.");
-                        return false;
-                    }
+                    result = false; // There's an unvisited tile, group is not connected.
+                    break;
                 }
+            }
+            if (!result) break;
+        }
+
+        if (!result)
+        {
+            Debug.Log("Game Over: MovableTiles group is not connected.");
+        }
+
+        return result;
+    }
+
+    private bool DepthFirstSearch(Transform tile, bool[,] visited)
+    {
+        int x = tile.GetComponent<MovableTile>().Column;
+        int y = tile.GetComponent<MovableTile>().Row;
+
+        visited[x, y] = true; // Mark the tile as visited.
+
+        bool result = true; // Initialize the result as true.
+
+        // Check neighbors and perform DFS on connected MovableTiles.
+        if (x > 0 && !visited[x - 1, y])
+        {
+            Transform leftNeighbor = movableTiles[x - 1, y];
+            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(leftNeighbor, visited);
             }
         }
 
-        // All movable tiles form a uniform group.
-        return true;
-    }
-
-    private bool CheckConnectedGroup(int x, int y, bool[,] visited)
-    {
-        // If the tile is out of bounds or already visited, return true.
-        if (x < 0 || x >= backgroundGrid.gridSizeX || y < 0 || y >= backgroundGrid.gridSizeY || visited[x, y])
-            return true;
-
-        // Mark the tile as visited.
-        visited[x, y] = true;
-
-        // Check neighbors (up, down, left, right).
-        bool isConnected = false;
-        Transform tile = movableTiles[x, y];
-        if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+        if (x < backgroundGrid.gridSizeX - 1 && !visited[x + 1, y])
         {
-            isConnected = true;
-            isConnected &= CheckConnectedGroup(x - 1, y, visited);
-            isConnected &= CheckConnectedGroup(x + 1, y, visited);
-            isConnected &= CheckConnectedGroup(x, y - 1, visited);
-            isConnected &= CheckConnectedGroup(x, y + 1, visited);
+            Transform rightNeighbor = movableTiles[x + 1, y];
+            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(rightNeighbor, visited);
+            }
         }
 
-        return isConnected;
+        if (y > 0 && !visited[x, y - 1])
+        {
+            Transform lowerNeighbor = movableTiles[x, y - 1];
+            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(lowerNeighbor, visited);
+            }
+        }
+
+        if (y < backgroundGrid.gridSizeY - 1 && !visited[x, y + 1])
+        {
+            Transform upperNeighbor = movableTiles[x, y + 1];
+            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(upperNeighbor, visited);
+            }
+        }
+
+        return result;
     }
+
 
 
 }
