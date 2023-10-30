@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3785851323251891498}
   - component: {fileID: 7737467480376019598}
   - component: {fileID: -5170325026435386499}
+  - component: {fileID: -2618133070714712794}
   m_Layer: 0
   m_Name: EvilTile
   m_TagString: EvilTile
@@ -171,3 +172,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3e5c8dc43cb5674f87f49bf80834d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2618133070714712794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340316894529563072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a00e64d407cc8144ebea6291dee2cb6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundGrid: {fileID: 0}
+  movableTileGrid: {fileID: 0}

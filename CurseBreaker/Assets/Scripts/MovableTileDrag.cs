@@ -42,7 +42,7 @@ public class MovableTileDrag : MonoBehaviour
         if (hit.collider != null)
         {
             // Check if the clicked object is a movable tile.
-            if (hit.collider.gameObject.CompareTag("MovableTile"))
+            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
             {
                 selectedTile = hit.collider.gameObject;
 
