@@ -78,14 +78,19 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         GameObject tilePrefab = GetTilePrefab(tileType);
 
-
-        if (column <= gridSizeX && row <= gridSizeY)
+        if (column < gridSizeX && row < gridSizeY)
         {
-            //Vector2 position = new Vector2(x, y);
+            // Calculate the initial position for the grid with an offset
+            Vector2 gridCenter = new Vector2(
+                (gridSizeX - 1) * backgroundGrid.backgroundTileSize * 0.5f - (2 * backgroundGrid.backgroundTileSize),
+                (gridSizeY - 1) * backgroundGrid.backgroundTileSize * 0.5f - (2 * backgroundGrid.backgroundTileSize)
+            );
+
+            // Calculate the position for the current tile relative to the grid center
             Vector2 position = new Vector2(
-                        column * backgroundGrid.backgroundTileSize,
-                        row * backgroundGrid.backgroundTileSize
-                    );
+                (column - 2) * backgroundGrid.backgroundTileSize,
+                (row - 2) * backgroundGrid.backgroundTileSize
+            ) + gridCenter;
 
             GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
             tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
@@ -99,9 +104,9 @@ public class MovableTileGrid : MonoBehaviour
             tileData.GridSizeX = gridSizeX;
             tileData.GridSizeY = gridSizeY;
         }
-
-
     }
+
+
 
     public void DestroyExistingMovableTiles()
     {

@@ -44,10 +44,10 @@ public class BackgroundGrid : MonoBehaviour
             backgroundTileSize = gridWidth / gridSizeX;
 
             //set boundaries
-            float boundary = gridWidth  - backgroundTileSize ;
-            minX = 0;
+            float boundary = gridWidth / 2 - backgroundTileSize / 2;
+            minX = -boundary;
             maxX = boundary;
-            minY = 0;
+            minY = -boundary;
             maxY = boundary;
         }
     }
@@ -59,31 +59,31 @@ public class BackgroundGrid : MonoBehaviour
         float tileWidth = backgroundTileSize; // Use the adjusted background tile size.
         float tileHeight = backgroundTileSize;
 
-        float totalWidth = gridSizeX * tileWidth;
-        float totalHeight = gridSizeY * tileHeight;
-        
-        Vector2 startPosition = new Vector2(0,0);
+        // Calculate the center position for the grid
+        Vector2 gridCenter = new Vector2(
+            (gridSizeX - 1) * tileWidth * 0.5f - (2 * tileWidth),
+            (gridSizeY - 1) * tileHeight * 0.5f - (2 * tileHeight)
+        );
 
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
+                // Calculate the position for the current tile relative to the grid center
                 Vector2 position = new Vector2(
-                    startPosition.x + x * tileWidth,
-                    startPosition.y + y * tileHeight
-                );
+                    x * tileWidth - 2 * tileWidth,
+                    y * tileHeight - 2 * tileHeight
+                ) + gridCenter;
 
                 GameObject tile = Instantiate(backgroundTilePrefab, position, Quaternion.identity);
                 tile.transform.localScale = new Vector3(backgroundTileSize, backgroundTileSize, 1); //scales the tile sprite
 
                 // Store the tile in the grid array
                 backgroundGrid[x, y] = tile.transform;
-
-                //backgroundGrid[x, y] accesses the tile at column x and row y
             }
         }
-
     }
+
 
     // Function to get the position of a background grid tile based on its column index.
     public Vector2 GetColumnPosition(int col)
