@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215245683996",
+    "project_id": "curse-breaker-a69bc",
+    "storage_bucket": "curse-breaker-a69bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215245683996:android:b8a608cad45d977629ced9",
+        "android_client_info": {
+          "package_name": "com.WindowGames.CurseBreaker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYCvOUJqbPSMXEZa1J3_xWXhPPMb5RSoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

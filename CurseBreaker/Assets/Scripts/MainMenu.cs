@@ -7,14 +7,19 @@ public class MainMenu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene("Gameboard");
+        SceneManager.LoadScene("Tutorial_level");
 
-        //loads next scene in build queue
+        //loads next scene in build queue:
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void LevelSelection()
     {
         SceneManager.LoadScene("LevelSelection");
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
