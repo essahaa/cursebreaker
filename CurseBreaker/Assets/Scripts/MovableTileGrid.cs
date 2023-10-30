@@ -18,7 +18,7 @@ public class MovableTileGrid : MonoBehaviour
     public int startColumn = 0; // Set the starting column index.
     public int startRow = 0;    // Set the starting row index.
 
-    private int targetLevel = 2; // The level you want to generate.
+    private int targetLevel = 1; // The level you want to generate.
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
