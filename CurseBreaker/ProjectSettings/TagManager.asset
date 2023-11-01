@@ -9,6 +9,7 @@ TagManager:
   - MovableTileGrid
   - Background
   - EvilTile
+  - TutorialMovementManager
   layers:
   - Default
   - TransparentFX

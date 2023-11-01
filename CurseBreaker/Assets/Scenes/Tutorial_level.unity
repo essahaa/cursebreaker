@@ -206,8 +206,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundTilePrefab: {fileID: 809021098844665488, guid: 6695a87574cba2041ab0838029d9c661, type: 3}
-  gridSizeX: 5
-  gridSizeY: 5
   gridMargin: 5
   backgroundTileSize: 1
   minX: -2.4
@@ -869,8 +867,9 @@ MonoBehaviour:
   backgroundGrid: {fileID: 68879168}
   csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   movableTileSize: 1
-  startColumn: 0
-  startRow: 0
+  gridSizeX: 0
+  gridSizeY: 0
+  targetLevel: 1
 --- !u!4 &1232163591
 Transform:
   m_ObjectHideFlags: 0
@@ -1249,8 +1248,8 @@ GameObject:
   - component: {fileID: 1712505922}
   - component: {fileID: 1712505921}
   m_Layer: 0
-  m_Name: LevelGenerator
-  m_TagString: Untagged
+  m_Name: TutorialMovementManager
+  m_TagString: TutorialMovementManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
