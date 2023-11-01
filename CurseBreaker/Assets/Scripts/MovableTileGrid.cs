@@ -22,6 +22,8 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
+    private bool backgroundGenerated = false;
+
     void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
@@ -84,7 +86,12 @@ public class MovableTileGrid : MonoBehaviour
 
     void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
     {
-        backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
+        if(!backgroundGenerated)
+        {
+            backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
+            backgroundGenerated = true;
+        }
+        
         GameObject tilePrefab = GetTilePrefab(tileType);
 
         if (column < gridSizeX && row < gridSizeY)
@@ -128,6 +135,7 @@ public class MovableTileGrid : MonoBehaviour
         // Find and destroy game objects with the "MovableTile" and "EvilTile" tags.
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
+        objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
 
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
@@ -135,6 +143,7 @@ public class MovableTileGrid : MonoBehaviour
             Destroy(obj);
         }
 
+        backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV(csvFile);
     }
@@ -456,6 +465,8 @@ public class MovableTileGrid : MonoBehaviour
         // Perform a depth-first search (DFS) to traverse and mark connected tiles.
         bool result = DepthFirstSearch(startTile, visited);
 
+        bool onlyEvilTiles = true; // Flag to track if the disconnected group contains only EvilTiles.
+
         // Check if there are any unvisited MovableTiles.
         for (int x = 0; x < gridSizeX; x++)
         {
@@ -464,20 +475,35 @@ public class MovableTileGrid : MonoBehaviour
                 Transform tile = movableTiles[x, y];
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
                 {
+                    movableTiles[x, y] = null;
                     result = false; // There's an unvisited tile, group is not connected.
-                    break;
+                    Destroy(tile.gameObject); // Destroy the disconnected tile.
+                    UpdateMovableTilesArray();
+                    if (!tile.CompareTag("EvilTile"))
+                    {
+                        onlyEvilTiles = false;
+                    }
                 }
             }
-            if (!result) break;
         }
-
+        
         if (!result)
         {
-            Debug.Log("Game Over: MovableTiles group is not connected.");
+            if (!onlyEvilTiles)
+            {
+                Debug.Log("Game Over: MovableTiles group is not connected.");
+            }
+            else
+            {
+                Debug.Log("The disconnected group contains only EvilTiles.");
+            }
         }
-
         return result;
     }
+
+
+
+
 
     private bool DepthFirstSearch(Transform tile, bool[,] visited)
     {
