@@ -20,12 +20,6 @@ public class BackgroundGrid : MonoBehaviour
 
     public Vector2 startPosition;
 
-    void Start()
-    {
-        
-        
-    }
-
     public void CalculateTileSize(int gridSizeX, int gridSizeY)
     {
         Camera mainCamera = Camera.main;
