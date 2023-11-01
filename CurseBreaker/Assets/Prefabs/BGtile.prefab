@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -647462187542226115}
   m_Layer: 0
   m_Name: BGtile
-  m_TagString: Untagged
+  m_TagString: BackgroundTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

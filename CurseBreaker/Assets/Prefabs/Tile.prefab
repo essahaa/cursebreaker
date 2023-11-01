@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: -5703516218831535177}
   - component: {fileID: 9136542795970590273}
   - component: {fileID: 8781617945137421497}
-  - component: {fileID: 6908503980427154240}
   m_Layer: 0
   m_Name: Tile
   m_TagString: MovableTile
@@ -187,16 +186,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundGrid: {fileID: 0}
   movableTileGrid: {fileID: 0}
---- !u!114 &6908503980427154240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1227834004184806325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 293384ebb3b8d664eb712bee29dcf1db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isAtBoundary: 0

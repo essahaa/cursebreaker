@@ -8,6 +8,8 @@ TagManager:
   - Boundary
   - MovableTileGrid
   - Background
+  - EvilTile
+  - TutorialMovementManager
   layers:
   - Default
   - TransparentFX

@@ -11,76 +11,115 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject evilTilePrefab;
     public BackgroundGrid backgroundGrid;
 
+    public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
+
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
 
-    public int startColumn = 0; // Set the starting column index.
-    public int startRow = 0;    // Set the starting row index.
+    public int gridSizeX; //number of columns, width of the grid
+    public int gridSizeY; //number of rows, height of the grid
+
+    private int selectedLevel = 2; // The level you want to generate.
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
     void Start()
     {
-        backgroundGrid = GameObject.Find("BackgroundGridManager").GetComponent<BackgroundGrid>();
-        movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
+        backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
 
-        GenerateMovableTiles();
-
+        ReadLevelDataFromCSV(csvFile);
     }
 
-    public void GenerateMovableTiles()
+    public int CheckSelectedLevel()
     {
-        // Calculate the starting position for the entire grid
-        float startX = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeX - 1) / 2;
-        float startY = -backgroundGrid.backgroundTileSize * (backgroundGrid.gridSizeY - 1) / 2;
+        return selectedLevel;
+    }
 
-        for (int x = 1; x <= 3; x++)
+    public void ReadLevelDataFromCSV(TextAsset csvText)
+    {
+        string[] csvLines = csvText.text.Split('\n'); // Split the CSV file into lines.
+        bool arraySizeSet = false; // Add a flag to track if array size is set.
+
+        foreach (string line in csvLines)
         {
-            for (int y = 1; y <= 3; y++)
+            string[] values = line.Split(';'); // Split each line into values.
+
+            // Check if the current line corresponds to the target level.
+            if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
             {
-                Vector2 position = new Vector2(
-                    startX + x * backgroundGrid.backgroundTileSize,
-                    startY + y * backgroundGrid.backgroundTileSize
-                );
+                Debug.Log("level " + values[0] + "selectedlevel " + selectedLevel);
+                // Parse data from the CSV line.
+                int column = int.Parse(values[1]);
+                int row = int.Parse(values[2]);
+                string tileType = values[3];
+                gridSizeX = int.Parse(values[4]);
+                gridSizeY = int.Parse(values[5]);
 
-                GameObject tile = Instantiate(movableTilePrefab, position, Quaternion.identity);
-                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
-                movableTiles[x, y] = tile.transform;
+                // Set the array size only once.
+                if (!arraySizeSet)
+                {
+                    movableTiles = new Transform[gridSizeX, gridSizeY];
+                    arraySizeSet = true; // Update the flag.
+                }
 
-                // Assign row and column indices to the tile
-                tile.GetComponent<MovableTile>().Row = y;
-                tile.GetComponent<MovableTile>().Column = x;
-                tile.GetComponent<MovableTile>().TileType = "Normal";
+
+                GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
             }
         }
-
-        Vector2 position2 = new Vector2(
-                    startX + 1 * backgroundGrid.backgroundTileSize,
-                    startY + 1 * backgroundGrid.backgroundTileSize
-                );
-        // Instantiate the new tile prefab at the specified position.
-        GameObject newTile = Instantiate(evilTilePrefab, position2, Quaternion.identity);
-        newTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1); //scales the tile sprite
-
-        // Destroy the old movableTilePrefab you want to replace.
-        Destroy(movableTiles[1, 1].gameObject);
-
-        // Update the movableTiles array to reference the new tile's transform.
-        movableTiles[1, 1] = newTile.transform;
-
-        // Assign the row and column indices to the new tile.
-        newTile.GetComponent<MovableTile>().Row = 1;
-        newTile.GetComponent<MovableTile>().Column = 1;
-        newTile.GetComponent<MovableTile>().TileType = "Evil";
-
-
     }
+
+    GameObject GetTilePrefab(string tileType)
+    {
+        // Choose the appropriate prefab based on the tileType.
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            // Add more cases for other tile types as needed.
+            default:
+                return movableTilePrefab; // Default to a fallback prefab.
+        }
+    }
+
+    void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
+    {
+        backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
+        GameObject tilePrefab = GetTilePrefab(tileType);
+
+        if (column < gridSizeX && row < gridSizeY)
+        {
+            // Check if the position exists in the backgroundGrid array
+            if (backgroundGrid.backgroundGrid[column, row] != null)
+            {
+                // Get the position from the backgroundGrid array
+                Vector3 position = backgroundGrid.backgroundGrid[column, row].position;
+
+                // Create the tile at the retrieved position
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                movableTiles[column, row] = tile.transform;
+
+                MovableTile tileData = tile.GetComponent<MovableTile>();
+                tileData.Level = selectedLevel;
+                tileData.Row = row;
+                tileData.Column = column;
+                tileData.TileType = tileType;
+                tileData.GridSizeX = gridSizeX;
+                tileData.GridSizeY = gridSizeY;
+            }
+        }
+    }
+
+
+
 
     public void DestroyExistingMovableTiles()
     {
         // Clear the references in the movableTiles array.
-        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            for (int y = 0; y < gridSizeY; y++)
             {
                 movableTiles[x, y] = null;
             }
@@ -97,7 +136,7 @@ public class MovableTileGrid : MonoBehaviour
         }
 
         // Generate new movable tiles (and evil tiles if needed).
-        GenerateMovableTiles();
+        ReadLevelDataFromCSV(csvFile);
     }
 
     public Transform[,] GetMovableTiles()
@@ -143,9 +182,9 @@ public class MovableTileGrid : MonoBehaviour
     public Transform[,] UpdateMovableTilesArray()
     {
 
-        for (int row = 0; row < backgroundGrid.gridSizeY; row++)
+        for (int row = 0; row < gridSizeY; row++)
         {
-            for (int col = 0; col < backgroundGrid.gridSizeX; col++)
+            for (int col = 0; col < gridSizeX; col++)
             {
                 // Get the tile at the current position.
                 Transform tile = movableTiles[col, row];
@@ -194,9 +233,9 @@ public class MovableTileGrid : MonoBehaviour
     {
         int count = 0;
 
-        for (int row = 0; row < backgroundGrid.gridSizeY; row++)
+        for (int row = 0; row < gridSizeY; row++)
         {
-            for (int col = 0; col < backgroundGrid.gridSizeX; col++)
+            for (int col = 0; col < gridSizeX; col++)
             {
                 Transform movableTile = movableTiles[col, row];
 
@@ -221,7 +260,7 @@ public class MovableTileGrid : MonoBehaviour
         bool hasMovableTile = false;
 
         // Check the right neighbor
-        if (col < backgroundGrid.gridSizeX - 1)
+        if (col < gridSizeX - 1)
         {
             Transform rightNeighbor = movableTiles[col + 1, row];
             if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
@@ -241,7 +280,7 @@ public class MovableTileGrid : MonoBehaviour
         }
 
         // Check the upper neighbor
-        if (row < backgroundGrid.gridSizeY - 1)
+        if (row < gridSizeY - 1)
         {
             Transform upperNeighbor = movableTiles[col, row + 1];
             if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
@@ -391,56 +430,104 @@ public class MovableTileGrid : MonoBehaviour
         return tilesInColumn;
     }
 
-    public bool CheckUniformGroup()
+    public bool IsMovableTilesGroupConnected()
     {
-        // Create a boolean grid to mark visited tiles.
-        bool[,] visited = new bool[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY];
+        // Create a 2D array to keep track of visited tiles.
+        bool[,] visited = new bool[gridSizeX, gridSizeY];
 
-        // Find the first unvisited MovableTile.
-        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        // Find the first MovableTile as the starting point for traversal.
+        Transform startTile = null;
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            for (int y = 0; y < gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+                {
+                    startTile = tile;
+                    break;
+                }
+            }
+            if (startTile != null) break;
+        }
+
+        if (startTile == null) return true; // No MovableTiles are present, group is still "connected."
+
+        // Perform a depth-first search (DFS) to traverse and mark connected tiles.
+        bool result = DepthFirstSearch(startTile, visited);
+
+        // Check if there are any unvisited MovableTiles.
+        for (int x = 0; x < gridSizeX; x++)
+        {
+            for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
                 {
-                    bool isConnected = CheckConnectedGroup(x, y, visited);
-                    if (!isConnected)
-                    {
-                        Debug.Log("Game Over - The group is not uniform.");
-                        return false;
-                    }
+                    result = false; // There's an unvisited tile, group is not connected.
+                    break;
                 }
+            }
+            if (!result) break;
+        }
+
+        if (!result)
+        {
+            Debug.Log("Game Over: MovableTiles group is not connected.");
+        }
+
+        return result;
+    }
+
+    private bool DepthFirstSearch(Transform tile, bool[,] visited)
+    {
+        int x = tile.GetComponent<MovableTile>().Column;
+        int y = tile.GetComponent<MovableTile>().Row;
+
+        visited[x, y] = true; // Mark the tile as visited.
+
+        bool result = true; // Initialize the result as true.
+
+        // Check neighbors and perform DFS on connected MovableTiles.
+        if (x > 0 && !visited[x - 1, y])
+        {
+            Transform leftNeighbor = movableTiles[x - 1, y];
+            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(leftNeighbor, visited);
             }
         }
 
-        // All movable tiles form a uniform group.
-        return true;
-    }
-
-    private bool CheckConnectedGroup(int x, int y, bool[,] visited)
-    {
-        // If the tile is out of bounds or already visited, return true.
-        if (x < 0 || x >= backgroundGrid.gridSizeX || y < 0 || y >= backgroundGrid.gridSizeY || visited[x, y])
-            return true;
-
-        // Mark the tile as visited.
-        visited[x, y] = true;
-
-        // Check neighbors (up, down, left, right).
-        bool isConnected = false;
-        Transform tile = movableTiles[x, y];
-        if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+        if (x < gridSizeX - 1 && !visited[x + 1, y])
         {
-            isConnected = true;
-            isConnected &= CheckConnectedGroup(x - 1, y, visited);
-            isConnected &= CheckConnectedGroup(x + 1, y, visited);
-            isConnected &= CheckConnectedGroup(x, y - 1, visited);
-            isConnected &= CheckConnectedGroup(x, y + 1, visited);
+            Transform rightNeighbor = movableTiles[x + 1, y];
+            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(rightNeighbor, visited);
+            }
         }
 
-        return isConnected;
+        if (y > 0 && !visited[x, y - 1])
+        {
+            Transform lowerNeighbor = movableTiles[x, y - 1];
+            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(lowerNeighbor, visited);
+            }
+        }
+
+        if (y < gridSizeY - 1 && !visited[x, y + 1])
+        {
+            Transform upperNeighbor = movableTiles[x, y + 1];
+            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
+            {
+                result &= DepthFirstSearch(upperNeighbor, visited);
+            }
+        }
+
+        return result;
     }
+
 
 
 }

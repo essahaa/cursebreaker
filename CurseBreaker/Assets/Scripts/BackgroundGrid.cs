@@ -7,10 +7,10 @@ public class BackgroundGrid : MonoBehaviour
 {
     public Transform[,] backgroundGrid;
     public GameObject backgroundTilePrefab;
-    public int gridSizeX = 5; //number of columns, width of the grid
-    public int gridSizeY = 5; //number of rows, height of the grid
+    
     public float gridMargin = 5.0f; //margin in percentages of screen width
     public float backgroundTileSize; //Calculated based on screen size
+    private float gridWidth;
 
     // Define the boundaries of the play area.
     public float minX; // Calculated based on screen size
@@ -22,11 +22,11 @@ public class BackgroundGrid : MonoBehaviour
 
     void Start()
     {
-        CalculateTileSize();
-        GenerateBackgroundGrid(gridSizeX, gridSizeY);
+        
+        
     }
 
-    public void CalculateTileSize()
+    public void CalculateTileSize(int gridSizeX, int gridSizeY)
     {
         Camera mainCamera = Camera.main;
 
@@ -40,7 +40,7 @@ public class BackgroundGrid : MonoBehaviour
             float marginsWidth = mainCamera.ScreenToWorldPoint(new Vector3(marginsPixelWidth, 0, 0)).x - mainCamera.ScreenToWorldPoint(Vector3.zero).x;
 
             //grid width and tile width
-            float gridWidth = screenWorldWidth - marginsWidth;
+            gridWidth = screenWorldWidth - marginsWidth;
             backgroundTileSize = gridWidth / gridSizeX;
 
             //set boundaries
@@ -54,67 +54,36 @@ public class BackgroundGrid : MonoBehaviour
 
     public void GenerateBackgroundGrid(int gridSizeX, int gridSizeY)
     {
+        CalculateTileSize(gridSizeX, gridSizeY);
+
         backgroundGrid = new Transform[gridSizeX, gridSizeY];
 
-        float tileWidth = backgroundTileSize; // Use the adjusted background tile size.
+        float tileWidth = backgroundTileSize;
         float tileHeight = backgroundTileSize;
 
-        float totalWidth = gridSizeX * tileWidth;
-        float totalHeight = gridSizeY * tileHeight;
-        
-        Vector2 startPosition = new Vector2(
-            -(totalWidth - tileWidth) / 2,
-            -(totalHeight - tileHeight) / 2
-        );
+        // Calculate the position of the middle tile based on gridSizeX and gridSizeY
+        float middleX = (gridSizeX - 1) * 0.5f * tileWidth;
+        float middleY = (gridSizeY - 1) * 0.5f * tileHeight;
 
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
+                // Calculate the position for the current tile relative to the middle point of the grid
                 Vector2 position = new Vector2(
-                    startPosition.x + x * tileWidth,
-                    startPosition.y + y * tileHeight
+                    x * tileWidth - middleX,
+                    y * tileHeight - middleY
                 );
 
                 GameObject tile = Instantiate(backgroundTilePrefab, position, Quaternion.identity);
-                tile.transform.localScale = new Vector3(backgroundTileSize, backgroundTileSize, 1); //scales the tile sprite
+                tile.transform.localScale = new Vector3(backgroundTileSize, backgroundTileSize, 1); // Scales the tile sprite
 
                 // Store the tile in the grid array
                 backgroundGrid[x, y] = tile.transform;
-
-                //backgroundGrid[x, y] accesses the tile at column x and row y
             }
         }
-
-    }
-
-    // Function to get the position of a background grid tile based on its column index.
-    public Vector2 GetColumnPosition(int col)
-    {
-        float tileWidth = backgroundTileSize;
-        float x = -(tileWidth * (gridSizeX - 1)) / 2 + col * tileWidth;
-        return new Vector2(x, 0f); // Assuming the grid is at y=0.
-    }
-
-    // Function to get the position of a background grid tile based on its row index.
-    public Vector2 GetRowPosition(int row)
-    {
-        float tileHeight = backgroundTileSize;
-        float y = -(tileHeight * (gridSizeY - 1)) / 2 + row * tileHeight;
-        return new Vector2(0f, y); // Assuming the grid is at x=0.
     }
 
     
-    // Function to get the position of a background grid tile based on its row and column index.
-    public Vector2 GetTilePosition(int row, int col)
-    {
-        float tileWidth = backgroundTileSize;
-        float tileHeight = backgroundTileSize;
 
-        float x = -(tileWidth * (gridSizeX - 1)) / 2 + col * tileWidth;
-        float y = -(tileHeight * (gridSizeY - 1)) / 2 + row * tileHeight;
-
-        return new Vector2(x, y);
-    }
-    
 }

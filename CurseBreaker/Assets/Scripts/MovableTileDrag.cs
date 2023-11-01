@@ -8,6 +8,7 @@ public class MovableTileDrag : MonoBehaviour
 {
     public BackgroundGrid backgroundGrid;
     public MovableTileGrid movableTileGrid;
+    public TutorialLevel tutorialLevel;
 
     private Vector3 initialMousePosition;
     private Vector3 initialTilePosition;
@@ -42,7 +43,7 @@ public class MovableTileDrag : MonoBehaviour
         if (hit.collider != null)
         {
             // Check if the clicked object is a movable tile.
-            if (hit.collider.gameObject.CompareTag("MovableTile"))
+            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
             {
                 selectedTile = hit.collider.gameObject;
 
@@ -108,7 +109,8 @@ public class MovableTileDrag : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        if (isDragging && !allElementsNull)
+        int selectedLevel = movableTileGrid.CheckSelectedLevel();
+        if (isDragging && !allElementsNull && selectedLevel != 1)
         {
             FindObjectOfType<AudioManager>().Play("liik");
 
@@ -204,13 +206,18 @@ public class MovableTileDrag : MonoBehaviour
                 
             }
         }
+        else if(isDragging && !allElementsNull && selectedLevel == 1)
+        {
+            tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
+
+            tutorialLevel.TutorialMovement();
+        }
     }
 
     private void OnMouseUp()
     {
         isDragging = false;
         bool isSnappedToNewPlace = false;
-        movableTileGrid.CheckUniformGroup();
 
         if (!allElementsNull)
         {
@@ -248,7 +255,7 @@ public class MovableTileDrag : MonoBehaviour
                         tile.position = targetSnappedPosition;
 
                         // Ensure that row and column are within valid bounds
-                        if (column >= 0 && column < backgroundGrid.gridSizeX && row >= 0 && row < backgroundGrid.gridSizeY)
+                        if (column >= 0 && column < movableTileGrid.gridSizeX && row >= 0 && row < movableTileGrid.gridSizeY)
                         {
                             movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
 
@@ -279,6 +286,7 @@ public class MovableTileDrag : MonoBehaviour
                 // Toggle between "horizontal" and "vertical" move types.
                 currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                 Debug.Log("movetype change: " + currentMoveType);
+                movableTileGrid.IsMovableTilesGroupConnected();
             }
             else
             {
@@ -294,7 +302,7 @@ public class MovableTileDrag : MonoBehaviour
                     currentMovableTiles[i, j] = null;
                 }
             }
-
+            
             allElementsNull = false;
             tileInSamePosition = false;
             
