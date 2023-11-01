@@ -110,6 +110,7 @@ public class MovableTileDrag : MonoBehaviour
     private void OnMouseDrag()
     {
         int selectedLevel = movableTileGrid.CheckSelectedLevel();
+
         if (isDragging && !allElementsNull && selectedLevel != 1)
         {
             FindObjectOfType<AudioManager>().Play("liik");
@@ -118,100 +119,65 @@ public class MovableTileDrag : MonoBehaviour
             Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 offset = mouseCurrentPos - initialMousePosition;
 
-            if (currentMoveType == "horizontal")
+            // Iterate through the tiles in the row or column.
+            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
-                // Horizontal movement (row)
-
-                // Calculate the target position for each tile in the row.
-                for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
-                    for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                    Transform tile = currentMovableTiles[col, row];
+
+                    if (tile != null)
                     {
-                        Transform tile = currentMovableTiles[col, row];
+                        Vector3 targetPosition;
 
-                        if (tile != null)
+                        if (currentMoveType == "horizontal")
                         {
-                            Vector3 targetPosition = initialTilePositions[col, row] + new Vector3(offset.x, 0f, 0f);
-
-                            // Ensure the tile stays within the game board's boundaries.
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX); 
-
-
-                            // Iterate through existing tiles to check for collisions.
-                            foreach (Transform otherTile in currentMovableTiles)
-                            {
-                                if (otherTile != null && otherTile != tile)
-                                {
-                                    Vector3 otherTilePosition = otherTile.position;
-
-                                    if (otherTilePosition == targetPosition)
-                                    {
-                                        tileInSamePosition = true;
-                                        Debug.Log("There is a tile at the target snapped position.");
-                                    }
-                                    else
-                                    {
-                                        // Move the tile to the target position.
-                                        tile.position = targetPosition;
-                                    }
-                                }
-                            }
+                            targetPosition = initialTilePositions[col, row] + new Vector3(offset.x, 0f, 0f);
+                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
                         }
-
-                        
-                    }
-                }
-                
-            }
-            else
-            {
-                // Vertical movement (column)
-                
-                // Calculate the target position for each tile in the column.
-                for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
-                {
-                    for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
-                    {
-                        Transform tile = currentMovableTiles[col, row];
-
-                        if (tile != null)
+                        else
                         {
-                            Vector3 targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
-
-                            // Ensure the tile stays within the game board's boundaries.
+                            targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
                             targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+                        }
 
-                            // Iterate through existing tiles to check for collisions.
-                            foreach (Transform otherTile in currentMovableTiles)
+                        foreach (Transform otherTile in currentMovableTiles)
+                        {
+                            if (otherTile != null && otherTile != tile)
                             {
-                                if (otherTile != null && otherTile != tile) 
-                                {
-                                    Vector3 otherTilePosition = otherTile.position;
+                                Vector3 otherTilePosition = otherTile.position;
 
-                                    if (otherTilePosition == targetPosition)
-                                    {
-                                        tileInSamePosition = true;
-                                        Debug.Log("There is a tile at the target snapped position.");
-                                    }
-                                    else
-                                    {
-                                        // Move the tile to the target position.
-                                        tile.position = targetPosition;
-                                    }
+                                if (otherTilePosition == targetPosition)
+                                {
+                                    tileInSamePosition = true;
+                                    Debug.Log("There is a tile at the target snapped position.");
                                 }
                             }
                         }
+
+                        if (!tileInSamePosition)
+                        {
+                            // Update the tile's position to the target position.
+                            tile.position = targetPosition;
+
+                            // Calculate the new column and row based on the target position.
+                            int column = Mathf.RoundToInt((targetPosition.x - backgroundGrid.minX) / backgroundGrid.backgroundTileSize);
+                            int newRow = Mathf.RoundToInt((targetPosition.y - backgroundGrid.minY) / backgroundGrid.backgroundTileSize);
+
+                            // Update the movableTileGrid with the new position.
+                            movableTileGrid.UpdateMovableTile(column, newRow, tile);
+                        }
                     }
                 }
-                
             }
         }
-        else if(isDragging && !allElementsNull && selectedLevel == 1)
+        else if (isDragging && !allElementsNull && selectedLevel == 1)
         {
             tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
 
             tutorialLevel.TutorialMovement();
         }
+
     }
 
     private void OnMouseUp()
@@ -221,64 +187,67 @@ public class MovableTileDrag : MonoBehaviour
 
         if (!allElementsNull)
         {
+            if (tileInSamePosition)
+            {
+                for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+                {
+                    for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                    {
+                        Transform tile = currentMovableTiles[col, row];
+
+                        if (tile != null)
+                        {
+                            tile.position = initialTilePositions[col, row];
+                            // Reset the movableTile to their original column and row.
+                            movableTileGrid.UpdateMovableTile(col, row, tile);
+                        }
+                    }
+                }
+
+            }
             //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
 
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
-            // Snap each tile to the nearest grid position.
+            // Snap each tile to the nearest grid position based on rows and columns.
             foreach (Transform tile in currentMovableTiles)
             {
-                if (tile != null) 
+                if (tile != null)
                 {
-                    Vector3 currentPosition = tile.position;
+                    MovableTile movableTileComponent = tile.GetComponent <MovableTile>();
 
-                    // Define the target snapped position for the current tile.
-                    Vector3 targetSnappedPosition = new Vector3(
-                        Mathf.Round(currentPosition.x / backgroundGrid.backgroundTileSize) * backgroundGrid.backgroundTileSize,
-                        Mathf.Round(currentPosition.y / backgroundGrid.backgroundTileSize) * backgroundGrid.backgroundTileSize,
-                        0f
-                    );
+                    // Calculate the target snapped position based on row and column.
+                    float targetX = movableTileComponent.Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
+                    float targetY = movableTileComponent.Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
 
                     // Ensure the snapped position stays within the background grid boundaries.
-                    targetSnappedPosition.x = Mathf.Clamp(targetSnappedPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
-                    targetSnappedPosition.y = Mathf.Clamp(targetSnappedPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+                    targetX = Mathf.Clamp(targetX, backgroundGrid.minX, backgroundGrid.maxX);
+                    targetY = Mathf.Clamp(targetY, backgroundGrid.minY, backgroundGrid.maxY);
 
-                    int column, row;
-                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+                    // Set the tile's position to the target position.
+                    tile.position = new Vector3(targetX, targetY, 0f);
+
+                    // Update the movableTileGrid with the new position.
+                    movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
+                    Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
 
                     if (!tileInSamePosition)
                     {
-                        column = Mathf.RoundToInt((targetSnappedPosition.x - backgroundGrid.minX) / backgroundGrid.backgroundTileSize);
-                        row = Mathf.RoundToInt((targetSnappedPosition.y - backgroundGrid.minY) / backgroundGrid.backgroundTileSize);
-
-                        tile.position = targetSnappedPosition;
-
-                        // Ensure that row and column are within valid bounds
-                        if (column >= 0 && column < movableTileGrid.gridSizeX && row >= 0 && row < movableTileGrid.gridSizeY)
-                        {
-                            movableTileGrid.UpdateMovableTile(column, row, movableTileComponent.transform);
-
-                            Debug.Log("Snapped to row: " + row + ", column: " + column + " tile position " + tile.position);
-                            Debug.Log("movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
-                        }
-
                         isSnappedToNewPlace = true;
                     }
                     else
                     {
-                        tile.position = initialTilePositions[movableTileComponent.Column, movableTileComponent.Row];
-                        movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, movableTileComponent.transform);
-                        
                         Debug.Log("tile position in snap " + tile.position + "movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
 
                         isSnappedToNewPlace = false;
 
-                    }                  
+                    }
+                    
                 }
             }
 
-            if(isSnappedToNewPlace)
+            if (isSnappedToNewPlace)
             {
                 //Update movableTiles array with new snapped positions
                 movableTiles = movableTileGrid.UpdateMovableTilesArray();
@@ -302,10 +271,10 @@ public class MovableTileDrag : MonoBehaviour
                     currentMovableTiles[i, j] = null;
                 }
             }
-            
+
             allElementsNull = false;
             tileInSamePosition = false;
-            
         }
     }
+
 }
