@@ -22,8 +22,6 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
-    private bool backgroundGenerated = false;
-
     void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
@@ -86,12 +84,7 @@ public class MovableTileGrid : MonoBehaviour
 
     void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
     {
-        if(!backgroundGenerated)
-        {
-            backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
-            backgroundGenerated = true;
-        }
-        
+        backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
         GameObject tilePrefab = GetTilePrefab(tileType);
 
         if (column < gridSizeX && row < gridSizeY)
@@ -135,7 +128,6 @@ public class MovableTileGrid : MonoBehaviour
         // Find and destroy game objects with the "MovableTile" and "EvilTile" tags.
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
-        objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
 
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
@@ -143,7 +135,6 @@ public class MovableTileGrid : MonoBehaviour
             Destroy(obj);
         }
 
-        backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV(csvFile);
     }
