@@ -15,10 +15,10 @@ public class MovableTileGrid : MonoBehaviour
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
 
-    public int startColumn = 0; // Set the starting column index.
-    public int startRow = 0;    // Set the starting row index.
+    public int gridSizeX; //number of columns, width of the grid
+    public int gridSizeY; //number of rows, height of the grid
 
-    private int targetLevel = 1; // The level you want to generate.
+    private int selectedLevel = 2; // The level you want to generate.
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -26,32 +26,41 @@ public class MovableTileGrid : MonoBehaviour
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
 
-        movableTiles = new Transform[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY]; // Use the size of the background grid.
-
-        backgroundGrid.GenerateBackgroundGrid(backgroundGrid.gridSizeX, backgroundGrid.gridSizeY);
-
         ReadLevelDataFromCSV(csvFile);
+    }
 
+    public int CheckSelectedLevel()
+    {
+        return selectedLevel;
     }
 
     public void ReadLevelDataFromCSV(TextAsset csvText)
     {
         string[] csvLines = csvText.text.Split('\n'); // Split the CSV file into lines.
+        bool arraySizeSet = false; // Add a flag to track if array size is set.
 
         foreach (string line in csvLines)
         {
             string[] values = line.Split(';'); // Split each line into values.
 
             // Check if the current line corresponds to the target level.
-            if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == targetLevel)
+            if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
             {
-                Debug.Log("level " + values[0] + "targetlevel " + targetLevel);
+                Debug.Log("level " + values[0] + "selectedlevel " + selectedLevel);
                 // Parse data from the CSV line.
                 int column = int.Parse(values[1]);
                 int row = int.Parse(values[2]);
                 string tileType = values[3];
-                int gridSizeX = int.Parse(values[4]);
-                int gridSizeY = int.Parse(values[5]);
+                gridSizeX = int.Parse(values[4]);
+                gridSizeY = int.Parse(values[5]);
+
+                // Set the array size only once.
+                if (!arraySizeSet)
+                {
+                    movableTiles = new Transform[gridSizeX, gridSizeY];
+                    arraySizeSet = true; // Update the flag.
+                }
+
 
                 GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
             }
@@ -75,45 +84,42 @@ public class MovableTileGrid : MonoBehaviour
 
     void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
     {
-        backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+        backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
         GameObject tilePrefab = GetTilePrefab(tileType);
 
         if (column < gridSizeX && row < gridSizeY)
         {
-            // Calculate the initial position for the grid with an offset
-            Vector2 gridCenter = new Vector2(
-                (gridSizeX - 1) * backgroundGrid.backgroundTileSize * 0.5f - (2 * backgroundGrid.backgroundTileSize),
-                (gridSizeY - 1) * backgroundGrid.backgroundTileSize * 0.5f - (2 * backgroundGrid.backgroundTileSize)
-            );
+            // Check if the position exists in the backgroundGrid array
+            if (backgroundGrid.backgroundGrid[column, row] != null)
+            {
+                // Get the position from the backgroundGrid array
+                Vector3 position = backgroundGrid.backgroundGrid[column, row].position;
 
-            // Calculate the position for the current tile relative to the grid center
-            Vector2 position = new Vector2(
-                (column - 2) * backgroundGrid.backgroundTileSize,
-                (row - 2) * backgroundGrid.backgroundTileSize
-            ) + gridCenter;
+                // Create the tile at the retrieved position
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                movableTiles[column, row] = tile.transform;
 
-            GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
-            tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
-            movableTiles[column, row] = tile.transform;
-
-            MovableTile tileData = tile.GetComponent<MovableTile>();
-            tileData.Level = targetLevel;
-            tileData.Row = row;
-            tileData.Column = column;
-            tileData.TileType = tileType;
-            tileData.GridSizeX = gridSizeX;
-            tileData.GridSizeY = gridSizeY;
+                MovableTile tileData = tile.GetComponent<MovableTile>();
+                tileData.Level = selectedLevel;
+                tileData.Row = row;
+                tileData.Column = column;
+                tileData.TileType = tileType;
+                tileData.GridSizeX = gridSizeX;
+                tileData.GridSizeY = gridSizeY;
+            }
         }
     }
+
 
 
 
     public void DestroyExistingMovableTiles()
     {
         // Clear the references in the movableTiles array.
-        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            for (int y = 0; y < gridSizeY; y++)
             {
                 movableTiles[x, y] = null;
             }
@@ -176,9 +182,9 @@ public class MovableTileGrid : MonoBehaviour
     public Transform[,] UpdateMovableTilesArray()
     {
 
-        for (int row = 0; row < backgroundGrid.gridSizeY; row++)
+        for (int row = 0; row < gridSizeY; row++)
         {
-            for (int col = 0; col < backgroundGrid.gridSizeX; col++)
+            for (int col = 0; col < gridSizeX; col++)
             {
                 // Get the tile at the current position.
                 Transform tile = movableTiles[col, row];
@@ -227,9 +233,9 @@ public class MovableTileGrid : MonoBehaviour
     {
         int count = 0;
 
-        for (int row = 0; row < backgroundGrid.gridSizeY; row++)
+        for (int row = 0; row < gridSizeY; row++)
         {
-            for (int col = 0; col < backgroundGrid.gridSizeX; col++)
+            for (int col = 0; col < gridSizeX; col++)
             {
                 Transform movableTile = movableTiles[col, row];
 
@@ -254,7 +260,7 @@ public class MovableTileGrid : MonoBehaviour
         bool hasMovableTile = false;
 
         // Check the right neighbor
-        if (col < backgroundGrid.gridSizeX - 1)
+        if (col < gridSizeX - 1)
         {
             Transform rightNeighbor = movableTiles[col + 1, row];
             if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
@@ -274,7 +280,7 @@ public class MovableTileGrid : MonoBehaviour
         }
 
         // Check the upper neighbor
-        if (row < backgroundGrid.gridSizeY - 1)
+        if (row < gridSizeY - 1)
         {
             Transform upperNeighbor = movableTiles[col, row + 1];
             if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
@@ -427,13 +433,13 @@ public class MovableTileGrid : MonoBehaviour
     public bool IsMovableTilesGroupConnected()
     {
         // Create a 2D array to keep track of visited tiles.
-        bool[,] visited = new bool[backgroundGrid.gridSizeX, backgroundGrid.gridSizeY];
+        bool[,] visited = new bool[gridSizeX, gridSizeY];
 
         // Find the first MovableTile as the starting point for traversal.
         Transform startTile = null;
-        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
@@ -451,9 +457,9 @@ public class MovableTileGrid : MonoBehaviour
         bool result = DepthFirstSearch(startTile, visited);
 
         // Check if there are any unvisited MovableTiles.
-        for (int x = 0; x < backgroundGrid.gridSizeX; x++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < backgroundGrid.gridSizeY; y++)
+            for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
@@ -492,7 +498,7 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        if (x < backgroundGrid.gridSizeX - 1 && !visited[x + 1, y])
+        if (x < gridSizeX - 1 && !visited[x + 1, y])
         {
             Transform rightNeighbor = movableTiles[x + 1, y];
             if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
@@ -510,7 +516,7 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        if (y < backgroundGrid.gridSizeY - 1 && !visited[x, y + 1])
+        if (y < gridSizeY - 1 && !visited[x, y + 1])
         {
             Transform upperNeighbor = movableTiles[x, y + 1];
             if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
