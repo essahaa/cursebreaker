@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class MovableTileGrid : MonoBehaviour
 {
@@ -225,6 +226,8 @@ public class MovableTileGrid : MonoBehaviour
                         if(CountEvilTiles() == 0)
                         {
                             Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                            SceneManager.LoadScene("LevelCompleted");
+
                         }
                         
                     }
