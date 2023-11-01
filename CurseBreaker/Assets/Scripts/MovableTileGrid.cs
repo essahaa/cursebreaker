@@ -9,7 +9,6 @@ public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
     public GameObject evilTilePrefab;
-    public BackgroundGrid backgroundGrid;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
@@ -26,8 +25,6 @@ public class MovableTileGrid : MonoBehaviour
 
     void Start()
     {
-        backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-
         ReadLevelDataFromCSV(csvFile);
     }
 
@@ -63,7 +60,6 @@ public class MovableTileGrid : MonoBehaviour
                     arraySizeSet = true; // Update the flag.
                 }
 
-
                 GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
             }
         }
@@ -86,7 +82,9 @@ public class MovableTileGrid : MonoBehaviour
 
     void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
     {
-        if(!backgroundGenerated)
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+
+        if (!backgroundGenerated)
         {
             backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
             backgroundGenerated = true;
