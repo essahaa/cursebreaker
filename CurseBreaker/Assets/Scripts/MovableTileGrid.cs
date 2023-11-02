@@ -37,6 +37,12 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
+    public void NextLevel()
+    {
+        selectedLevel = selectedLevel + 1;
+        ReadLevelDataFromCSV();
+    }
+
     private void ReadCSV()
     {
         string[] lines = csvFile.text.Split('\n');
@@ -46,6 +52,7 @@ public class MovableTileGrid : MonoBehaviour
     public void ReadLevelDataFromCSV()
     {
         bool arraySizeSet = false; // Add a flag to track if array size is set.
+        bool noMoreLevels = true; // Flag to check if there are no more levels.
 
         if (csvLines.Count > 0)
         {
@@ -56,6 +63,7 @@ public class MovableTileGrid : MonoBehaviour
                 // Check if the current line corresponds to the target level.
                 if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
                 {
+                    noMoreLevels = false; // We found a matching level.
                     Debug.Log("level " + values[0] + " selectedlevel " + selectedLevel);
                     // Parse data from the CSV line.
                     int column = int.Parse(values[1]);
@@ -75,7 +83,12 @@ public class MovableTileGrid : MonoBehaviour
                 }
             }
         }
-        
+        if (noMoreLevels)
+        {
+            Debug.Log("No more levels in the CSV file.");
+            SceneManager.LoadScene("MainMenu");
+        }
+
     }
 
     GameObject GetTilePrefab(string tileType)
@@ -491,7 +504,7 @@ public class MovableTileGrid : MonoBehaviour
                     movableTiles[x, y] = null;
                     result = false; // There's an unvisited tile, group is not connected.
                     Destroy(tile.gameObject); // Destroy the disconnected tile.
-                    UpdateMovableTilesArray();
+                    
                     if (!tile.CompareTag("EvilTile"))
                     {
                         onlyEvilTiles = false;
@@ -509,8 +522,16 @@ public class MovableTileGrid : MonoBehaviour
             else
             {
                 Debug.Log("The disconnected group contains only EvilTiles.");
+                if (CountEvilTiles() == 0)
+                {
+                    Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                    SceneManager.LoadScene("LevelCompleted");
+
+                }
             }
+            
         }
+        
         return result;
     }
 
