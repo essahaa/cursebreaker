@@ -491,7 +491,7 @@ public class MovableTileGrid : MonoBehaviour
                     movableTiles[x, y] = null;
                     result = false; // There's an unvisited tile, group is not connected.
                     Destroy(tile.gameObject); // Destroy the disconnected tile.
-                    UpdateMovableTilesArray();
+                    
                     if (!tile.CompareTag("EvilTile"))
                     {
                         onlyEvilTiles = false;
@@ -509,8 +509,16 @@ public class MovableTileGrid : MonoBehaviour
             else
             {
                 Debug.Log("The disconnected group contains only EvilTiles.");
+                if (CountEvilTiles() == 0)
+                {
+                    Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                    SceneManager.LoadScene("LevelCompleted");
+
+                }
             }
+            
         }
+        
         return result;
     }
 
