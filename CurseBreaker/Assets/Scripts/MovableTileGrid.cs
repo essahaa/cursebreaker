@@ -24,9 +24,12 @@ public class MovableTileGrid : MonoBehaviour
 
     private bool backgroundGenerated = false;
 
+    private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
+
     void Start()
     {
-        ReadLevelDataFromCSV(csvFile);
+        ReadCSV(); // Read the CSV file.
+        ReadLevelDataFromCSV(); // Read the level data from the CSV.
     }
 
     public int CheckSelectedLevel()
@@ -34,36 +37,45 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
-    public void ReadLevelDataFromCSV(TextAsset csvText)
+    private void ReadCSV()
     {
-        string[] csvLines = csvText.text.Split('\n'); // Split the CSV file into lines.
+        string[] lines = csvFile.text.Split('\n');
+        csvLines.AddRange(lines);
+    }
+
+    public void ReadLevelDataFromCSV()
+    {
         bool arraySizeSet = false; // Add a flag to track if array size is set.
 
-        foreach (string line in csvLines)
+        if (csvLines.Count > 0)
         {
-            string[] values = line.Split(';'); // Split each line into values.
-
-            // Check if the current line corresponds to the target level.
-            if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
+            foreach (string line in csvLines)
             {
-                Debug.Log("level " + values[0] + "selectedlevel " + selectedLevel);
-                // Parse data from the CSV line.
-                int column = int.Parse(values[1]);
-                int row = int.Parse(values[2]);
-                string tileType = values[3];
-                gridSizeX = int.Parse(values[4]);
-                gridSizeY = int.Parse(values[5]);
+                string[] values = line.Split(';'); // Split each line into values.
 
-                // Set the array size only once.
-                if (!arraySizeSet)
+                // Check if the current line corresponds to the target level.
+                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
                 {
-                    movableTiles = new Transform[gridSizeX, gridSizeY];
-                    arraySizeSet = true; // Update the flag.
-                }
+                    Debug.Log("level " + values[0] + " selectedlevel " + selectedLevel);
+                    // Parse data from the CSV line.
+                    int column = int.Parse(values[1]);
+                    int row = int.Parse(values[2]);
+                    string tileType = values[3];
+                    gridSizeX = int.Parse(values[4]);
+                    gridSizeY = int.Parse(values[5]);
 
-                GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+                    // Set the array size only once.
+                    if (!arraySizeSet)
+                    {
+                        movableTiles = new Transform[gridSizeX, gridSizeY];
+                        arraySizeSet = true; // Update the flag.
+                    }
+
+                    GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+                }
             }
         }
+        
     }
 
     GameObject GetTilePrefab(string tileType)
@@ -144,7 +156,7 @@ public class MovableTileGrid : MonoBehaviour
 
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
-        ReadLevelDataFromCSV(csvFile);
+        ReadLevelDataFromCSV();
     }
 
     public Transform[,] GetMovableTiles()
