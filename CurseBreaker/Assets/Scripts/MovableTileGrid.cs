@@ -245,7 +245,13 @@ public class MovableTileGrid : MonoBehaviour
 
                     if(tile.CompareTag("MovableTile"))
                     {
-                        Debug.Log("level failed");
+                        Debug.Log("level failed koska yks tippu");
+                        GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
+                        if (levelFailedBox != null)
+                        {
+                            animator = levelFailedBox.GetComponent<Animator>();
+                        }
+                        animator.SetTrigger("LevelEnd");
                     }
                     else
                     {
