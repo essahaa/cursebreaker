@@ -27,10 +27,13 @@ public class MovableTileDrag : MonoBehaviour
     private int rowIndex;
     private int columnIndex;
 
+    private int selectedLevel;
+
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+        tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
 
         movableTiles = movableTileGrid.movableTiles;
     }
@@ -40,8 +43,11 @@ public class MovableTileDrag : MonoBehaviour
         // Raycast to detect which tile was clicked.
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 
-        if (hit.collider != null)
+        selectedLevel = movableTileGrid.CheckSelectedLevel();
+
+        if (hit.collider != null && selectedLevel != 1)
         {
+            //initialMousePosition = hit.transform.position;
             // Check if the clicked object is a movable tile.
             if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
             {
@@ -50,8 +56,6 @@ public class MovableTileDrag : MonoBehaviour
                 //get the row and column of the selected tile from MovableTile component
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
-
-                Debug.Log("rowindex " + selectedTile.GetComponent<MovableTile>().Row + " colindex " + selectedTile.GetComponent<MovableTile>().Column + " currentmovetype: " + currentMoveType);
 
                 // Find all the movable tiles in the specified row or column.
                 if (currentMoveType == "horizontal")
@@ -101,6 +105,24 @@ public class MovableTileDrag : MonoBehaviour
                 isDragging = true;
             }
         }
+        else if(hit.collider != null && selectedLevel == 1)
+        {
+            //initialMousePosition = hit.transform.position;
+            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
+            {
+                selectedTile = hit.collider.gameObject;
+                rowIndex = selectedTile.GetComponent<MovableTile>().Row;
+                columnIndex = selectedTile.GetComponent<MovableTile>().Column;
+
+                Debug.Log("hit detected, tutorial level");
+                
+                
+                currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
+                initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions();
+
+                isDragging = true;
+            }
+        }
         else
         {
             Debug.Log("No hit detected.");
@@ -109,8 +131,6 @@ public class MovableTileDrag : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        int selectedLevel = movableTileGrid.CheckSelectedLevel();
-
         if (isDragging && !allElementsNull && selectedLevel != 1)
         {
             FindObjectOfType<AudioManager>().Play("liik");
@@ -171,11 +191,50 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
         }
-        else if (isDragging && !allElementsNull && selectedLevel == 1)
+        else if (isDragging && selectedLevel == 1)
         {
-            tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
+            // Calculate the offset based on the initial mouse and tile positions.
+            Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 offset = mouseCurrentPos - initialMousePosition;
 
-            tutorialLevel.TutorialMovement();
+            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+            {
+                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                {
+                    Transform tile = currentMovableTiles[col, row];
+
+                    if (tile != null)
+                    {
+                        Vector3 targetPosition;
+                        if (currentMoveType == "horizontal")
+                        { 
+                            targetPosition = initialTilePositions[col, row] + new Vector3(backgroundGrid.backgroundTileSize, 0f, 0f);
+
+                            Debug.Log("targetposition: " + targetPosition);
+
+                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
+                        }
+                        else
+                        {
+                            targetPosition = initialTilePositions[col, row] + new Vector3(0f, backgroundGrid.backgroundTileSize, 0f);
+
+                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+                        }
+
+                        // Update the tile's position to the target position.
+                        tile.position = targetPosition;
+
+                        // Calculate the new column and row based on the target position.
+                        int column = Mathf.RoundToInt((targetPosition.x - backgroundGrid.minX) / backgroundGrid.backgroundTileSize);
+                        int newRow = Mathf.RoundToInt((targetPosition.y - backgroundGrid.minY) / backgroundGrid.backgroundTileSize);
+
+                        // Update the movableTileGrid with the new position.
+                        movableTileGrid.UpdateMovableTile(column, newRow, tile);
+                    }
+
+
+                }
+            }
         }
 
     }
@@ -247,6 +306,13 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
 
+            if (selectedLevel == 1 && isSnappedToNewPlace)
+            {
+                //check if snapped place is the right one
+
+                //the first movement in tutorial level is done correctly
+                tutorialLevel.ChangeMovementDone();
+            }
             if (isSnappedToNewPlace)
             {
                 //Update movableTiles array with new snapped positions
@@ -271,6 +337,8 @@ public class MovableTileDrag : MonoBehaviour
                     currentMovableTiles[i, j] = null;
                 }
             }
+
+            
 
             allElementsNull = false;
             tileInSamePosition = false;
