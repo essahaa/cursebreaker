@@ -14,11 +14,12 @@ public class MovableTileGrid : MonoBehaviour
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
-
+    public Animator animator;
+    
     public int gridSizeX; //number of columns, width of the grid
     public int gridSizeY; //number of rows, height of the grid
 
-    private int selectedLevel = 1; // The level you want to generate.
+    private int selectedLevel = 2; // The level you want to generate.
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -518,6 +519,12 @@ public class MovableTileGrid : MonoBehaviour
             if (!onlyEvilTiles)
             {
                 Debug.Log("Game Over: MovableTiles group is not connected.");
+                GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
+                if (levelFailedBox != null)
+                {
+                    animator = levelFailedBox.GetComponent<Animator>();
+                }
+                animator.SetTrigger("LevelEnd");
             }
             else
             {
@@ -525,7 +532,12 @@ public class MovableTileGrid : MonoBehaviour
                 if (CountEvilTiles() == 0)
                 {
                     Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                    SceneManager.LoadScene("LevelCompleted");
+                    GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+                    if (levelCompletedBox != null)
+                    {
+                        animator = levelCompletedBox.GetComponent<Animator>();
+                    }
+                    animator.SetTrigger("LevelEnd");
 
                 }
             }
