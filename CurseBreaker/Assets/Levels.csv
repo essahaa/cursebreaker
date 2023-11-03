@@ -1,8 +1,8 @@
 Level;Column;Row;TileType;GridSizeX;GridSizeY;;;
 1;4;4;Normal;10;10;;;
-1;4;5;Evil;10;10;;;
+1;4;5;Normal;10;10;;;
 1;5;4;Normal;10;10;;;
-1;5;5;Normal;10;10;;;
+1;5;5;Evil;10;10;;;
 ;;;;;;;;
 2;4;4;Normal;10;10;;;
 2;4;5;Normal;10;10;;;
