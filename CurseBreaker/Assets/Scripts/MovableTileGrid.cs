@@ -40,7 +40,7 @@ public class MovableTileGrid : MonoBehaviour
     public void NextLevel()
     {
         selectedLevel = selectedLevel + 1;
-        ReadLevelDataFromCSV();
+        DestroyExistingMovableTiles();
     }
 
     private void ReadCSV()
