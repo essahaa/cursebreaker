@@ -1,17 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class TutorialLevel : MonoBehaviour
 {
-    //eka siirto on yks pyk‰l‰ oikealle, toka siirto yks pyk‰l‰ alas
-    //n‰ill‰ on tietyt rowit ja columnit
-    //onmouseclick pit‰s ottaa vaan sen tietyn rowin tilet jos kyseess‰ on tutorial
-
-    //pit‰‰ tarkistaa snappaako siirretty rowi oikeaan kohtaan, jos snappaa niin sitten siirryt‰‰n toiseen siirtoon
-
-    //pit‰‰ ehk‰ asettaa jotkut rajat ett‰ rowia ei saa edes siirretty‰ pitemm‰lle kuin yhden pyk‰l‰n verran
-    private string currentMoveType = "horizontal";
+    public string currentMoveType = "horizontal";
     private int rowIndex;
     private int columnIndex;
 
@@ -19,7 +13,12 @@ public class TutorialLevel : MonoBehaviour
     public bool lastMovementDone = false;
 
     private Transform[,] currentMovableTiles;
-    private Vector3[,] initialTilePositions;
+    public Vector3[,] initialTilePositions;
+
+    private void Start()
+    {
+        firstMovementDone = false;
+    }
 
     public Transform[,] TutorialLevelFindCurrentMovables()
     {
@@ -31,7 +30,6 @@ public class TutorialLevel : MonoBehaviour
             rowIndex = 5;
 
             currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInRow(rowIndex);
-
         }
         else if (firstMovementDone)
         {
@@ -44,7 +42,7 @@ public class TutorialLevel : MonoBehaviour
         return currentMovableTiles;
     }
 
-    public Vector3[,] TutorialLevelGetInitialPositions()
+    public Vector3[,] TutorialLevelGetInitialPositions(Transform[,] currentMovableTiles)
     {
         initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
 
@@ -57,18 +55,39 @@ public class TutorialLevel : MonoBehaviour
                 if (tile != null)
                 {
                     initialTilePositions[col, row] = currentMovableTiles[col, row].position;
+                    Debug.Log("initialtileposition " + currentMovableTiles[col, row].position);
 
                 }
             }
         }
-
         return initialTilePositions;
     }
 
-    public bool ChangeMovementDone()
+    public void TutorialCompleted()
     {
-        firstMovementDone = firstMovementDone = false ? true : false;
-        return firstMovementDone;
+        MovableTileGrid movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+        Destroy(movableTileGrid.movableTiles[6, 5]);
+        Debug.Log("tutorial completed");
+    }
+
+    public void ChangeMovementDone()
+    {
+        firstMovementDone = true;
+        currentMoveType = "vertical";
+        MovableTileGrid movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+        movableTileGrid.UpdateMovableTilesArray();
+    }
+
+    public void EmptyCurrentMovableArray()
+    {
+        //empty current movable tiles array
+        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+        {
+            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+            {
+                currentMovableTiles[i, j] = null;
+            }
+        }
     }
     
 }

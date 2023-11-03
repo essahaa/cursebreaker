@@ -107,19 +107,18 @@ public class MovableTileDrag : MonoBehaviour
         }
         else if(hit.collider != null && selectedLevel == 1)
         {
-            //initialMousePosition = hit.transform.position;
             if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
             {
                 selectedTile = hit.collider.gameObject;
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
 
-                Debug.Log("hit detected, tutorial level");
-                
-                
-                currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
-                initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions();
+                Debug.Log("hit detected, tutorial level, first movement done " + tutorialLevel.firstMovementDone);
 
+                currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
+                initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions(currentMovableTiles);
+
+                allElementsNull = false;
                 isDragging = true;
             }
         }
@@ -191,11 +190,9 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
         }
-        else if (isDragging && selectedLevel == 1)
+        else if (isDragging && !allElementsNull && selectedLevel == 1)
         {
-            // Calculate the offset based on the initial mouse and tile positions.
-            Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 offset = mouseCurrentPos - initialMousePosition;
+            tileInSamePosition = false;
 
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
@@ -206,33 +203,23 @@ public class MovableTileDrag : MonoBehaviour
                     if (tile != null)
                     {
                         Vector3 targetPosition;
-                        if (currentMoveType == "horizontal")
-                        { 
-                            targetPosition = initialTilePositions[col, row] + new Vector3(backgroundGrid.backgroundTileSize, 0f, 0f);
+                        if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
+                        {
+                            targetPosition = backgroundGrid.backgroundGrid[col + 1, row].position;
 
-                            Debug.Log("targetposition: " + targetPosition);
-
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
+                            tile.position = targetPosition;
+                            Debug.Log("horizontal col, row " + (col +1) + " , " + row);
+                            movableTileGrid.UpdateMovableTile(col + 1, row, tile);
                         }
                         else
                         {
-                            targetPosition = initialTilePositions[col, row] + new Vector3(0f, backgroundGrid.backgroundTileSize, 0f);
+                            targetPosition = backgroundGrid.backgroundGrid[col, row - 1].position;
 
-                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+                            tile.position = targetPosition;
+                            Debug.Log("vertical col, row " + col + " , " + (row - 1));
+                            movableTileGrid.UpdateMovableTile(col, row - 1, tile);
                         }
-
-                        // Update the tile's position to the target position.
-                        tile.position = targetPosition;
-
-                        // Calculate the new column and row based on the target position.
-                        int column = Mathf.RoundToInt((targetPosition.x - backgroundGrid.minX) / backgroundGrid.backgroundTileSize);
-                        int newRow = Mathf.RoundToInt((targetPosition.y - backgroundGrid.minY) / backgroundGrid.backgroundTileSize);
-
-                        // Update the movableTileGrid with the new position.
-                        movableTileGrid.UpdateMovableTile(column, newRow, tile);
                     }
-
-
                 }
             }
         }
@@ -244,7 +231,7 @@ public class MovableTileDrag : MonoBehaviour
         isDragging = false;
         bool isSnappedToNewPlace = false;
 
-        if (!allElementsNull)
+        if (!allElementsNull && selectedLevel != 1)
         {
             if (tileInSamePosition)
             {
@@ -266,7 +253,6 @@ public class MovableTileDrag : MonoBehaviour
             }
             //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
-
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
             // Snap each tile to the nearest grid position based on rows and columns.
@@ -274,7 +260,7 @@ public class MovableTileDrag : MonoBehaviour
             {
                 if (tile != null)
                 {
-                    MovableTile movableTileComponent = tile.GetComponent <MovableTile>();
+                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
 
                     // Calculate the target snapped position based on row and column.
                     float targetX = movableTileComponent.Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
@@ -305,14 +291,7 @@ public class MovableTileDrag : MonoBehaviour
                     
                 }
             }
-
-            if (selectedLevel == 1 && isSnappedToNewPlace)
-            {
-                //check if snapped place is the right one
-
-                //the first movement in tutorial level is done correctly
-                tutorialLevel.ChangeMovementDone();
-            }
+         
             if (isSnappedToNewPlace)
             {
                 //Update movableTiles array with new snapped positions
@@ -323,7 +302,7 @@ public class MovableTileDrag : MonoBehaviour
                 Debug.Log("movetype change: " + currentMoveType);
                 movableTileGrid.IsMovableTilesGroupConnected();
             }
-            else
+            else if(!isSnappedToNewPlace)
             {
                 currentMoveType = (currentMoveType == "horizontal") ? "horizontal" : "vertical";
                 Debug.Log("movetype still same: " + currentMoveType);
@@ -338,10 +317,79 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
 
+            allElementsNull = false;
+            tileInSamePosition = false;
+        }
+        if (selectedLevel == 1)
+        {
             
+            // Snap each tile to the nearest grid position based on rows and columns.
+            foreach (Transform tile in currentMovableTiles)
+            {
+                if (tile != null)
+                {
+                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+                    int col = movableTileComponent.Column;
+                    int row = movableTileComponent.Row;
+
+                    tile.position = backgroundGrid.backgroundGrid[col, row].position;
+                   
+                    Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
+
+                    if (currentMoveType == "horizontal")
+                    {
+                        if (movableTileComponent.Row == 5 && (movableTileComponent.Column == 5 || movableTileComponent.Column == 6))
+                        {
+                            //Update movableTiles array with new snapped positions
+                            movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                            //the first movement in tutorial level is done correctly
+                            tutorialLevel.ChangeMovementDone();
+                            currentMoveType = "vertical";
+                            Debug.Log("first movement done + movetype changed " + tutorialLevel.firstMovementDone + " , " + tutorialLevel.currentMoveType + " , " + currentMoveType);
+                        }
+                    }
+                    else
+                    {
+                        //the second movement in tutorial level is done correctly
+                        if (movableTileComponent.Column == 5 && (movableTileComponent.Row == 3 || movableTileComponent.Row == 4))
+                        {
+                            //Update movableTiles array with new snapped positions
+                            movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                            tutorialLevel.TutorialCompleted();
+                            Debug.Log("second movement done + movetype changed " + tutorialLevel.currentMoveType);
+                        }
+                    }
+
+                    //empty current movable tiles array
+                    for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                        {
+                            if(movableTileGrid.movableTiles[i, j] != null)
+                            {
+                                Debug.Log("movabletiles " + i + " , " + j);
+                            }
+                            
+                        }
+                    }
+
+                }
+            }
+
+            tutorialLevel.EmptyCurrentMovableArray();
+
+            //empty current movable tiles array
+            for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+            {
+                for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                {
+                    currentMovableTiles[i, j] = null;
+                }
+            }
 
             allElementsNull = false;
             tileInSamePosition = false;
+
         }
     }
 
