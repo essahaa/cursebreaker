@@ -7,7 +7,7 @@ Level;Column;Row;TileType;GridSizeX;GridSizeY;isLocked;;
 2;4;4;Normal;10;10;FALSE;;
 2;4;5;Normal;10;10;FALSE;;
 2;5;4;Normal;10;10;FALSE;;
-2;5;5;Normal;10;10;FALSE;;
+2;5;5;Normal;10;10;TRUE;;
 2;6;4;Evil;10;10;FALSE;;
 2;6;5;Evil;10;10;FALSE;;
 ;;;;;;;;
