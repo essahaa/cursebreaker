@@ -9,7 +9,9 @@ using UnityEngine.SceneManagement;
 public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
+    public Sprite glowingTile; 
     public GameObject evilTilePrefab;
+    public Sprite glowingTileEvil;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
