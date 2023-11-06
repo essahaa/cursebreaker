@@ -1745,59 +1745,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174888021}
   m_CullTransparentMesh: 1
---- !u!1 &1232163589
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1232163591}
-  - component: {fileID: 1232163590}
-  m_Layer: 0
-  m_Name: MovableTileGridManager
-  m_TagString: MovableTileGrid
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1232163590
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1232163589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e8b77cfef3d8134395a43ce4085806b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movableTilePrefab: {fileID: 1227834004184806325, guid: 28bb514d19801a046a88fd075b01e46a, type: 3}
-  glowingTile: {fileID: 0}
-  evilTilePrefab: {fileID: 8340316894529563072, guid: 890320a7e537bbc47a70ee8a0c1b55e8, type: 3}
-  glowingTileEvil: {fileID: 0}
-  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
-  movableTileSize: 1
-  animator: {fileID: 0}
-  gridSizeX: 0
-  gridSizeY: 0
---- !u!4 &1232163591
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1232163589}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3773712, y: 3.4476495, z: -4.7681355}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1374374375
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,7 +2165,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 19.799988, y: -91.69995}
+  m_AnchoredPosition: {x: 19.799988, y: -671}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1543685892
@@ -2521,53 +2468,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618053167}
   m_CullTransparentMesh: 1
---- !u!1 &1712505920
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1712505922}
-  - component: {fileID: 1712505921}
-  m_Layer: 0
-  m_Name: TutorialMovementManager
-  m_TagString: TutorialMovementManager
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1712505921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1712505920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2062bfc65ea0d704988d2f37a8d6d510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentMoveType: horizontal
-  firstMovementDone: 0
-  lastMovementDone: 0
---- !u!4 &1712505922
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1712505920}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.9846629, y: -0.3852456, z: 0.011533685}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1776653634
 GameObject:
   m_ObjectHideFlags: 0
@@ -2737,6 +2637,59 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1900735026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1900735028}
+  - component: {fileID: 1900735027}
+  m_Layer: 0
+  m_Name: TutorialLevelGenerator
+  m_TagString: TutorialLevel
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1900735027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900735026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2062bfc65ea0d704988d2f37a8d6d510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movableTilePrefab: {fileID: 1227834004184806325, guid: a8bddad52778201468dc919a49db0ca0, type: 3}
+  evilTilePrefab: {fileID: 8340316894529563072, guid: c91ab36fa10a89044a4c537194fc4388, type: 3}
+  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
+  backgroundGrid: {fileID: 68879168}
+  animator: {fileID: 0}
+  firstMovementDone: 0
+  tutorialDone: 0
+  gridSizeX: 0
+  gridSizeY: 0
+--- !u!4 &1900735028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900735026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1953051928
 GameObject:
   m_ObjectHideFlags: 0
@@ -3165,9 +3118,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1374374378}
-  - {fileID: 1712505922}
+  - {fileID: 1900735028}
   - {fileID: 68879169}
-  - {fileID: 1232163591}
   - {fileID: 2034798785}
   - {fileID: 566522856}
   - {fileID: 1488381966}
