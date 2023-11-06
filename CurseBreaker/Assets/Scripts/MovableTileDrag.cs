@@ -33,7 +33,6 @@ public class MovableTileDrag : MonoBehaviour
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
-        tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
 
         movableTiles = movableTileGrid.movableTiles;
 
@@ -106,21 +105,6 @@ public class MovableTileDrag : MonoBehaviour
                 isDragging = true;
             }
         }
-        else if(hit.collider != null && selectedLevel == 1)
-        {
-            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
-            {
-                selectedTile = hit.collider.gameObject;
-                rowIndex = selectedTile.GetComponent<MovableTile>().Row;
-                columnIndex = selectedTile.GetComponent<MovableTile>().Column;
-
-                currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
-                initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions(currentMovableTiles);
-
-                allElementsNull = false;
-                isDragging = true;
-            }
-        }
         else
         {
             Debug.Log("No hit detected.");
@@ -184,39 +168,6 @@ public class MovableTileDrag : MonoBehaviour
 
                             // Update the movableTileGrid with the new position.
                             movableTileGrid.UpdateMovableTile(column, newRow, tile);
-                        }
-                    }
-                }
-            }
-        }
-        else if (isDragging && !allElementsNull && selectedLevel == 1)
-        {
-            tileInSamePosition = false;
-
-            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
-            {
-                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
-                {
-                    Transform tile = currentMovableTiles[col, row];
-
-                    if (tile != null)
-                    {
-                        Vector3 targetPosition;
-                        if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
-                        {
-                            targetPosition = backgroundGrid.backgroundGrid[col + 1, row].position;
-
-                            tile.position = targetPosition;
-                            Debug.Log("horizontal col, row " + (col +1) + " , " + row);
-                            movableTileGrid.UpdateMovableTile(col + 1, row, tile);
-                        }
-                        else
-                        {
-                            targetPosition = backgroundGrid.backgroundGrid[col, row - 1].position;
-
-                            tile.position = targetPosition;
-                            Debug.Log("vertical col, row " + col + " , " + (row - 1));
-                            movableTileGrid.UpdateMovableTile(col, row - 1, tile);
                         }
                     }
                 }
@@ -315,46 +266,7 @@ public class MovableTileDrag : MonoBehaviour
             allElementsNull = false;
             tileInSamePosition = false;
         }
-        if (selectedLevel == 1)
-        {
-            // Snap each tile to the nearest grid position based on rows and columns.
-            foreach (Transform tile in currentMovableTiles)
-            {
-                if (tile != null)
-                {
-                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
-                    int col = movableTileComponent.Column;
-                    int row = movableTileComponent.Row;
-
-                    tile.position = backgroundGrid.backgroundGrid[col, row].position;
-                    movableTileGrid.UpdateMovableTile(col, row, tile);
-
-                    if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
-                    {
-                        //first movement done
-                    }
-                    else
-                    {
-                            tutorialLevel.TutorialCompleted();   
-                    }
-                }               
-            }
-            tutorialLevel.ChangeMovementDone();
-            currentMoveType = "vertical";
-            tutorialLevel.EmptyCurrentMovableArray();
-
-            //empty current movable tiles array
-            for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
-            {
-                for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
-                {
-                    currentMovableTiles[i, j] = null;
-                }
-            }
-
-            allElementsNull = false;
-            tileInSamePosition = false;
-        }
+        
     }
 
 }

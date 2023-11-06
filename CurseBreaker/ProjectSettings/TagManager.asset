@@ -12,6 +12,7 @@ TagManager:
   - TutorialMovementManager
   - BackgroundTile
   - LockTile
+  - TutorialLevel
   layers:
   - Default
   - TransparentFX
