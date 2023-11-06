@@ -36,6 +36,8 @@ public class MovableTileDrag : MonoBehaviour
         tutorialLevel = GameObject.FindGameObjectWithTag("TutorialMovementManager").GetComponent<TutorialLevel>();
 
         movableTiles = movableTileGrid.movableTiles;
+
+        selectedLevel = movableTileGrid.CheckSelectedLevel();
     }
 
     private void OnMouseDown()
@@ -43,7 +45,7 @@ public class MovableTileDrag : MonoBehaviour
         // Raycast to detect which tile was clicked.
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 
-        selectedLevel = movableTileGrid.CheckSelectedLevel();
+        
 
         if (hit.collider != null && selectedLevel != 1)
         {
@@ -92,7 +94,6 @@ public class MovableTileDrag : MonoBehaviour
                             if (currentMovableTiles[col, row] != null)
                             {
                                 initialTilePositions[col, row] = currentMovableTiles[col, row].position;
-                                Debug.Log("position " + currentMovableTiles[col, row].position);
                             }
                         }
                     }
@@ -112,8 +113,6 @@ public class MovableTileDrag : MonoBehaviour
                 selectedTile = hit.collider.gameObject;
                 rowIndex = selectedTile.GetComponent<MovableTile>().Row;
                 columnIndex = selectedTile.GetComponent<MovableTile>().Column;
-
-                Debug.Log("hit detected, tutorial level, first movement done " + tutorialLevel.firstMovementDone);
 
                 currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
                 initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions(currentMovableTiles);
@@ -283,12 +282,8 @@ public class MovableTileDrag : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("tile position in snap " + tile.position + "movabletilecomponent.Row " + movableTileComponent.Row + " movabletilecomponent.Column " + movableTileComponent.Column);
-
                         isSnappedToNewPlace = false;
-
-                    }
-                    
+                    }                   
                 }
             }
          
@@ -322,7 +317,6 @@ public class MovableTileDrag : MonoBehaviour
         }
         if (selectedLevel == 1)
         {
-            
             // Snap each tile to the nearest grid position based on rows and columns.
             foreach (Transform tile in currentMovableTiles)
             {
@@ -333,49 +327,20 @@ public class MovableTileDrag : MonoBehaviour
                     int row = movableTileComponent.Row;
 
                     tile.position = backgroundGrid.backgroundGrid[col, row].position;
-                   
-                    Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
+                    movableTileGrid.UpdateMovableTile(col, row, tile);
 
-                    if (currentMoveType == "horizontal")
+                    if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
                     {
-                        if (movableTileComponent.Row == 5 && (movableTileComponent.Column == 5 || movableTileComponent.Column == 6))
-                        {
-                            //Update movableTiles array with new snapped positions
-                            movableTiles = movableTileGrid.UpdateMovableTilesArray();
-                            //the first movement in tutorial level is done correctly
-                            tutorialLevel.ChangeMovementDone();
-                            currentMoveType = "vertical";
-                            Debug.Log("first movement done + movetype changed " + tutorialLevel.firstMovementDone + " , " + tutorialLevel.currentMoveType + " , " + currentMoveType);
-                        }
+                        //first movement done
                     }
                     else
                     {
-                        //the second movement in tutorial level is done correctly
-                        if (movableTileComponent.Column == 5 && (movableTileComponent.Row == 3 || movableTileComponent.Row == 4))
-                        {
-                            //Update movableTiles array with new snapped positions
-                            movableTiles = movableTileGrid.UpdateMovableTilesArray();
-                            tutorialLevel.TutorialCompleted();
-                            Debug.Log("second movement done + movetype changed " + tutorialLevel.currentMoveType);
-                        }
+                            tutorialLevel.TutorialCompleted();   
                     }
-
-                    //empty current movable tiles array
-                    for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
-                        {
-                            if(movableTileGrid.movableTiles[i, j] != null)
-                            {
-                                Debug.Log("movabletiles " + i + " , " + j);
-                            }
-                            
-                        }
-                    }
-
-                }
+                }               
             }
-
+            tutorialLevel.ChangeMovementDone();
+            currentMoveType = "vertical";
             tutorialLevel.EmptyCurrentMovableArray();
 
             //empty current movable tiles array
@@ -389,7 +354,6 @@ public class MovableTileDrag : MonoBehaviour
 
             allElementsNull = false;
             tileInSamePosition = false;
-
         }
     }
 

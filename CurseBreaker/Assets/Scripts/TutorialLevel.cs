@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class TutorialLevel : MonoBehaviour
 {
+    public Animator animator;
+
     public string currentMoveType = "horizontal";
     private int rowIndex;
     private int columnIndex;
@@ -55,7 +57,6 @@ public class TutorialLevel : MonoBehaviour
                 if (tile != null)
                 {
                     initialTilePositions[col, row] = currentMovableTiles[col, row].position;
-                    Debug.Log("initialtileposition " + currentMovableTiles[col, row].position);
 
                 }
             }
@@ -65,9 +66,20 @@ public class TutorialLevel : MonoBehaviour
 
     public void TutorialCompleted()
     {
-        MovableTileGrid movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
-        Destroy(movableTileGrid.movableTiles[6, 5]);
-        Debug.Log("tutorial completed");
+        if(firstMovementDone)
+        {
+            MovableTileGrid movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+            Destroy(movableTileGrid.movableTiles[6, 5].gameObject);
+            Debug.Log("tutorial completed");
+
+            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+            if (levelCompletedBox != null)
+            {
+                animator = levelCompletedBox.GetComponent<Animator>();
+            }
+            animator.SetTrigger("LevelEnd");
+        }
+        
     }
 
     public void ChangeMovementDone()
