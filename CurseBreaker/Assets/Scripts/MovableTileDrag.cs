@@ -35,16 +35,13 @@ public class MovableTileDrag : MonoBehaviour
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         movableTiles = movableTileGrid.movableTiles;
-
         selectedLevel = movableTileGrid.CheckSelectedLevel();
     }
 
     private void OnMouseDown()
     {
         // Raycast to detect which tile was clicked.
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-
-        
+        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero); 
 
         if (hit.collider != null && selectedLevel != 1)
         {
@@ -68,6 +65,7 @@ public class MovableTileDrag : MonoBehaviour
                     currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInColumn(columnIndex);
                 }
 
+
                 //checks if there are non null objects in current movables array
                 for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
                 {
@@ -76,7 +74,21 @@ public class MovableTileDrag : MonoBehaviour
                         if (currentMovableTiles[i, j] != null)
                         {
                             allElementsNull = false;
-                            break;  // No need to continue checking once a non-null element is found.
+
+                            MovableTile movableTile = currentMovableTiles[i, j].GetComponent<MovableTile>();
+
+                            if (movableTile != null)
+                            {
+                                SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
+                                if (movableTile.TileType == "Normal")
+                                {
+                                    spriteRenderer.sprite = movableTileGrid.glowingTile;  
+                                }
+                                else if (movableTile.TileType == "Evil")
+                                {
+                                    spriteRenderer.sprite = movableTileGrid.glowingTileEvil;
+                                }
+                            }
                         }
                     }
                 }
@@ -259,10 +271,26 @@ public class MovableTileDrag : MonoBehaviour
             {
                 for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
                 {
-                    currentMovableTiles[i, j] = null;
+                    if (currentMovableTiles[i, j] != null)
+                    {
+                        MovableTile movableTile = currentMovableTiles[i, j].GetComponent<MovableTile>();
+                        // Check if the MovableTile component is not null
+                        if (movableTile != null)
+                        {
+                            SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
+                            if (movableTile.TileType == "Normal")
+                            {
+                                spriteRenderer.sprite = movableTileGrid.tile;
+                            }
+                            else if (movableTile.TileType == "Evil")
+                            {
+                                spriteRenderer.sprite = movableTileGrid.evilTile;
+                            }
+                        }
+                        currentMovableTiles[i, j] = null;
+                    }
                 }
             }
-
             allElementsNull = false;
             tileInSamePosition = false;
         }

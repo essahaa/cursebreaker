@@ -61,9 +61,9 @@ public class TutorialLevel : MonoBehaviour
                 string[] values = line.Split(';'); // Split each line into values.
 
                 // Check if the current line corresponds to the target level.
-                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == 1)
+                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == 0)
                 {
-                    Debug.Log("level " + values[0] + " selectedlevel " + 1);
+                    Debug.Log("level " + values[0] + " selectedlevel " + 0);
                     // Parse data from the CSV line.
                     int column = int.Parse(values[1]);
                     int row = int.Parse(values[2]);

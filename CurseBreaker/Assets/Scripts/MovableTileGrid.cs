@@ -9,9 +9,11 @@ using UnityEngine.SceneManagement;
 public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
-    public Sprite glowingTile; 
+    public Sprite glowingTile;
+    public Sprite tile;
     public GameObject evilTilePrefab;
     public Sprite glowingTileEvil;
+    public Sprite evilTile;
     public GameObject lockTilePrefab;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
@@ -22,7 +24,7 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeX; //number of columns, width of the grid
     public int gridSizeY; //number of rows, height of the grid
 
-    private int selectedLevel = 2; // The level you want to generate.
+    private int selectedLevel = 1; // The level you want to generate.
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
