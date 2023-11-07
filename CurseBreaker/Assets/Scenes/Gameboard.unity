@@ -3136,9 +3136,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movableTilePrefab: {fileID: 1227834004184806325, guid: 28bb514d19801a046a88fd075b01e46a, type: 3}
-  glowingTile: {fileID: 0}
+  glowingTile: {fileID: 21300000, guid: c9e73d2d570593c47a9b138b49d4adda, type: 3}
   evilTilePrefab: {fileID: 8340316894529563072, guid: 890320a7e537bbc47a70ee8a0c1b55e8, type: 3}
-  glowingTileEvil: {fileID: 0}
+  glowingTileEvil: {fileID: 21300000, guid: e02accc72f02b5f4ca3d64aa216a5480, type: 3}
   lockTilePrefab: {fileID: 6779172287901570810, guid: 35bfd5311b84d2047af40ad84c874ff9, type: 3}
   csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   movableTileSize: 1
