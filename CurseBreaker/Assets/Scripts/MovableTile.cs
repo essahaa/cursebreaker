@@ -13,8 +13,7 @@ public class MovableTile : MonoBehaviour
     public int Row { get; set; }
     public int Column { get; set; }
     public string TileType { get; set; }
-
-
+    public bool locked = false; // Add the locked flag.
 
 
 }
