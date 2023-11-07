@@ -154,6 +154,7 @@ public class MovableTileGrid : MonoBehaviour
 
     void CreateLockTileOnMovableTile(int column, int row, bool isLocked)
     {
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         Debug.Log("CreateLockTileOnMovableTile - Column: " + column + ", Row: " + row + ", isLocked: " + isLocked);
 
         if (column >= 0 && column < gridSizeX && row >= 0 && row < gridSizeY)
@@ -163,7 +164,7 @@ public class MovableTileGrid : MonoBehaviour
                 if (isLocked)
                 {
                     GameObject lockTile = Instantiate(lockTilePrefab, movableTiles[column, row].position, Quaternion.identity);
-                    lockTile.transform.localScale = new Vector3(movableTileSize, movableTileSize, 1);
+                    lockTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
                     lockTile.transform.SetParent(movableTiles[column, row]);
                 }
             }
