@@ -43,7 +43,7 @@ public class MovableTileDrag : MonoBehaviour
         // Raycast to detect which tile was clicked.
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero); 
 
-        if (hit.collider != null && selectedLevel != 1)
+        if (hit.collider != null)
         {
             //initialMousePosition = hit.transform.position;
             // Check if the clicked object is a movable tile.
@@ -125,7 +125,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        if (isDragging && !allElementsNull && selectedLevel != 1)
+        if (isDragging && !allElementsNull)
         {
             FindObjectOfType<AudioManager>().Play("liik");
 
@@ -193,7 +193,7 @@ public class MovableTileDrag : MonoBehaviour
         isDragging = false;
         bool isSnappedToNewPlace = false;
 
-        if (!allElementsNull && selectedLevel != 1)
+        if (!allElementsNull)
         {
             if (tileInSamePosition)
             {
