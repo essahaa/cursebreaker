@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7737467480376019598}
   - component: {fileID: -5170325026435386499}
   - component: {fileID: -733277757621446007}
+  - component: {fileID: 5252421693733334399}
   m_Layer: 0
   m_Name: TutorialEvilTile
   m_TagString: EvilTile
@@ -172,6 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3e5c8dc43cb5674f87f49bf80834d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  locked: 0
 --- !u!114 &-733277757621446007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,3 +188,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundGrid: {fileID: 0}
   tutorialLevel: {fileID: 0}
+--- !u!95 &5252421693733334399
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340316894529563072}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a734d219f964f8a418c51f769f0478cb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

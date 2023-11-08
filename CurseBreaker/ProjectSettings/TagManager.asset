@@ -13,6 +13,7 @@ TagManager:
   - BackgroundTile
   - LockTile
   - TutorialLevel
+  - LevelManager
   layers:
   - Default
   - TransparentFX

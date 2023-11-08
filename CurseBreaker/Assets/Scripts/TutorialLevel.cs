@@ -40,16 +40,11 @@ public class TutorialLevel : MonoBehaviour
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
 
-        ReadLevelDataFromCSV();
-        
-        
+        ReadLevelDataFromCSV();  
     }
-
-    
 
     public void ReadLevelDataFromCSV()
     {
-        Debug.Log("reading csv");
         string[] lines = csvFile.text.Split('\n');
         csvLines.AddRange(lines);
         bool arraySizeSet = false; // Add a flag to track if array size is set.
@@ -81,10 +76,7 @@ public class TutorialLevel : MonoBehaviour
                     GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
                 }
             }
-
         }
-        
-
     }
 
     GameObject GetTilePrefab(string tileType)
@@ -177,33 +169,6 @@ public class TutorialLevel : MonoBehaviour
         }
 
         return movableTiles;
-    }
-
-    public void DestroyExistingMovableTiles()
-    {
-        // Clear the references in the movableTiles array.
-        for (int x = 0; x < gridSizeX; x++)
-        {
-            for (int y = 0; y < gridSizeY; y++)
-            {
-                movableTiles[x, y] = null;
-            }
-        }
-
-        // Find and destroy game objects with the "MovableTile" and "EvilTile" tags.
-        GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
-        objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
-        objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
-
-        // Loop through and destroy each GameObject
-        foreach (GameObject obj in objectsToDestroy)
-        {
-            Destroy(obj);
-        }
-
-        backgroundGenerated = false;
-        // Generate new movable tiles (and evil tiles if needed).
-        ReadLevelDataFromCSV();
     }
 
     public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
@@ -328,7 +293,10 @@ public class TutorialLevel : MonoBehaviour
     {
         if(firstMovementDone)
         {
-            Destroy(movableTiles[6, 5].gameObject);
+            GameObject tileToDestroy = movableTiles[6, 5].gameObject;
+            animator = tileToDestroy.GetComponent<Animator>();
+            animator.SetTrigger("blow");
+            //Destroy(tileToDestroy);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
