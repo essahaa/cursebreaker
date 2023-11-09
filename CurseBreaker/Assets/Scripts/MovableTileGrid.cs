@@ -109,22 +109,10 @@ public class MovableTileGrid : MonoBehaviour
         switch (tileType)
         {
             case "Normal":
-                switch(isLocked)
-                {
-                    case true:
-                        return lockTilePrefab;
-                    case false:
                         return movableTilePrefab;
-                }
-
             case "Evil":
-                switch (isLocked)
-                {
-                    case true:
-                        return lockTilePrefab;
-                    case false:
-                        return movableTilePrefab;
-                }
+                        return evilTilePrefab;
+                
             // Add more cases for other tile types as needed.
             default:
                 return movableTilePrefab; // Default to a fallback prefab.
@@ -155,7 +143,7 @@ public class MovableTileGrid : MonoBehaviour
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
                 tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
                 movableTiles[column, row] = tile.transform;
-
+                
                 MovableTile tileData = tile.GetComponent<MovableTile>();
                 tileData.Level = selectedLevel;
                 tileData.Row = row;
@@ -163,8 +151,10 @@ public class MovableTileGrid : MonoBehaviour
                 tileData.TileType = tileType;
                 tileData.GridSizeX = gridSizeX;
                 tileData.GridSizeY = gridSizeY;
+                tileData.IsLocked = isLocked;
                 // Check if the lock tile is being created
                 CreateLockTileOnMovableTile(column, row, isLocked);
+             
             }
         }
     }
@@ -396,37 +386,61 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
     {
-        Debug.Log("rowindex in findmovable " + rowIndex);
-
-        int numRows = movableTiles.GetLength(1);
         int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-        Transform[,] tilesInRow = new Transform[numCols, numRows];
+        int numRows = movableTiles.GetLength(1);
+        Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
 
-        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
-
-        if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
+        // Initialize all tiles as null or some default state as required.
+        for (int col = 0; col < numCols; col++)
         {
-            for (int col = 0; col < numCols; col++)
+            tilesInRow[col, rowIndex] = null;
+        }
+
+        bool inSequence = false;
+        List<Transform> sequenceTiles = new List<Transform>();
+
+        for (int col = 0; col < numCols; col++)
+        {
+            Transform tile = movableTiles[col, rowIndex];
+
+            // If we encounter a LockTile or null, reset the sequence.
+            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
             {
-                if (movableTiles[col, rowIndex] != null)
+                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid row needs at least 2 tiles.
                 {
-                    // Check if the tile has an adjacent tile to the left or right.
-                    bool hasLeftAdjacent = (col > 0 && movableTiles[col - 1, rowIndex] != null);
-                    bool hasRightAdjacent = (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null);
-
-                    if (hasLeftAdjacent || hasRightAdjacent)
+                    foreach (Transform validTile in sequenceTiles)
                     {
-                        // Include this tile in the movable row.
-                        tilesInRow[col, rowIndex] = movableTiles[col, rowIndex];
-                        foundAdjacentTile = true; // Set the flag to true.
-
-                    }
-                    else if (foundAdjacentTile)
-                    {
-                        // Exclude this tile as it's alone after an adjacent tile.
-                        tilesInRow[col, rowIndex] = null;
+                        MovableTile tileData = validTile.GetComponent<MovableTile>();
+                        tilesInRow[tileData.Column, rowIndex] = validTile;
                     }
                 }
+                // Reset the sequence regardless of its validity because of the LockTile or gap.
+                sequenceTiles.Clear();
+                inSequence = false;
+                continue;
+            }
+
+            // Add to current sequence if we are in one.
+            if (inSequence)
+            {
+                sequenceTiles.Add(tile);
+            }
+            else
+            {
+                // Start a new sequence if we're not already in one.
+                sequenceTiles.Clear();
+                sequenceTiles.Add(tile);
+                inSequence = true;
+            }
+        }
+
+        // Handle the case where the last tile in the row is not a LockTile and we have a valid sequence.
+        if (inSequence && sequenceTiles.Count >= 2)
+        {
+            foreach (Transform validTile in sequenceTiles)
+            {
+                MovableTile tileData = validTile.GetComponent<MovableTile>();
+                tilesInRow[tileData.Column, rowIndex] = validTile;
             }
         }
 
@@ -436,39 +450,64 @@ public class MovableTileGrid : MonoBehaviour
 
 
 
-    // Function to find and return movable tiles in a specified column.
+
     public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
-        Debug.Log("colindex in findmovable " + columnIndex);
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numRows = movableTiles.GetLength(1);
+        Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
 
-        int numRows = movableTiles.GetLength(1); // Assuming movableTiles is in [col, row] format.
-        int numCols = movableTiles.GetLength(0);
-        Transform[,] tilesInColumn = new Transform[numCols, numRows];
-
-        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
-
-        if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
+        // Initialize all tiles in the column as null or some default state as required.
+        for (int row = 0; row < numRows; row++)
         {
-            for (int row = 0; row < numRows; row++)
-            {
-                if (movableTiles[columnIndex, row] != null)
-                {
-                    // Check if the tile has an adjacent tile above or below.
-                    bool hasAboveAdjacent = (row > 0 && movableTiles[columnIndex, row - 1] != null);
-                    bool hasBelowAdjacent = (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null);
+            tilesInColumn[columnIndex, row] = null;
+        }
 
-                    if (hasAboveAdjacent || hasBelowAdjacent)
+        bool inSequence = false;
+        List<Transform> sequenceTiles = new List<Transform>();
+
+        for (int row = 0; row < numRows; row++)
+        {
+            Transform tile = movableTiles[columnIndex, row];
+
+            // If we encounter a LockTile or null, reset the sequence.
+            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
+            {
+                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid column needs at least 2 tiles.
+                {
+                    foreach (Transform validTile in sequenceTiles)
                     {
-                        // Include this tile in the movable column.
-                        tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row];
-                        foundAdjacentTile = true; // Set the flag to true.
-                    }
-                    else if (foundAdjacentTile)
-                    {
-                        // Exclude this tile as it's alone after an adjacent tile.
-                        tilesInColumn[columnIndex, row] = null;
+                        MovableTile tileData = validTile.GetComponent<MovableTile>();
+                        tilesInColumn[columnIndex, tileData.Row] = validTile;
                     }
                 }
+                // Reset the sequence regardless of its validity because of the LockTile or gap.
+                sequenceTiles.Clear();
+                inSequence = false;
+                continue;
+            }
+
+            // Add to current sequence if we are in one.
+            if (inSequence)
+            {
+                sequenceTiles.Add(tile);
+            }
+            else
+            {
+                // Start a new sequence if we're not already in one.
+                sequenceTiles.Clear();
+                sequenceTiles.Add(tile);
+                inSequence = true;
+            }
+        }
+
+        // Handle the case where the last tile in the column is not a LockTile and we have a valid sequence.
+        if (inSequence && sequenceTiles.Count >= 2)
+        {
+            foreach (Transform validTile in sequenceTiles)
+            {
+                MovableTile tileData = validTile.GetComponent<MovableTile>();
+                tilesInColumn[columnIndex, tileData.Row] = validTile;
             }
         }
 
@@ -534,7 +573,7 @@ public class MovableTileGrid : MonoBehaviour
             for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
-                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")))
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile")))
                 {
                     startTile = tile;
                     break;
@@ -556,7 +595,7 @@ public class MovableTileGrid : MonoBehaviour
             for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
-                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && !visited[x, y])
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile")) && !visited[x, y])
                 {
                     movableTiles[x, y] = null;
                     result = false; // There's an unvisited tile, group is not connected.
@@ -620,7 +659,7 @@ public class MovableTileGrid : MonoBehaviour
         if (x > 0 && !visited[x - 1, y])
         {
             Transform leftNeighbor = movableTiles[x - 1, y];
-            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile")))
+            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile") || leftNeighbor.CompareTag("LockTile")))
             {
                 result &= DepthFirstSearch(leftNeighbor, visited);
             }
@@ -629,7 +668,7 @@ public class MovableTileGrid : MonoBehaviour
         if (x < gridSizeX - 1 && !visited[x + 1, y])
         {
             Transform rightNeighbor = movableTiles[x + 1, y];
-            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
+            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile") || rightNeighbor.CompareTag("LockTile")))
             {
                 result &= DepthFirstSearch(rightNeighbor, visited);
             }
@@ -638,7 +677,7 @@ public class MovableTileGrid : MonoBehaviour
         if (y > 0 && !visited[x, y - 1])
         {
             Transform lowerNeighbor = movableTiles[x, y - 1];
-            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile")))
+            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile") || lowerNeighbor.CompareTag("LockTile")))
             {
                 result &= DepthFirstSearch(lowerNeighbor, visited);
             }
@@ -647,7 +686,7 @@ public class MovableTileGrid : MonoBehaviour
         if (y < gridSizeY - 1 && !visited[x, y + 1])
         {
             Transform upperNeighbor = movableTiles[x, y + 1];
-            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
+            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile") || upperNeighbor.CompareTag("LockTile")))
             {
                 result &= DepthFirstSearch(upperNeighbor, visited);
             }
