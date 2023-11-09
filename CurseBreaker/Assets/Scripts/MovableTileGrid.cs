@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class MovableTileGrid : MonoBehaviour
 {
@@ -101,15 +102,29 @@ public class MovableTileGrid : MonoBehaviour
 
     }
 
-    GameObject GetTilePrefab(string tileType)
+    private GameObject GetTilePrefab(string tileType, bool isLocked)
     {
+
         // Choose the appropriate prefab based on the tileType.
         switch (tileType)
         {
             case "Normal":
-                return movableTilePrefab;
+                switch(isLocked)
+                {
+                    case true:
+                        return lockTilePrefab;
+                    case false:
+                        return movableTilePrefab;
+                }
+
             case "Evil":
-                return evilTilePrefab;
+                switch (isLocked)
+                {
+                    case true:
+                        return lockTilePrefab;
+                    case false:
+                        return movableTilePrefab;
+                }
             // Add more cases for other tile types as needed.
             default:
                 return movableTilePrefab; // Default to a fallback prefab.
@@ -126,7 +141,7 @@ public class MovableTileGrid : MonoBehaviour
             backgroundGenerated = true;
         }
         
-        GameObject tilePrefab = GetTilePrefab(tileType);
+        GameObject tilePrefab = GetTilePrefab(tileType, isLocked);
 
         if (column < gridSizeX && row < gridSizeY)
         {
