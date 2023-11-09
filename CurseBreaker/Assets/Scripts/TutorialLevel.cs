@@ -11,6 +11,11 @@ public class TutorialLevel : MonoBehaviour
 {
     public GameObject movableTilePrefab;
     public GameObject evilTilePrefab;
+    public GameObject arrowPrefab;
+    public GameObject lynaraPrefab;
+
+    private GameObject arrow;
+    private GameObject lynara;
 
     public TextAsset csvFile;
     public BackgroundGrid backgroundGrid;
@@ -111,6 +116,16 @@ GameObject GetTilePrefab(string tileType)
         if (!backgroundGenerated)
         {
             backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
+
+            Vector3 arrowposition = new Vector3(0.1f, 0.7f, 0);
+
+            arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
+            arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+
+            Vector3 lynaraPosition = new Vector3(-0.6f, -2.4f, 0);
+            lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
+            lynara.transform.localScale = new Vector3(0.9f, 0.9f, 1);
+
             backgroundGenerated = true;
         }
 
@@ -317,6 +332,10 @@ GameObject GetTilePrefab(string tileType)
     public void ChangeMovementDone()
     {
         firstMovementDone = true;
+        arrow.SetActive(false);
+        arrow.transform.position = new Vector3(1.2f, 0, 0);
+        arrow.transform.rotation = Quaternion.Euler(0, 0, 270);
+        arrow.SetActive(true);
         currentMoveType = "vertical";
         UpdateMovableTilesArray();
     }
