@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -15,7 +17,7 @@ public class TutorialLevel : MonoBehaviour
     
     public Animator animator;
 
-    private int selectedLevel = 1; // The level you want to generate.
+    private int selectedLevel = 0; // The level you want to generate.
     
     private int rowIndex;
     private int columnIndex;
@@ -27,10 +29,10 @@ public class TutorialLevel : MonoBehaviour
     
     private bool backgroundGenerated = false;
 
-    public int gridSizeX; //number of columns, width of the grid
-    public int gridSizeY; //number of rows, height of the grid
+    public int gridSizeX = 10; //number of columns, width of the grid
+    public int gridSizeY = 10; //number of rows, height of the grid
 
-    private Transform[,] currentMovableTiles;
+    private Transform[] currentMovableTiles;
     private Transform[,] movableTiles;
     public Vector3[,] initialTilePositions;
 
@@ -43,43 +45,53 @@ public class TutorialLevel : MonoBehaviour
         ReadLevelDataFromCSV();  
     }
 
+    
+
     public void ReadLevelDataFromCSV()
     {
-        string[] lines = csvFile.text.Split('\n');
-        csvLines.AddRange(lines);
-        bool arraySizeSet = false; // Add a flag to track if array size is set.
-
-        if (csvLines.Count > 0)
+        using (var reader = new StreamReader(new MemoryStream(csvFile.bytes)))
         {
-            foreach (string line in csvLines)
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string[] values = line.Split(';'); // Split each line into values.
+                // Skip empty lines
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-                // Check if the current line corresponds to the target level.
-                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == 0)
+                string[] values = line.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+                // Ensure there's enough data in the line to avoid IndexOutOfRangeException
+                if (values.Length < 6) continue;
+
+                if (int.TryParse(values[0], out int level) && level == selectedLevel)
                 {
-                    Debug.Log("level " + values[0] + " selectedlevel " + 0);
-                    // Parse data from the CSV line.
-                    int column = int.Parse(values[1]);
-                    int row = int.Parse(values[2]);
-                    string tileType = values[3];
-                    gridSizeX = int.Parse(values[4]);
-                    gridSizeY = int.Parse(values[5]);
-
-                    // Set the array size only once.
-                    if (!arraySizeSet)
+                    // Use TryParse for safety.
+                    if (int.TryParse(values[1], out int column) &&
+                        int.TryParse(values[2], out int row) &&
+                        int.TryParse(values[4], out gridSizeX) &&
+                        int.TryParse(values[5], out gridSizeY))
                     {
-                        movableTiles = new Transform[gridSizeX, gridSizeY];
-                        arraySizeSet = true; // Update the flag.
-                    }
+                        string tileType = values[3];
 
-                    GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+                        // Initialize the array on first successful parse.
+                        if (movableTiles == null)
+                        {
+                            movableTiles = new Transform[gridSizeX, gridSizeY];
+                        }
+
+                        GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+                    }
+                    else
+                    {
+                        // Handle parsing errors or log for debugging
+                    }
                 }
             }
         }
     }
 
-    GameObject GetTilePrefab(string tileType)
+
+
+GameObject GetTilePrefab(string tileType)
     {
         // Choose the appropriate prefab based on the tileType.
         switch (tileType)
@@ -106,27 +118,39 @@ public class TutorialLevel : MonoBehaviour
 
         if (column < gridSizeX && row < gridSizeY)
         {
-            // Check if the position exists in the backgroundGrid array
-            if (backgroundGrid.backgroundGrid[column, row] != null)
+            // Cache the reference to the background grid cell
+            Transform backgroundGridCell = backgroundGrid.backgroundGrid[column, row];
+
+            if (backgroundGridCell != null)
             {
-                // Get the position from the backgroundGrid array
-                Vector3 position = backgroundGrid.backgroundGrid[column, row].position;
+                // Get the position from the cached reference
+                Vector3 position = backgroundGridCell.position;
 
                 // Create the tile at the retrieved position
-                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+                MovableTile tile = Instantiate(tilePrefab, position, Quaternion.identity).GetComponent<MovableTile>();
+                tile.Row = row;
+                tile.Column = column;
+                tile.TileType = tileType;
+
                 tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+
+                
                 movableTiles[column, row] = tile.transform;
 
                 MovableTile tileData = tile.GetComponent<MovableTile>();
-                tileData.Level = selectedLevel;
-                tileData.Row = row;
-                tileData.Column = column;
-                tileData.TileType = tileType;
-                tileData.GridSizeX = gridSizeX;
-                tileData.GridSizeY = gridSizeY;
+                if (tileData != null)
+                {
+                    tileData.Level = selectedLevel;
+                    tileData.Row = row;
+                    tileData.Column = column;
+                    tileData.TileType = tileType;
+                    tileData.GridSizeX = gridSizeX;
+                    tileData.GridSizeY = gridSizeY;
+                }
             }
         }
     }
+
     public void UpdateMovableTile(int column, int row, Transform newTile)
     {
         //empty cell 
@@ -134,14 +158,12 @@ public class TutorialLevel : MonoBehaviour
         // Update the cell with the new tile.
         movableTiles[column, row] = newTile;
 
-        Transform tile = movableTiles[column, row];
+        MovableTile tile = movableTiles[column, row].GetComponent<MovableTile>();
 
         if (tile != null)
         {
-            // Get the MovableTile component of the tile.
-            MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
-            movableTileComponent.Row = row;
-            movableTileComponent.Column = column;
+            tile.Row = row;
+            tile.Column = column;
         }
 
     }
@@ -171,38 +193,23 @@ public class TutorialLevel : MonoBehaviour
         return movableTiles;
     }
 
-    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
+    public Transform[] FindAdjacentMovableTilesInRow(int rowIndex)
     {
-        Debug.Log("rowindex in findmovable " + rowIndex);
+        Debug.Log("rowIndex in FindAdjacentMovableTilesInRow " + rowIndex);
 
-        int numRows = movableTiles.GetLength(1);
-        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-        Transform[,] tilesInRow = new Transform[numCols, numRows];
-
-        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+        int numCols = movableTiles.GetLength(0); // Number of columns.
+        Transform[] tilesInRow = new Transform[numCols]; // Only need a 1D array for a single row.
 
         if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
         {
             for (int col = 0; col < numCols; col++)
             {
-                if (movableTiles[col, rowIndex] != null)
+                // Only consider this tile if it's not null and has at least one adjacent tile.
+                if (movableTiles[col, rowIndex] != null &&
+                    ((col > 0 && movableTiles[col - 1, rowIndex] != null) ||
+                     (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null)))
                 {
-                    // Check if the tile has an adjacent tile to the left or right.
-                    bool hasLeftAdjacent = (col > 0 && movableTiles[col - 1, rowIndex] != null);
-                    bool hasRightAdjacent = (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null);
-
-                    if (hasLeftAdjacent || hasRightAdjacent)
-                    {
-                        // Include this tile in the movable row.
-                        tilesInRow[col, rowIndex] = movableTiles[col, rowIndex];
-                        foundAdjacentTile = true; // Set the flag to true.
-
-                    }
-                    else if (foundAdjacentTile)
-                    {
-                        // Exclude this tile as it's alone after an adjacent tile.
-                        tilesInRow[col, rowIndex] = null;
-                    }
+                    tilesInRow[col] = movableTiles[col, rowIndex];
                 }
             }
         }
@@ -210,16 +217,13 @@ public class TutorialLevel : MonoBehaviour
         return tilesInRow;
     }
 
-    // Function to find and return movable tiles in a specified column.
-    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
+
+    public Transform[] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
-        Debug.Log("colindex in findmovable " + columnIndex);
+        Debug.Log("columnIndex in FindAdjacentMovableTilesInColumn " + columnIndex);
 
-        int numRows = movableTiles.GetLength(1); // Assuming movableTiles is in [col, row] format.
-        int numCols = movableTiles.GetLength(0);
-        Transform[,] tilesInColumn = new Transform[numCols, numRows];
-
-        bool foundAdjacentTile = false; // Flag to track if an adjacent tile has been found.
+        int numRows = movableTiles.GetLength(1); // Number of rows.
+        Transform[] tilesInColumn = new Transform[numRows]; // Only need a 1D array for a single column.
 
         if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
         {
@@ -234,13 +238,7 @@ public class TutorialLevel : MonoBehaviour
                     if (hasAboveAdjacent || hasBelowAdjacent)
                     {
                         // Include this tile in the movable column.
-                        tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row];
-                        foundAdjacentTile = true; // Set the flag to true.
-                    }
-                    else if (foundAdjacentTile)
-                    {
-                        // Exclude this tile as it's alone after an adjacent tile.
-                        tilesInColumn[columnIndex, row] = null;
+                        tilesInColumn[row] = movableTiles[columnIndex, row];
                     }
                 }
             }
@@ -249,7 +247,8 @@ public class TutorialLevel : MonoBehaviour
         return tilesInColumn;
     }
 
-    public Transform[,] TutorialLevelFindCurrentMovables()
+
+    public Transform[] TutorialLevelFindCurrentMovables()
     {
         if (!firstMovementDone)
         {
@@ -269,34 +268,39 @@ public class TutorialLevel : MonoBehaviour
         return currentMovableTiles;
     }
 
-    public Vector3[,] TutorialLevelGetInitialPositions(Transform[,] currentMovableTiles)
+    public Vector3[,] TutorialLevelGetInitialPositions(Transform[] currentMovableTiles)
     {
-        initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
+        // Initialize the array for initial positions
+        initialTilePositions = new Vector3[gridSizeY, gridSizeX];
 
-        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+        foreach (Transform tile in currentMovableTiles)
         {
-            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+            if (tile != null)
             {
-                Transform tile = currentMovableTiles[col, row];
-
-                if (tile != null)
+                MovableTile movableTile = tile.GetComponent<MovableTile>();
+                if (movableTile != null)
                 {
-                    initialTilePositions[col, row] = currentMovableTiles[col, row].position;
-
+                    int row = movableTile.Row;
+                    int col = movableTile.Column;
+                    initialTilePositions[col, row] = tile.position;
+                }
+                else
+                {
+                    Debug.LogError("MovableTile component not found on tile.");
                 }
             }
         }
+
         return initialTilePositions;
     }
+
 
     public void TutorialCompleted()
     {
         if(firstMovementDone)
         {
-            GameObject tileToDestroy = movableTiles[6, 5].gameObject;
-            animator = tileToDestroy.GetComponent<Animator>();
-            animator.SetTrigger("blow");
-            //Destroy(tileToDestroy);
+            GameObject tileToDestroy = movableTiles[6, 5].gameObject;       
+            Destroy(tileToDestroy);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
@@ -320,12 +324,9 @@ public class TutorialLevel : MonoBehaviour
     public void EmptyCurrentMovableArray()
     {
         //empty current movable tiles array
-        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+        for (int i = 0; i < currentMovableTiles.Length; i++)
         {
-            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
-            {
-                currentMovableTiles[i, j] = null;
-            }
+            currentMovableTiles[i] = null; 
         }
     }
     

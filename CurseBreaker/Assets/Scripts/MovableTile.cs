@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MovableTile : MonoBehaviour
 {
-    public static MovableTile Instance;
+    //public static MovableTile Instance;
 
     public int Level { get; set; }
 
