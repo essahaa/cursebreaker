@@ -93,6 +93,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
 
+
                 if (!allElementsNull)
                 {
                     initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
@@ -134,11 +135,17 @@ public class MovableTileDrag : MonoBehaviour
             Vector3 offset = mouseCurrentPos - initialMousePosition;
 
             // Iterate through the tiles in the row or column.
-            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+        {
+            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
             {
-                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                Transform tile = currentMovableTiles[col, row];
+
+                // Skip locked tiles
+                if (tile != null && tile.GetComponent<MovableTile>().IsLocked)
                 {
-                    Transform tile = currentMovableTiles[col, row];
+                    continue; // This will skip the current iteration, hence not moving the locked tile.
+                }
 
                     if (tile != null)
                     {
