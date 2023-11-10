@@ -16,6 +16,7 @@ public class MovableTileGrid : MonoBehaviour
     public Sprite glowingTileEvil;
     public Sprite evilTile;
     public GameObject lockTilePrefab;
+    public GameObject keyTilePrefab; // Assign this in the Inspector with your KeyTile prefab.
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
@@ -80,9 +81,10 @@ public class MovableTileGrid : MonoBehaviour
                     gridSizeY = int.Parse(values[5]);
                     string isLockedStr = values[6].ToLower(); // Convert to lowercase to handle case-insensitivity
                     bool isLocked = isLockedStr == "true";
+                    bool isKey = values[7].ToLower() == "true";
 
-                    
-                    
+
+
                     // Set the array size only once.
                     if (!arraySizeSet)
                     {
@@ -90,7 +92,7 @@ public class MovableTileGrid : MonoBehaviour
                         arraySizeSet = true; // Update the flag.
                     }
 
-                    GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY, isLocked);
+                    GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY, isLocked, isKey);
                 }
             }
         }
@@ -102,7 +104,7 @@ public class MovableTileGrid : MonoBehaviour
 
     }
 
-    private GameObject GetTilePrefab(string tileType, bool isLocked)
+    private GameObject GetTilePrefab(string tileType, bool isLocked, bool isKey)
     {
 
         // Choose the appropriate prefab based on the tileType.
@@ -119,7 +121,7 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
-    void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked)
+    void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked, bool isKey)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
 
@@ -129,7 +131,7 @@ public class MovableTileGrid : MonoBehaviour
             backgroundGenerated = true;
         }
         
-        GameObject tilePrefab = GetTilePrefab(tileType, isLocked);
+        GameObject tilePrefab = GetTilePrefab(tileType, isLocked, isKey);
 
         if (column < gridSizeX && row < gridSizeY)
         {
@@ -152,9 +154,10 @@ public class MovableTileGrid : MonoBehaviour
                 tileData.GridSizeX = gridSizeX;
                 tileData.GridSizeY = gridSizeY;
                 tileData.IsLocked = isLocked;
+                tileData.IsKey = isKey;
                 // Check if the lock tile is being created
                 CreateLockTileOnMovableTile(column, row, isLocked);
-             
+                CreateKeyTileOnMovableTile(column, row, isKey);
             }
         }
     }
@@ -177,7 +180,24 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
+    void CreateKeyTileOnMovableTile(int column, int row, bool isKey)
+    {
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+        Debug.Log("CreateKeyTileOnMovableTile - Column: " + column + ", Row: " + row + ", isKey: " + isKey);
 
+        if (column >= 0 && column < gridSizeX && row >= 0 && row < gridSizeY)
+        {
+            if (movableTiles != null && movableTiles[column, row] != null)
+            {
+                if (isKey)
+                {
+                    GameObject keyTile = Instantiate(keyTilePrefab, movableTiles[column, row].position, Quaternion.identity);
+                    keyTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                    keyTile.transform.SetParent(movableTiles[column, row]);
+                }
+            }
+        }
+    }
 
 
 

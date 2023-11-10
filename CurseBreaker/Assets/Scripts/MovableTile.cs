@@ -14,4 +14,5 @@ public class MovableTile : MonoBehaviour
     public int Column { get; set; }
     public string TileType { get; set; }
     public bool IsLocked { get; set; } // Use a property for the locked flag.
+    public bool IsKey { get; set; }
 }
