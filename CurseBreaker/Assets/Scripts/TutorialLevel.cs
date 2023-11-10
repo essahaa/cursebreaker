@@ -36,6 +36,8 @@ public class TutorialLevel : MonoBehaviour
 
     public int gridSizeX = 10; //number of columns, width of the grid
     public int gridSizeY = 10; //number of rows, height of the grid
+    private int movableTilePoolSize;
+    private int evilTilePoolSize;
 
     private Transform[] currentMovableTiles;
     private Transform[,] movableTiles;
@@ -43,19 +45,77 @@ public class TutorialLevel : MonoBehaviour
 
     private List<string> csvLines = new List<string>();
 
+    private Queue<GameObject> normalTilePool = new Queue<GameObject>();
+    private Queue<GameObject> evilTilePool = new Queue<GameObject>();
+
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
 
-        ReadLevelDataFromCSV();  
+        ReadLevelDataFromCSV();
+
+        // Pre-instantiate Normal Tiles
+        for (int i = 0; i < movableTilePoolSize; i++)
+        {
+            GameObject newTile = Instantiate(movableTilePrefab);
+            newTile.SetActive(false);
+            normalTilePool.Enqueue(newTile);
+        }
+
+        // Pre-instantiate Evil Tiles
+        for (int i = 0; i < evilTilePoolSize; i++)
+        {
+            GameObject newTile = Instantiate(evilTilePrefab);
+            newTile.SetActive(false);
+            evilTilePool.Enqueue(newTile);
+        }
     }
 
-    
+    public GameObject GetTile(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return GetFromPool(normalTilePool, movableTilePrefab);
+            case "Evil":
+                return GetFromPool(evilTilePool, evilTilePrefab);
+            default:
+                return null;
+        }
+    }
+
+    private GameObject GetFromPool(Queue<GameObject> pool, GameObject prefab)
+    {
+        if (pool.Count > 0)
+        {
+            return pool.Dequeue();
+        }
+        else
+        {
+            return Instantiate(prefab);
+        }
+    }
+
+    public void ReturnTile(GameObject tile, string tileType)
+    {
+        tile.SetActive(false);
+        Debug.Log("tile disabled");
+        if (tileType == "Normal")
+        {
+            normalTilePool.Enqueue(tile);
+        }
+        else if (tileType == "Evil")
+        {
+            evilTilePool.Enqueue(tile);
+        }
+    }
 
     public void ReadLevelDataFromCSV()
     {
         using (var reader = new StreamReader(new MemoryStream(csvFile.bytes)))
         {
+            movableTilePoolSize = 0;
+            evilTilePoolSize = 0;
             string line;
             while ((line = reader.ReadLine()) != null)
             {
@@ -84,6 +144,15 @@ public class TutorialLevel : MonoBehaviour
                         }
 
                         GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+                        
+                        if(tileType == "Normal")
+                        {
+                            movableTilePoolSize++;
+                        }
+                        else
+                        {
+                            evilTilePoolSize++;
+                        }
                     }
                     else
                     {
@@ -91,23 +160,6 @@ public class TutorialLevel : MonoBehaviour
                     }
                 }
             }
-        }
-    }
-
-
-
-GameObject GetTilePrefab(string tileType)
-    {
-        // Choose the appropriate prefab based on the tileType.
-        switch (tileType)
-        {
-            case "Normal":
-                return movableTilePrefab;
-            case "Evil":
-                return evilTilePrefab;
-            // Add more cases for other tile types as needed.
-            default:
-                return movableTilePrefab; // Default to a fallback prefab.
         }
     }
 
@@ -129,8 +181,6 @@ GameObject GetTilePrefab(string tileType)
             backgroundGenerated = true;
         }
 
-        GameObject tilePrefab = GetTilePrefab(tileType);
-
         if (column < gridSizeX && row < gridSizeY)
         {
             // Cache the reference to the background grid cell
@@ -138,29 +188,24 @@ GameObject GetTilePrefab(string tileType)
 
             if (backgroundGridCell != null)
             {
-                // Get the position from the cached reference
                 Vector3 position = backgroundGridCell.position;
-
-                // Create the tile at the retrieved position
-                MovableTile tile = Instantiate(tilePrefab, position, Quaternion.identity).GetComponent<MovableTile>();
-                tile.Row = row;
-                tile.Column = column;
-                tile.TileType = tileType;
-
+                GameObject tile = GetTile(tileType);
+      
+                tile.transform.position = position;
                 tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                tile.SetActive(true);
 
-                
-                movableTiles[column, row] = tile.transform;
-
-                MovableTile tileData = tile.GetComponent<MovableTile>();
-                if (tileData != null)
+                MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+                if (movableTileComponent != null)
                 {
-                    tileData.Level = selectedLevel;
-                    tileData.Row = row;
-                    tileData.Column = column;
-                    tileData.TileType = tileType;
-                    tileData.GridSizeX = gridSizeX;
-                    tileData.GridSizeY = gridSizeY;
+                    movableTileComponent.Level = selectedLevel;
+                    movableTileComponent.Row = row;
+                    movableTileComponent.Column = column;
+                    movableTileComponent.TileType = tileType;
+                    movableTileComponent.GridSizeX = gridSizeX;
+                    movableTileComponent.GridSizeY = gridSizeY;
+
+                    movableTiles[column, row] = movableTileComponent.transform;
                 }
             }
         }
@@ -314,8 +359,9 @@ GameObject GetTilePrefab(string tileType)
     {
         if(firstMovementDone)
         {
-            GameObject tileToDestroy = movableTiles[6, 5].gameObject;       
-            Destroy(tileToDestroy);
+            MovableTile tileToDestroy = movableTiles[6, 5].GetComponent<MovableTile>();
+            //Destroy(tileToDestroy);
+            ReturnTile(tileToDestroy.gameObject, tileToDestroy.TileType);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
