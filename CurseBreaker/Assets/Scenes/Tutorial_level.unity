@@ -2235,6 +2235,7 @@ MonoBehaviour:
   evilTilePrefab: {fileID: 8340316894529563072, guid: c91ab36fa10a89044a4c537194fc4388, type: 3}
   arrowPrefab: {fileID: 1116196204006266678, guid: c54891ec82a5f5041b70c00c5563ef7e, type: 3}
   lynaraPrefab: {fileID: 642847183060046940, guid: 7d22c4f824c8a294fba6ee79ba7fa15d, type: 3}
+  dialogBubblePrefab: {fileID: 0}
   csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   backgroundGrid: {fileID: 68879168}
   animator: {fileID: 0}

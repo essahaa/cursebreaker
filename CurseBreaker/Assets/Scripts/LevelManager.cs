@@ -27,6 +27,19 @@ public class LevelManager : MonoBehaviour
         ParseCSV();
     }
 
+    public GameObject GetTile(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            default:
+                return null;
+        }
+    }
+
     public void LoadLevel(int levelNumber)
     {
         LevelData levelData = allLevelsData.FirstOrDefault(l => l.LevelNumber == levelNumber);
@@ -38,7 +51,7 @@ public class LevelManager : MonoBehaviour
             // Let MovableTileGrid handle the tile generation.
             foreach (MovableTileData tile in levelData.Tiles)
             {
-                movableTileGrid.GenerateTile(tile, levelData.GridSizeX, levelData.GridSizeY);
+                movableTileGrid.GenerateTile(tile);
             }
         }
         else
@@ -80,7 +93,8 @@ public class LevelManager : MonoBehaviour
                     Column = int.Parse(values[1]),
                     Row = int.Parse(values[2]),
                     TileType = values[3],
-                    IsLocked = values[6].ToLower().Equals("true")
+                    IsLocked = values[6].ToLower().Equals("true"),
+                    IsKey = values[7].ToLower().Equals("true")
                 };
 
                 // Add the new tile to the current level
@@ -116,6 +130,7 @@ public class LevelManager : MonoBehaviour
         public int Column;
         public string TileType;
         public bool IsLocked;
+        public bool IsKey;
     }
 
     
