@@ -404,135 +404,167 @@ public class MovableTileGrid : MonoBehaviour
         return hasMovableTile;
     }
 
-    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
+public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
+{
+    int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+    int numRows = movableTiles.GetLength(1);
+    Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
+
+    // Initialize all tiles as null or some default state as required.
+    for (int col = 0; col < numCols; col++)
     {
-        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-        int numRows = movableTiles.GetLength(1);
-        Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
-
-        // Initialize all tiles as null or some default state as required.
-        for (int col = 0; col < numCols; col++)
-        {
-            tilesInRow[col, rowIndex] = null;
-        }
-
-        bool inSequence = false;
-        List<Transform> sequenceTiles = new List<Transform>();
-
-        for (int col = 0; col < numCols; col++)
-        {
-            Transform tile = movableTiles[col, rowIndex];
-
-            // If we encounter a LockTile or null, reset the sequence.
-            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
-            {
-                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid row needs at least 2 tiles.
-                {
-                    foreach (Transform validTile in sequenceTiles)
-                    {
-                        MovableTile tileData = validTile.GetComponent<MovableTile>();
-                        tilesInRow[tileData.Column, rowIndex] = validTile;
-                    }
-                }
-                // Reset the sequence regardless of its validity because of the LockTile or gap.
-                sequenceTiles.Clear();
-                inSequence = false;
-                continue;
-            }
-
-            // Add to current sequence if we are in one.
-            if (inSequence)
-            {
-                sequenceTiles.Add(tile);
-            }
-            else
-            {
-                // Start a new sequence if we're not already in one.
-                sequenceTiles.Clear();
-                sequenceTiles.Add(tile);
-                inSequence = true;
-            }
-        }
-
-        // Handle the case where the last tile in the row is not a LockTile and we have a valid sequence.
-        if (inSequence && sequenceTiles.Count >= 2)
-        {
-            foreach (Transform validTile in sequenceTiles)
-            {
-                MovableTile tileData = validTile.GetComponent<MovableTile>();
-                tilesInRow[tileData.Column, rowIndex] = validTile;
-            }
-        }
-
-        return tilesInRow;
+        tilesInRow[col, rowIndex] = null;
     }
 
+    bool inSequence = false;
+    List<Transform> sequenceTiles = new List<Transform>();
 
-
-
-
-    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
+    for (int col = 0; col < numCols; col++)
     {
-        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-        int numRows = movableTiles.GetLength(1);
-        Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
+        Transform tile = movableTiles[col, rowIndex];
 
-        // Initialize all tiles in the column as null or some default state as required.
-        for (int row = 0; row < numRows; row++)
+        // If we encounter a LockTile or null, reset the sequence.
+        if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
         {
-            tilesInColumn[columnIndex, row] = null;
-        }
-
-        bool inSequence = false;
-        List<Transform> sequenceTiles = new List<Transform>();
-
-        for (int row = 0; row < numRows; row++)
-        {
-            Transform tile = movableTiles[columnIndex, row];
-
-            // If we encounter a LockTile or null, reset the sequence.
-            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
+            if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid row needs at least 2 tiles.
             {
-                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid column needs at least 2 tiles.
+                foreach (Transform validTile in sequenceTiles)
                 {
-                    foreach (Transform validTile in sequenceTiles)
+                    MovableTile tileData = validTile.GetComponent<MovableTile>();
+                    tilesInRow[tileData.Column, rowIndex] = validTile;
+                    // Lock the parent tile if it has a child LockTile.
+                    if (HasChildLockTile(validTile))
                     {
-                        MovableTile tileData = validTile.GetComponent<MovableTile>();
-                        tilesInColumn[columnIndex, tileData.Row] = validTile;
+                        tileData.IsLocked = true;
                     }
                 }
-                // Reset the sequence regardless of its validity because of the LockTile or gap.
-                sequenceTiles.Clear();
-                inSequence = false;
-                continue;
             }
-
-            // Add to current sequence if we are in one.
-            if (inSequence)
-            {
-                sequenceTiles.Add(tile);
-            }
-            else
-            {
-                // Start a new sequence if we're not already in one.
-                sequenceTiles.Clear();
-                sequenceTiles.Add(tile);
-                inSequence = true;
-            }
+            // Reset the sequence regardless of its validity because of the LockTile or gap.
+            sequenceTiles.Clear();
+            inSequence = false;
+            continue;
         }
 
-        // Handle the case where the last tile in the column is not a LockTile and we have a valid sequence.
-        if (inSequence && sequenceTiles.Count >= 2)
+        // Add to current sequence if we are in one.
+        if (inSequence)
         {
-            foreach (Transform validTile in sequenceTiles)
+            sequenceTiles.Add(tile);
+        }
+        else
+        {
+            // Start a new sequence if we're not already in one.
+            sequenceTiles.Clear();
+            sequenceTiles.Add(tile);
+            inSequence = true;
+        }
+    }
+
+    // Handle the case where the last tile in the row is not a LockTile and we have a valid sequence.
+    if (inSequence && sequenceTiles.Count >= 2)
+    {
+        foreach (Transform validTile in sequenceTiles)
+        {
+            MovableTile tileData = validTile.GetComponent<MovableTile>();
+            tilesInRow[tileData.Column, rowIndex] = validTile;
+            // Lock the parent tile if it has a child LockTile.
+            if (HasChildLockTile(validTile))
             {
-                MovableTile tileData = validTile.GetComponent<MovableTile>();
-                tilesInColumn[columnIndex, tileData.Row] = validTile;
+                tileData.IsLocked = true;
             }
         }
-
-        return tilesInColumn;
     }
+
+    return tilesInRow;
+}
+
+public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
+{
+    int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+    int numRows = movableTiles.GetLength(1);
+    Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
+
+    // Initialize all tiles in the column as null or some default state as required.
+    for (int row = 0; row < numRows; row++)
+    {
+        tilesInColumn[columnIndex, row] = null;
+    }
+
+    bool inSequence = false;
+    List<Transform> sequenceTiles = new List<Transform>();
+
+    for (int row = 0; row < numRows; row++)
+    {
+        Transform tile = movableTiles[columnIndex, row];
+
+        // If we encounter a LockTile or null, reset the sequence.
+        if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
+        {
+            if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid column needs at least 2 tiles.
+            {
+                foreach (Transform validTile in sequenceTiles)
+                {
+                    MovableTile tileData = validTile.GetComponent<MovableTile>();
+                    tilesInColumn[columnIndex, tileData.Row] = validTile;
+                    // Lock the parent tile if it has a child LockTile.
+                    if (HasChildLockTile(validTile))
+                    {
+                        tileData.IsLocked = true;
+                    }
+                }
+            }
+            // Reset the sequence regardless of its validity because of the LockTile or gap.
+            sequenceTiles.Clear();
+            inSequence = false;
+            continue;
+        }
+
+        // Add to current sequence if we are in one.
+        if (inSequence)
+        {
+            sequenceTiles.Add(tile);
+        }
+        else
+        {
+            // Start a new sequence if we're not already in one.
+            sequenceTiles.Clear();
+            sequenceTiles.Add(tile);
+            inSequence = true;
+        }
+    }
+
+    // Handle the case where the last tile in the column is not a LockTile and we have a valid sequence.
+    if (inSequence && sequenceTiles.Count >= 2)
+    {
+        foreach (Transform validTile in sequenceTiles)
+        {
+            MovableTile tileData = validTile.GetComponent<MovableTile>();
+            tilesInColumn[columnIndex, tileData.Row] = validTile;
+            // Lock the parent tile if it has a child LockTile.
+            if (HasChildLockTile(validTile))
+            {
+                tileData.IsLocked = true;
+            }
+        }
+    }
+
+    return tilesInColumn;
+}
+
+    private bool HasChildLockTile(Transform parentTile)
+{
+    // Iterate through child objects of the parentTile.
+    foreach (Transform child in parentTile)
+    {
+        // Check if the child is a LockTile.
+        if (child.CompareTag("LockTile"))
+        {
+            return true;
+        }
+    }
+
+    // Return false if no child LockTile was found.
+    return false;
+}
 
 
 
@@ -715,6 +747,110 @@ public class MovableTileGrid : MonoBehaviour
         return result;
     }
 
+    public void DestroyKeyAndLockTilesIfNeighbor()
+{
+    for (int x = 0; x < gridSizeX; x++)
+    {
+        for (int y = 0; y < gridSizeY; y++)
+        {
+            Transform tile = movableTiles[x, y];
+
+            if (tile != null && HasKeyTileChild(tile))
+            {
+                // Check neighbors in all four directions.
+                if (IsLockTileAt(x + 1, y))
+                {
+                    DestroyChildTiles(tile);
+                    DestroyChildTiles(movableTiles[x + 1, y]);
+                }
+                if (IsLockTileAt(x - 1, y))
+                {
+                    DestroyChildTiles(tile);
+                    DestroyChildTiles(movableTiles[x - 1, y]);
+                }
+                if (IsLockTileAt(x, y + 1))
+                {
+                    DestroyChildTiles(tile);
+                    DestroyChildTiles(movableTiles[x, y + 1]);
+                }
+                if (IsLockTileAt(x, y - 1))
+                {
+                    DestroyChildTiles(tile);
+                    DestroyChildTiles(movableTiles[x, y - 1]);
+                }
+            }
+        }
+    }
+}
+
+    private bool HasKeyTileChild(Transform parentTile)
+    {
+        // Iterate through child objects of the parentTile.
+        foreach (Transform child in parentTile)
+        {
+            // Check if the child is a KeyTile.
+            if (child.CompareTag("KeyTile"))
+            {
+                return true;
+            }
+        }
+
+        return false; // No KeyTile child found.
+    }
+
+    private bool IsLockTileAt(int x, int y)
+    {
+        if (x >= 0 && x < gridSizeX && y >= 0 && y < gridSizeY)
+        {
+            Transform tile = movableTiles[x, y];
+
+            if (tile != null)
+            {
+                // Check if any of the child objects have the "LockTile" tag.
+                foreach (Transform child in tile)
+                {
+                    if (child.CompareTag("LockTile"))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false; // Coordinates are out of bounds or no LockTile found.
+    }
+
+
+    private void DestroyChildTiles(Transform parentTile)
+{
+    bool lockTileDestroyed = false; // Flag to check if a lock tile was destroyed
+
+    // Iterate through child objects of the parentTile.
+    foreach (Transform child in parentTile)
+    {
+        // Check if the child is a KeyTile or LockTile.
+        if (child.CompareTag("KeyTile") || child.CompareTag("LockTile"))
+        {
+            // Destroy the child object.
+            Destroy(child.gameObject);
+
+            if (child.CompareTag("LockTile"))
+            {
+                lockTileDestroyed = true;
+            }
+        }
+    }
+
+    // If a lock tile was destroyed, update the parent tile's isLocked status
+    if (lockTileDestroyed)
+    {
+        MovableTile parentTileComponent = parentTile.GetComponent<MovableTile>();
+        if (parentTileComponent != null)
+        {
+            parentTileComponent.IsLocked = false;
+        }
+    }
+}
 
 
 }

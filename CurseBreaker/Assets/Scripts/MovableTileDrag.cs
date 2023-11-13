@@ -141,14 +141,15 @@ public class MovableTileDrag : MonoBehaviour
             {
                 Transform tile = currentMovableTiles[col, row];
 
-                // Skip locked tiles
-                if (tile != null && tile.GetComponent<MovableTile>().IsLocked)
-                {
-                    continue; // This will skip the current iteration, hence not moving the locked tile.
-                }
-
                     if (tile != null)
                     {
+                        MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+                        // Skip the locked tiles
+                        if (movableTileComponent.IsLocked)
+                        {
+                            Debug.Log($"Locked Tile at [{col}, {row}] Position: {tile.position}");
+                            continue;
+                        }
                         Vector3 targetPosition;
 
                         if (currentMoveType == "horizontal")
@@ -231,6 +232,13 @@ public class MovableTileDrag : MonoBehaviour
                 {
                     MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
 
+                    // Skip the locked tiles
+                    if (movableTileComponent.IsLocked)
+                    {
+                        Debug.Log($"Locked Tile Final Position at [{movableTileComponent.Column}, {movableTileComponent.Row}]: {tile.position}");
+                        continue;
+                    }
+
                     // Calculate the target snapped position based on row and column.
                     float targetX = movableTileComponent.Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
                     float targetY = movableTileComponent.Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
@@ -256,7 +264,10 @@ public class MovableTileDrag : MonoBehaviour
                     }                   
                 }
             }
-         
+
+            movableTileGrid.DestroyKeyAndLockTilesIfNeighbor();
+
+
             if (isSnappedToNewPlace)
             {
                 //Update movableTiles array with new snapped positions
