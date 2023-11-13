@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TutorialLevelMovement : MonoBehaviour
@@ -11,7 +12,11 @@ public class TutorialLevelMovement : MonoBehaviour
     public Vector3[,] initialTilePositions;
 
     private bool isMoved = false;
+    private bool secondMoveCanBeDone = false;
     private string currentMoveType = "horizontal";
+
+    int clickCount = 0; // Counter for clicks
+    int speechBubbleThreshold = 3; // Number of clicks to show speech bubbles before starting tile movement
 
     private GameObject selectedTile;
 
@@ -21,26 +26,54 @@ public class TutorialLevelMovement : MonoBehaviour
         tutorialLevel = GameObject.FindGameObjectWithTag("TutorialLevel").GetComponent<TutorialLevel>();
 
     }
-    private void OnMouseDown()
+
+    private void Update()
     {
-        // Raycast to detect which tile was clicked.
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-
-        if (hit.collider != null)
+        // Check for mouse click or touch input
+        if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
         {
-            Debug.Log("hit detected");
-            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
+            clickCount++; // Increment the click counter
+            Debug.Log("clicks " + clickCount);
+
+            if (clickCount <= speechBubbleThreshold)
             {
-                selectedTile = hit.collider.gameObject;
+                // Show next speech bubble
+                tutorialLevel.ShowNextSpeechBubble(clickCount);
+            }
+            else
+            {
+                if (clickCount > speechBubbleThreshold && secondMoveCanBeDone)
+                {
+                    tutorialLevel.ShowNextSpeechBubble(5);
+                    secondMoveCanBeDone = false;
 
-                currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
-                initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions(currentMovableTiles);
+                }
+                // Raycast to detect which tile was clicked or tapped.
+                Vector3 inputPos = Input.mousePosition;
+                if (Input.touchCount > 0)
+                {
+                    inputPos = Input.GetTouch(0).position;
+                }
 
-                isMoved = true;
+                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(inputPos), Vector2.zero);
+
+                if (hit.collider != null)
+                {
+                    Debug.Log("hit detected");
+
+                    if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
+                    {
+                        selectedTile = hit.collider.gameObject;
+
+                        currentMovableTiles = tutorialLevel.TutorialLevelFindCurrentMovables();
+                        initialTilePositions = tutorialLevel.TutorialLevelGetInitialPositions(currentMovableTiles);
+
+                        isMoved = true;
+                    }
+                }
             }
         }
     }
-
     private void OnMouseUp()
     {
         if (isMoved)
@@ -83,14 +116,21 @@ public class TutorialLevelMovement : MonoBehaviour
             if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
             {
                 // First movement done
-                // Additional logic for first movement
+                tutorialLevel.ShowNextSpeechBubble(4);
+                tutorialLevel.ChangeMovementDone();
+                secondMoveCanBeDone = true;
             }
-            else
+            else if(currentMoveType == "vertical" && !tutorialLevel.tutorialDone)
             {
                 tutorialLevel.TutorialCompleted();
             }
+            else if(tutorialLevel.tutorialDone)
+            {
+                tutorialLevel.ShowNextSpeechBubble(7);
+                tutorialLevel.EndLevel();
+            }
 
-            tutorialLevel.ChangeMovementDone();
+            
             currentMoveType = "vertical";
 
             //empty current movable tiles array

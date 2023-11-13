@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TutorialLevel : MonoBehaviour
 {
@@ -13,9 +15,22 @@ public class TutorialLevel : MonoBehaviour
     public GameObject evilTilePrefab;
     public GameObject arrowPrefab;
     public GameObject lynaraPrefab;
+    public GameObject dialogBubblePrefab;
+
+    public Canvas shadowCanvas;
 
     private GameObject arrow;
     private GameObject lynara;
+    private GameObject dialogBubble;
+
+    private string dialogue1 = "Hi there! I'm here to guide you.";
+    private string dialogue2 = "Your objective is to move the yellow tiles row by row so that the red tile isn't connected to the yellow ones.";
+    private string dialogue3 = "In this game, you have to move the puzzles so that every other move is horizontal and every other vertical.";
+    private string dialogue4 = "To move a row, just tap and hold it, then slide it to right.";
+    private string dialogue5 = "Great job! Now, you need to know that there must be atleast 2 tiles in the row for you to be able to move it.";
+    private string dialogue6 = "Let’s do another one! Tap and hold the column in the middle and slide it downwards.";
+    private string dialogue7 = "Fantastic! You’ve completed the level.";
+    private string dialogue8 = "Now that you've mastered the basics, it's time to tackle more challenging puzzles!";
 
     public TextAsset csvFile;
     public BackgroundGrid backgroundGrid;
@@ -26,8 +41,6 @@ public class TutorialLevel : MonoBehaviour
     
     private int rowIndex;
     private int columnIndex;
-
-    private string currentMoveType = "horizontal";
 
     public bool firstMovementDone = false;
     public bool tutorialDone = false;
@@ -43,16 +56,13 @@ public class TutorialLevel : MonoBehaviour
     private Transform[,] movableTiles;
     public Vector3[,] initialTilePositions;
 
-    private List<string> csvLines = new List<string>();
-
     private Queue<GameObject> normalTilePool = new Queue<GameObject>();
     private Queue<GameObject> evilTilePool = new Queue<GameObject>();
 
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-
-        ReadLevelDataFromCSV();
+        backgroundGenerated = false;
 
         // Pre-instantiate Normal Tiles
         for (int i = 0; i < movableTilePoolSize; i++)
@@ -69,6 +79,9 @@ public class TutorialLevel : MonoBehaviour
             newTile.SetActive(false);
             evilTilePool.Enqueue(newTile);
         }
+
+        ReadLevelDataFromCSV();
+        GeneratePrefabs();
     }
 
     public GameObject GetTile(string tileType)
@@ -156,21 +169,18 @@ public class TutorialLevel : MonoBehaviour
                     }
                     else
                     {
-                        // Handle parsing errors or log for debugging
+                        Debug.Log("Error when parsing values");
                     }
                 }
             }
         }
     }
 
-    public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
-    {
-        if (!backgroundGenerated)
-        {
-            backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
+    void GeneratePrefabs()
+    {      
+            float tileSize = backgroundGrid.backgroundTileSize;
 
             Vector3 arrowposition = new Vector3(0.1f, 0.7f, 0);
-
             arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
             arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
 
@@ -178,10 +188,21 @@ public class TutorialLevel : MonoBehaviour
             lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
             lynara.transform.localScale = new Vector3(0.9f, 0.9f, 1);
 
+            Vector3 dialogPosition = new Vector3(0.4f, -4f, 0);
+            dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity);
+            dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+
+    }
+
+    public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
+    {
+        if (!backgroundGenerated)
+        {
+            backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
             backgroundGenerated = true;
         }
 
-        if (column < gridSizeX && row < gridSizeY)
+            if (column < gridSizeX && row < gridSizeY)
         {
             // Cache the reference to the background grid cell
             Transform backgroundGridCell = backgroundGrid.backgroundGrid[column, row];
@@ -217,7 +238,6 @@ public class TutorialLevel : MonoBehaviour
         movableTiles[column, row] = null;
         // Update the cell with the new tile.
         movableTiles[column, row] = newTile;
-
         MovableTile tile = movableTiles[column, row].GetComponent<MovableTile>();
 
         if (tile != null)
@@ -225,12 +245,10 @@ public class TutorialLevel : MonoBehaviour
             tile.Row = row;
             tile.Column = column;
         }
-
     }
 
     public Transform[,] UpdateMovableTilesArray()
     {
-
         for (int row = 0; row < gridSizeY; row++)
         {
             for (int col = 0; col < gridSizeX; col++)
@@ -255,10 +273,8 @@ public class TutorialLevel : MonoBehaviour
 
     public Transform[] FindAdjacentMovableTilesInRow(int rowIndex)
     {
-        Debug.Log("rowIndex in FindAdjacentMovableTilesInRow " + rowIndex);
-
         int numCols = movableTiles.GetLength(0); // Number of columns.
-        Transform[] tilesInRow = new Transform[numCols]; // Only need a 1D array for a single row.
+        Transform[] tilesInRow = new Transform[numCols];
 
         if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
         {
@@ -277,29 +293,20 @@ public class TutorialLevel : MonoBehaviour
         return tilesInRow;
     }
 
-
     public Transform[] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
-        Debug.Log("columnIndex in FindAdjacentMovableTilesInColumn " + columnIndex);
-
         int numRows = movableTiles.GetLength(1); // Number of rows.
-        Transform[] tilesInColumn = new Transform[numRows]; // Only need a 1D array for a single column.
+        Transform[] tilesInColumn = new Transform[numRows]; 
 
         if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
         {
             for (int row = 0; row < numRows; row++)
             {
-                if (movableTiles[columnIndex, row] != null)
+                if (movableTiles[columnIndex, row] != null &&
+                    ((row > 0 && movableTiles[columnIndex, row - 1] != null) ||
+                     (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null)))
                 {
-                    // Check if the tile has an adjacent tile above or below.
-                    bool hasAboveAdjacent = (row > 0 && movableTiles[columnIndex, row - 1] != null);
-                    bool hasBelowAdjacent = (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null);
-
-                    if (hasAboveAdjacent || hasBelowAdjacent)
-                    {
-                        // Include this tile in the movable column.
-                        tilesInColumn[row] = movableTiles[columnIndex, row];
-                    }
+                    tilesInColumn[row] = movableTiles[columnIndex, row];
                 }
             }
         }
@@ -307,21 +314,16 @@ public class TutorialLevel : MonoBehaviour
         return tilesInColumn;
     }
 
-
     public Transform[] TutorialLevelFindCurrentMovables()
     {
         if (!firstMovementDone)
         {
-            currentMoveType = "horizontal";
             rowIndex = 5;
-
             currentMovableTiles = FindAdjacentMovableTilesInRow(rowIndex);
         }
         else if (firstMovementDone)
         {
-            currentMoveType = "vertical";
             columnIndex = 5;
-
             currentMovableTiles = FindAdjacentMovableTilesInColumn(columnIndex);
         }
 
@@ -354,17 +356,61 @@ public class TutorialLevel : MonoBehaviour
         return initialTilePositions;
     }
 
+    public void ShowNextSpeechBubble(int number)
+    {
+        Debug.Log("started");
+        TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
+        number = number + 1;
+
+        switch (number)
+        {
+            case 1:
+                tmp.text = dialogue1;
+                break;
+            case 2:
+                tmp.text = dialogue2;
+                break;
+            case 3:
+                tmp.text = dialogue3;
+                break;
+            case 4:
+                tmp.text = dialogue4;
+                break;
+            case 5:
+                tmp.text = dialogue5;
+                break;
+            case 6:
+                tmp.text = dialogue6;
+                break;
+            case 7:
+                tmp.text = dialogue7;
+                break;
+            case 8:
+                tmp.text = dialogue8;
+                break;
+            default:
+                tmp.text = dialogue1;
+                break;
+        }
+    }
 
     public void TutorialCompleted()
     {
         if(firstMovementDone)
         {
             MovableTile tileToDestroy = movableTiles[6, 5].GetComponent<MovableTile>();
-            //Destroy(tileToDestroy);
             ReturnTile(tileToDestroy.gameObject, tileToDestroy.TileType);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
+            ShowNextSpeechBubble(6);
+        }       
+    }
+
+    public void EndLevel()
+    {
+        if(tutorialDone)
+        {
             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
             if (levelCompletedBox != null)
             {
@@ -372,7 +418,6 @@ public class TutorialLevel : MonoBehaviour
             }
             animator.SetTrigger("LevelEnd");
         }
-        
     }
 
     public void ChangeMovementDone()
@@ -382,18 +427,7 @@ public class TutorialLevel : MonoBehaviour
         arrow.transform.position = new Vector3(1.2f, 0, 0);
         arrow.transform.rotation = Quaternion.Euler(0, 0, 270);
         arrow.SetActive(true);
-        currentMoveType = "vertical";
         UpdateMovableTilesArray();
     }
-
-    public void EmptyCurrentMovableArray()
-    {
-        //empty current movable tiles array
-        for (int i = 0; i < currentMovableTiles.Length; i++)
-        {
-            currentMovableTiles[i] = null; 
-        }
-    }
-    
 }
 
