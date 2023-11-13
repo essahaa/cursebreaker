@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 8862128430021704757}
   - component: {fileID: 3346480448369958524}
   - component: {fileID: 6509362207037033947}
+  - component: {fileID: 471439278695101553}
+  - component: {fileID: 7376183773602405579}
   m_Layer: 0
   m_Name: KeyTile
   m_TagString: KeyTile
@@ -158,3 +160,30 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &471439278695101553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6379398962969502475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3e5c8dc43cb5674f87f49bf80834d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7376183773602405579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6379398962969502475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a00e64d407cc8144ebea6291dee2cb6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundGrid: {fileID: 0}
+  movableTileGrid: {fileID: 0}
+  tutorialLevel: {fileID: 0}
