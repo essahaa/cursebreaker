@@ -3303,7 +3303,7 @@ GameObject:
   - component: {fileID: 1467024237}
   - component: {fileID: 1467024236}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Button 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4046,6 +4046,7 @@ MonoBehaviour:
   ShrinkScale: 1
   EnlargeDuration: 0.25
   ShrinkDuration: 0.25
+  showStarsButton: {fileID: 1467024236}
 --- !u!1 &1622395096
 GameObject:
   m_ObjectHideFlags: 0
@@ -4823,7 +4824,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -3, y: 150.25345}
-  m_SizeDelta: {x: 671.96, y: 619.3934}
+  m_SizeDelta: {x: 678.8095, y: 619.3934}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1900791884
 MonoBehaviour:

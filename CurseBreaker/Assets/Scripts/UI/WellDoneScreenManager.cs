@@ -1,16 +1,36 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WellDoneScreenManager : MonoBehaviour
 {
     [SerializeField] Star[] Stars;
-
     [SerializeField] float EnlargeScale = 1.5f;
     [SerializeField] float ShrinkScale = 1f;
     [SerializeField] float EnlargeDuration = 0.25f;
     [SerializeField] float ShrinkDuration = 0.25f;
+
+    // Reference to the button that triggers the stars
+    [SerializeField] Button showStarsButton;
+
     void Start()
     {
+        // Attach the method to the button click event
+        showStarsButton.onClick.AddListener(OnShowStarsButtonClick);
+    }
+
+    private void OnShowStarsButtonClick()
+    {
+        // Call ShowStars after a delay
+        StartCoroutine(StartStarsWithDelay(1f));
+    }
+
+    private IEnumerator StartStarsWithDelay(float delay)
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+
+        // Call ShowStars after the delay
         ShowStars(3);
     }
 
