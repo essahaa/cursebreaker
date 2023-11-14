@@ -724,7 +724,7 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         if (x > 0 && !visited[x - 1, y])
         {
             Transform leftNeighbor = movableTiles[x - 1, y];
-            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile") || leftNeighbor.CompareTag("LockTile")))
+            if (leftNeighbor != null && IsTileOrChildConnectable(leftNeighbor))
             {
                 result &= DepthFirstSearch(leftNeighbor, visited);
             }
@@ -733,16 +733,16 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         if (x < gridSizeX - 1 && !visited[x + 1, y])
         {
             Transform rightNeighbor = movableTiles[x + 1, y];
-            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile") || rightNeighbor.CompareTag("LockTile")))
-            {
-                result &= DepthFirstSearch(rightNeighbor, visited);
-            }
+        if (rightNeighbor != null && IsTileOrChildConnectable(rightNeighbor))
+        {
+            result &= DepthFirstSearch(rightNeighbor, visited);
+        }
         }
 
         if (y > 0 && !visited[x, y - 1])
         {
             Transform lowerNeighbor = movableTiles[x, y - 1];
-            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile") || lowerNeighbor.CompareTag("LockTile")))
+            if (lowerNeighbor != null && IsTileOrChildConnectable(lowerNeighbor))
             {
                 result &= DepthFirstSearch(lowerNeighbor, visited);
             }
@@ -751,13 +751,33 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         if (y < gridSizeY - 1 && !visited[x, y + 1])
         {
             Transform upperNeighbor = movableTiles[x, y + 1];
-            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile") || upperNeighbor.CompareTag("LockTile")))
+            if (upperNeighbor != null && IsTileOrChildConnectable(upperNeighbor))
             {
                 result &= DepthFirstSearch(upperNeighbor, visited);
             }
         }
 
         return result;
+    }
+
+    private bool IsTileOrChildConnectable(Transform tile)
+    {
+        // Check if the tile itself is connectable
+        if (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile"))
+        {
+            return true;
+        }
+
+        // Check if any of the children is a locked but connectable tile
+        foreach (Transform child in tile)
+        {
+            if (child.CompareTag("LockTile") || child.CompareTag("KeyTile"))
+            {
+                return true; // Considering locked tiles as connectors
+            }
+        }
+
+        return false;
     }
 
     public void DestroyKeyAndLockTilesIfNeighbor()
