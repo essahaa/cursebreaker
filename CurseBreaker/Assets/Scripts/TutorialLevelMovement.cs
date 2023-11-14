@@ -13,6 +13,7 @@ public class TutorialLevelMovement : MonoBehaviour
 
     private bool isMoved = false;
     private bool secondMoveCanBeDone = false;
+    private bool levelEnd = false;
     private string currentMoveType = "horizontal";
 
     int clickCount = 0; // Counter for clicks
@@ -39,6 +40,17 @@ public class TutorialLevelMovement : MonoBehaviour
             {
                 // Show next speech bubble
                 tutorialLevel.ShowNextSpeechBubble(clickCount);
+            }
+            else if (tutorialLevel.tutorialDone)
+            {
+                tutorialLevel.ShowNextSpeechBubble(7);
+
+                if(levelEnd)
+                {
+                    tutorialLevel.EndLevel();
+                }
+                levelEnd = true;
+
             }
             else
             {
@@ -112,6 +124,8 @@ public class TutorialLevelMovement : MonoBehaviour
                 }
             }
 
+            
+
             // Logic after moving tiles
             if (currentMoveType == "horizontal" && !tutorialLevel.firstMovementDone)
             {
@@ -124,11 +138,8 @@ public class TutorialLevelMovement : MonoBehaviour
             {
                 tutorialLevel.TutorialCompleted();
             }
-            else if(tutorialLevel.tutorialDone)
-            {
-                tutorialLevel.ShowNextSpeechBubble(7);
-                tutorialLevel.EndLevel();
-            }
+            
+            
 
             
             currentMoveType = "vertical";

@@ -358,7 +358,6 @@ public class TutorialLevel : MonoBehaviour
 
     public void ShowNextSpeechBubble(int number)
     {
-        Debug.Log("started");
         TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
         number = number + 1;
 
@@ -409,15 +408,13 @@ public class TutorialLevel : MonoBehaviour
 
     public void EndLevel()
     {
-        if(tutorialDone)
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        if (levelCompletedBox != null)
         {
-            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-            if (levelCompletedBox != null)
-            {
-                animator = levelCompletedBox.GetComponent<Animator>();
-            }
-            animator.SetTrigger("LevelEnd");
+            animator = levelCompletedBox.GetComponent<Animator>();
         }
+        animator.SetTrigger("LevelEnd");
+        
     }
 
     public void ChangeMovementDone()
