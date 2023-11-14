@@ -165,7 +165,7 @@ public class MovableTileGrid : MonoBehaviour
     void CreateLockTileOnMovableTile(int column, int row, bool isLocked)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        Debug.Log("CreateLockTileOnMovableTile - Column: " + column + ", Row: " + row + ", isLocked: " + isLocked);
+        //Debug.Log("CreateLockTileOnMovableTile - Column: " + column + ", Row: " + row + ", isLocked: " + isLocked);
 
         if (column >= 0 && column < gridSizeX && row >= 0 && row < gridSizeY)
         {
@@ -581,9 +581,15 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         {
             for (int col = 0; col < numCols; col++)
             {
-
-                tilesInRow[col, rowIndex] = movableTiles[col, rowIndex] != null ? movableTiles[col, rowIndex].transform : null;
-
+                // Check if the tile exists and is not locked
+                if (movableTiles[col, rowIndex] != null && !movableTiles[col, rowIndex].GetComponent<MovableTile>().IsLocked)
+                {
+                    tilesInRow[col, rowIndex] = movableTiles[col, rowIndex].transform;
+                }
+                else
+                {
+                    tilesInRow[col, rowIndex] = null; // Set to null if the tile is locked or doesn't exist
+                }
             }
         }
 
@@ -596,22 +602,29 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
         Debug.Log("colindex in findmovable " + columnIndex);
 
-        int numRows = movableTiles.GetLength(1); // Assuming movableTiles is in [col, row] format.
-        int numCols = movableTiles.GetLength(0);
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numRows = movableTiles.GetLength(1);
         Transform[,] tilesInColumn = new Transform[numCols, numRows];
 
         if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
         {
             for (int row = 0; row < numRows; row++)
             {
-
-                tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row] != null ? movableTiles[columnIndex, row].transform : null;
-
+                // Check if the tile exists and is not locked
+                if (movableTiles[columnIndex, row] != null && !movableTiles[columnIndex, row].GetComponent<MovableTile>().IsLocked)
+                {
+                    tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row].transform;
+                }
+                else
+                {
+                    tilesInColumn[columnIndex, row] = null; // Set to null if the tile is locked or doesn't exist
+                }
             }
         }
 
         return tilesInColumn;
     }
+
 
     public bool IsMovableTilesGroupConnected()
     {
