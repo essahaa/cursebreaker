@@ -121,6 +121,19 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    private string GetAnimationController(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return "TileController";
+            case "Evil":
+                return "EvilTileController";
+            default:
+                return null;
+        }
+    }
+
     void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked, bool isKey)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
@@ -145,7 +158,11 @@ public class MovableTileGrid : MonoBehaviour
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
                 tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
                 movableTiles[column, row] = tile.transform;
-                
+                // add individual Animator controllers
+                tile.AddComponent<Animator>(); 
+                Animator animator = tile.GetComponent<Animator>();
+                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(GetAnimationController(tileType));
+
                 MovableTile tileData = tile.GetComponent<MovableTile>();
                 tileData.Level = selectedLevel;
                 tileData.Row = row;
