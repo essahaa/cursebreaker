@@ -25,6 +25,12 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("LevelSelection");
     }
 
+    public void ChapterSelection()
+    {
+        SceneManager.LoadScene("ChapterSelection");
+    }
+
+
     public void GoToMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
