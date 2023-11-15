@@ -10,24 +10,22 @@ public class MovableTileDrag : MonoBehaviour
     public MovableTileGrid movableTileGrid;
     public TutorialLevel tutorialLevel;
 
-    private Vector3 initialMousePosition;
-    private Vector3 initialTilePosition;
-
     private string currentMoveType = "horizontal"; // Initialize with a horizontal move
 
-    private bool isDragging = false;
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
     private bool tileInSamePosition = false;
 
     private Vector3[,] initialTilePositions;
-    private Transform[,] movableTiles; 
+    private Transform[,] movableTiles;
     public Transform[,] currentMovableTiles;
 
-    private GameObject selectedTile;
     private int rowIndex;
     private int columnIndex;
 
-    private int selectedLevel;
+    private Vector3 initialTouchPosition;
+    private Vector3 currentTouchPosition;
+    private Vector3 offset;
+
 
     private void Start()
     {
@@ -35,111 +33,141 @@ public class MovableTileDrag : MonoBehaviour
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         movableTiles = movableTileGrid.movableTiles;
-        selectedLevel = movableTileGrid.CheckSelectedLevel();
     }
 
-    private void OnMouseDown()
+    private void Update()
     {
-        // Raycast to detect which tile was clicked.
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero); 
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    // Store the initial touch position
+                    initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+                    currentMovableTiles = GetCurrentMovableTiles(touch.position);
+                    break;
+
+                case TouchPhase.Moved:
+                    // Update the current touch position and calculate the offset
+                    currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+                    offset = currentTouchPosition - initialTouchPosition;
+
+                    // Now call MoveTile or MoveTiles method with the calculated offset
+                    MoveTiles(offset);
+                    break;
+
+                case TouchPhase.Ended:
+                    SnapTilesToGrid();
+                    break;
+            }
+        }
+    }
+
+    private Transform[,] GetCurrentMovableTiles(Vector2 screenPosition)
+    {
+        // Convert the screen position to a world position
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+        worldPosition.z = 0; // Set Z to 0 if your game is 2D
+
+        // Perform a raycast to see if we hit a tile
+        RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero);
 
         if (hit.collider != null)
         {
-            //initialMousePosition = hit.transform.position;
-            // Check if the clicked object is a movable tile.
-            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile"))
+            // Check if the object hit is a tile
+            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile") || hit.collider.gameObject.CompareTag("KeyTile"))
             {
-                selectedTile = hit.collider.gameObject;
-
-                //get the row and column of the selected tile from MovableTile component
-                rowIndex = selectedTile.GetComponent<MovableTile>().Row;
-                columnIndex = selectedTile.GetComponent<MovableTile>().Column;
+                GameObject tile = hit.collider.gameObject;
+                rowIndex = tile.GetComponent<MovableTile>().Row;
+                columnIndex = tile.GetComponent<MovableTile>().Column;
 
                 // Find all the movable tiles in the specified row or column.
                 if (currentMoveType == "horizontal")
                 {
-                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInRow(rowIndex);
+                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInRow(rowIndex);                
                 }
                 else if (currentMoveType == "vertical")
                 {
-                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInColumn(columnIndex);
+                    currentMovableTiles = movableTileGrid.FindAdjacentMovableTilesInColumn(columnIndex);                   
                 }
 
+                CheckNonNullAndChangeSprites();
+                SetInitialTilePositions();
 
-                //checks if there are non null objects in current movables array
-                for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+                return currentMovableTiles;
+            }
+        }
+        return null; // Return null if no row or column of tiles was found
+    }
+
+    private void CheckNonNullAndChangeSprites()
+    {
+        //checks if there are non null objects in current movables array
+        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+        {
+            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+            {
+                if (currentMovableTiles[i, j] != null)
                 {
-                    for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+                    allElementsNull = false;
+
+                    MovableTile movableTile = currentMovableTiles[i, j].GetComponent<MovableTile>();
+
+                    if (movableTile != null)
                     {
-                        if (currentMovableTiles[i, j] != null)
+                        SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
+                        if (movableTile.TileType == "Normal")
                         {
-                            allElementsNull = false;
-
-                            MovableTile movableTile = currentMovableTiles[i, j].GetComponent<MovableTile>();
-
-                            if (movableTile != null)
-                            {
-                                SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
-                                if (movableTile.TileType == "Normal")
-                                {
-                                    spriteRenderer.sprite = movableTileGrid.glowingTile;  
-                                }
-                                else if (movableTile.TileType == "Evil")
-                                {
-                                    spriteRenderer.sprite = movableTileGrid.glowingTileEvil;
-                                }
-                            }
+                            spriteRenderer.sprite = movableTileGrid.glowingTile;
+                        }
+                        else if (movableTile.TileType == "Evil")
+                        {
+                            spriteRenderer.sprite = movableTileGrid.glowingTileEvil;
                         }
                     }
                 }
+            }
+        }
+    }
 
+    private void SetInitialTilePositions()
+    {
+        if (!allElementsNull)
+        {
+            initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
 
-                if (!allElementsNull)
+            // Store the initial positions of all movable tiles in the row or column.
+            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+            {
+                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
-                    initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
-
-                    // Store the initial positions of all movable tiles in the row or column.
-                    for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+                    if (currentMovableTiles[col, row] != null)
                     {
-                        for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
-                        {
-                            if (currentMovableTiles[col, row] != null)
-                            {
-                                initialTilePositions[col, row] = currentMovableTiles[col, row].position;
-                            }
-                        }
+                        initialTilePositions[col, row] = currentMovableTiles[col, row].position;
                     }
                 }
-                else
-                {
-                    Debug.Log("currentmovabletiles null");
-                }
-
-                isDragging = true;
             }
         }
         else
         {
-            Debug.Log("No hit detected.");
+            Debug.Log("currentmovabletiles null");
         }
     }
 
-    private void OnMouseDrag()
+    private void MoveTiles(Vector3 offset)
     {
-        if (isDragging && !allElementsNull)
+        if (!allElementsNull)
         {
             FindObjectOfType<AudioManager>().Play("liik");
 
-            // Calculate the offset based on the initial mouse and tile positions.
-            Vector3 mouseCurrentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 offset = mouseCurrentPos - initialMousePosition;
-
             // Iterate through the tiles in the row or column.
-        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
-        {
-            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
-                Transform tile = currentMovableTiles[col, row];
+                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                {
+                    Transform tile = currentMovableTiles[col, row];
 
                     if (tile != null)
                     {
@@ -193,12 +221,10 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
         }
-
     }
 
-    private void OnMouseUp()
+    private void SnapTilesToGrid()
     {
-        isDragging = false;
         bool isSnappedToNewPlace = false;
 
         if (!allElementsNull)
@@ -261,12 +287,11 @@ public class MovableTileDrag : MonoBehaviour
                     else
                     {
                         isSnappedToNewPlace = false;
-                    }                   
+                    }
                 }
             }
 
             movableTileGrid.DestroyKeyAndLockTilesIfNeighbor();
-
 
             if (isSnappedToNewPlace)
             {
@@ -278,7 +303,7 @@ public class MovableTileDrag : MonoBehaviour
                 Debug.Log("movetype change: " + currentMoveType);
                 movableTileGrid.IsMovableTilesGroupConnected();
             }
-            else if(!isSnappedToNewPlace)
+            else if (!isSnappedToNewPlace)
             {
                 currentMoveType = (currentMoveType == "horizontal") ? "horizontal" : "vertical";
                 Debug.Log("movetype still same: " + currentMoveType);
@@ -312,7 +337,6 @@ public class MovableTileDrag : MonoBehaviour
             allElementsNull = false;
             tileInSamePosition = false;
         }
-        
-    }
 
+    }
 }
