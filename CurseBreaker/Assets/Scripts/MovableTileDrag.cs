@@ -76,12 +76,16 @@ public class MovableTileDrag : MonoBehaviour
 
         if (hit.collider != null)
         {
+            GameObject tile = hit.collider.gameObject;
+            Debug.Log(tile);
             // Check if the object hit is a tile
-            if (hit.collider.gameObject.CompareTag("MovableTile") || hit.collider.gameObject.CompareTag("EvilTile") || hit.collider.gameObject.CompareTag("KeyTile"))
+            if (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("KeyTile"))
             {
-                GameObject tile = hit.collider.gameObject;
+                Debug.Log(tile + " in if");
                 rowIndex = tile.GetComponent<MovableTile>().Row;
                 columnIndex = tile.GetComponent<MovableTile>().Column;
+
+                Debug.Log(tile + " row, col " + rowIndex + columnIndex);
 
                 // Find all the movable tiles in the specified row or column.
                 if (currentMoveType == "horizontal")

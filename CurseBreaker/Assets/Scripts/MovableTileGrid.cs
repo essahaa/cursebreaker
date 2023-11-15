@@ -156,8 +156,15 @@ public class MovableTileGrid : MonoBehaviour
                 tileData.IsLocked = isLocked;
                 tileData.IsKey = isKey;
                 // Check if the lock tile is being created
-                CreateLockTileOnMovableTile(column, row, isLocked);
-                CreateKeyTileOnMovableTile(column, row, isKey);
+                if(isLocked)
+                {
+                    CreateLockTileOnMovableTile(column, row, isLocked);
+                }
+                if(isKey)
+                {
+                    CreateKeyTileOnMovableTile(column, row, isKey);
+                }
+   
             }
         }
     }
