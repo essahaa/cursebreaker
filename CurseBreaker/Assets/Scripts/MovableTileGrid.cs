@@ -201,6 +201,10 @@ public class MovableTileGrid : MonoBehaviour
                     GameObject keyTile = Instantiate(keyTilePrefab, movableTiles[column, row].position, Quaternion.identity);
                     keyTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
                     keyTile.transform.SetParent(movableTiles[column, row]);
+
+                    MovableTile component = keyTile.GetComponent<MovableTile>();
+                    component.Column = column;
+                    component.Row = row;
                 }
             }
         }
