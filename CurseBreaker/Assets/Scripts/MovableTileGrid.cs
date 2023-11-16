@@ -45,6 +45,12 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
+    public void LoadLevel(int levelNumber)
+    {
+        selectedLevel = levelNumber;
+        ReadLevelDataFromCSV();
+    }
+
     public void NextLevel()
     {
         selectedLevel = selectedLevel + 1;
