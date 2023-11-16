@@ -26,6 +26,9 @@ public class MovableTileDrag : MonoBehaviour
     private Vector3 currentTouchPosition;
     private Vector3 offset;
 
+    public float tapCooldown = 0.5f; // Time in seconds to ignore taps after the first tap
+    private float lastTapTime;
+
 
     private void Start()
     {
@@ -37,7 +40,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && Time.time - lastTapTime > tapCooldown)
         {
             Touch touch = Input.GetTouch(0);
 
@@ -47,6 +50,7 @@ public class MovableTileDrag : MonoBehaviour
                     // Store the initial touch position
                     initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
                     currentMovableTiles = GetCurrentMovableTiles(touch.position);
+                    lastTapTime = Time.time;
                     break;
 
                 case TouchPhase.Moved:
@@ -243,52 +247,56 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }
-
             }
             //empty the currently moved row or column from movabletiles array so that it can be replaced by new positions
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
-            // Snap each tile to the nearest grid position based on rows and columns.
-            foreach (Transform tile in currentMovableTiles)
+            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
-                if (tile != null)
+                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
-                    MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
+                    Transform tile = currentMovableTiles[col, row];
 
-                    // Skip the locked tiles
-                    if (movableTileComponent.IsLocked)
-                    {
-                        Debug.Log($"Locked Tile Final Position at [{movableTileComponent.Column}, {movableTileComponent.Row}]: {tile.position}");
-                        continue;
-                    }
+                    if (tile != null)
+                    {                      
+                        MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
 
-                    // Calculate the target snapped position based on row and column.
-                    float targetX = movableTileComponent.Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
-                    float targetY = movableTileComponent.Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
+                        // Skip the locked tiles
+                        if (movableTileComponent.IsLocked)
+                        {
+                            Debug.Log($"Locked Tile Final Position at [{movableTileComponent.Column}, {movableTileComponent.Row}]: {tile.position}");
+                            continue;
+                        }
 
-                    // Ensure the snapped position stays within the background grid boundaries.
-                    targetX = Mathf.Clamp(targetX, backgroundGrid.minX, backgroundGrid.maxX);
-                    targetY = Mathf.Clamp(targetY, backgroundGrid.minY, backgroundGrid.maxY);
+                        // Calculate the target snapped position based on row and column.
+                        float targetX = movableTileComponent.Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
+                        float targetY = movableTileComponent.Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
 
-                    // Set the tile's position to the target position.
-                    tile.position = new Vector3(targetX, targetY, 0f);
+                        // Ensure the snapped position stays within the background grid boundaries.
+                        targetX = Mathf.Clamp(targetX, backgroundGrid.minX, backgroundGrid.maxX);
+                        targetY = Mathf.Clamp(targetY, backgroundGrid.minY, backgroundGrid.maxY);
 
-                    // Update the movableTileGrid with the new position.
-                    movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
-                    Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
+                        // Set the tile's position to the target position.
+                        tile.position = new Vector3(targetX, targetY, 0f);
 
-                    if (!tileInSamePosition)
-                    {
-                        isSnappedToNewPlace = true;
-                    }
-                    else
-                    {
-                        isSnappedToNewPlace = false;
+                        // Update the movableTileGrid with the new position.
+                        movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
+                        Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
+
+                        if (tile.position == initialTilePositions[col, row])
+                        {
+                            isSnappedToNewPlace = false;
+                        }
+                        else
+                        {
+                            isSnappedToNewPlace = true;
+                        }
+                        Debug.Log("issnappedtonewplace " + isSnappedToNewPlace);
                     }
                 }
             }
-
+            
             movableTileGrid.DestroyKeyAndLockTilesIfNeighbor();
 
             if (isSnappedToNewPlace)
@@ -325,7 +333,7 @@ public class MovableTileDrag : MonoBehaviour
                     }
                 }
             }
-            allElementsNull = false;
+            allElementsNull = true;
             tileInSamePosition = false;
         }
 
