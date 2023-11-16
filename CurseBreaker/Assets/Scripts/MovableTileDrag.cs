@@ -26,6 +26,9 @@ public class MovableTileDrag : MonoBehaviour
     private Vector3 currentTouchPosition;
     private Vector3 offset;
 
+    public float tapCooldown = 0.5f; // Time in seconds to ignore taps after the first tap
+    private float lastTapTime;
+
 
     private void Start()
     {
@@ -37,7 +40,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && Time.time - lastTapTime > tapCooldown)
         {
             Touch touch = Input.GetTouch(0);
 
@@ -47,6 +50,7 @@ public class MovableTileDrag : MonoBehaviour
                     // Store the initial touch position
                     initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
                     currentMovableTiles = GetCurrentMovableTiles(touch.position);
+                    lastTapTime = Time.time;
                     break;
 
                 case TouchPhase.Moved:
