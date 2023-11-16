@@ -103,6 +103,7 @@ public class MovableTileDrag : MonoBehaviour
                 return currentMovableTiles;
             }
         }
+        allElementsNull = true;
         return null; // Return null if no row or column of tiles was found
     }
 
