@@ -103,6 +103,7 @@ public class MovableTileDrag : MonoBehaviour
                 return currentMovableTiles;
             }
         }
+        allElementsNull = true;
         return null; // Return null if no row or column of tiles was found
     }
 
@@ -121,15 +122,8 @@ public class MovableTileDrag : MonoBehaviour
 
                     if (movableTile != null)
                     {
-                        SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
-                        if (movableTile.TileType == "Normal")
-                        {
-                            spriteRenderer.sprite = movableTileGrid.glowingTile;
-                        }
-                        else if (movableTile.TileType == "Evil")
-                        {
-                            spriteRenderer.sprite = movableTileGrid.glowingTileEvil;
-                        }
+                        Animator animator = movableTile.gameObject.GetComponent<Animator>();
+                        animator.SetBool("isGlowing", true);
                     }
                 }
             }
@@ -324,15 +318,8 @@ public class MovableTileDrag : MonoBehaviour
                         // Check if the MovableTile component is not null
                         if (movableTile != null)
                         {
-                            SpriteRenderer spriteRenderer = movableTile.gameObject.GetComponent<SpriteRenderer>();
-                            if (movableTile.TileType == "Normal")
-                            {
-                                spriteRenderer.sprite = movableTileGrid.tile;
-                            }
-                            else if (movableTile.TileType == "Evil")
-                            {
-                                spriteRenderer.sprite = movableTileGrid.evilTile;
-                            }
+                            Animator animator = movableTile.gameObject.GetComponent<Animator>();
+                            animator.SetBool("isGlowing", false);
                         }
                         currentMovableTiles[i, j] = null;
                     }

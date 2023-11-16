@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,13 +47,12 @@ public class LevelManager : MonoBehaviour
         LevelData levelData = allLevelsData.FirstOrDefault(l => l.LevelNumber == levelNumber);
         if (levelData != null)
         {
-            // Let MovableTileGrid handle the grid initialization.
-            movableTileGrid.InitializeGrid(levelData.GridSizeX, levelData.GridSizeY);
+            movableTileGrid.InitializeArray(levelData.GridSizeX, levelData.GridSizeY);
 
-            // Let MovableTileGrid handle the tile generation.
+            // Let MovableTileGrid handle the tile generation and the grid initialization.
             foreach (MovableTileData tile in levelData.Tiles)
             {
-                movableTileGrid.GenerateTile(tile);
+                movableTileGrid.GenerateTileFromCSV(tile.Column, tile.Row, tile.TileType, levelData.GridSizeX, levelData.GridSizeY, tile.IsLocked, tile.IsKey);
             }
         }
         else
@@ -64,43 +65,57 @@ public class LevelManager : MonoBehaviour
 
     private void ParseCSV()
     {
-        string[] lines = csvFile.text.Split('\n');
-        LevelData currentLevel = null;
-        int currentLevelNumber = -1;
+        Debug.Log("parse start");
 
-        foreach (string line in lines)
+        using (var reader = new StreamReader(new MemoryStream(csvFile.bytes)))
         {
-            string[] values = line.Split(';');
-
-            if (values.Length > 0 && int.TryParse(values[0], out int levelNumber))
+            LevelData currentLevel = null;
+            int currentLevelNumber = -1;
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                // Check if we've moved on to a new level
-                if (currentLevel == null || currentLevelNumber != levelNumber)
-                {
-                    // Parse grid sizes once per level
-                    int gridSizeX = int.Parse(values[4]);
-                    int gridSizeY = int.Parse(values[5]);
+                // Skip empty lines
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    // Create a new LevelData instance with grid sizes
-                    currentLevel = new LevelData(levelNumber, gridSizeX, gridSizeY);
-                    allLevelsData.Add(currentLevel);
-                    currentLevelNumber = levelNumber;
+                string[] values = line.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+                // Ensure there's enough data in the line to avoid IndexOutOfRangeException
+                if (values.Length < 8) continue;
+
+                
+                
+
+                if (values.Length > 0 && int.TryParse(values[0], out int levelNumber))
+                {
+                    // Check if we've moved on to a new level
+                    if (currentLevel == null || currentLevelNumber != levelNumber)
+                    {
+                        Debug.Log("current level number " + currentLevelNumber);
+                        // Parse grid sizes once per level
+                        int gridSizeX = int.Parse(values[4]);
+                        int gridSizeY = int.Parse(values[5]);
+
+                        // Create a new LevelData instance with grid sizes
+                        currentLevel = new LevelData(levelNumber, gridSizeX, gridSizeY);
+                        allLevelsData.Add(currentLevel);
+                        currentLevelNumber = levelNumber;
+                    }
+
+                    // Create a new MovableTileData instance without grid sizes
+                    MovableTileData movableTileData = new MovableTileData
+                    {
+                        Column = int.Parse(values[1]),
+                        Row = int.Parse(values[2]),
+                        TileType = values[3],
+                        IsLocked = values[6].ToLower().Equals("true"),
+                        IsKey = values[7].ToLower().Equals("true")
+                    };
+                    // Add the new tile to the current level
+                    currentLevel.Tiles.Add(movableTileData);
                 }
-
-                // Create a new MovableTileData instance without grid sizes
-                MovableTileData movableTileData = new MovableTileData
-                {
-                    Column = int.Parse(values[1]),
-                    Row = int.Parse(values[2]),
-                    TileType = values[3],
-                    IsLocked = values[6].ToLower().Equals("true"),
-                    IsKey = values[7].ToLower().Equals("true")
-                };
-
-                // Add the new tile to the current level
-                currentLevel.Tiles.Add(movableTileData);
             }
-        }
+        } 
+
     }
 
 
@@ -132,9 +147,6 @@ public class LevelManager : MonoBehaviour
         public bool IsLocked;
         public bool IsKey;
     }
-
-    
     */
-
 }
 
