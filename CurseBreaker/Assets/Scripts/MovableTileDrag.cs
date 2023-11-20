@@ -40,7 +40,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private void Update()
     {
-        if (Input.touchCount > 0 && Time.time - lastTapTime > tapCooldown)
+        if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
@@ -48,13 +48,17 @@ public class MovableTileDrag : MonoBehaviour
             {
                 case TouchPhase.Began:
                     // Store the initial touch position
-                    initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-                    currentMovableTiles = GetCurrentMovableTiles(touch.position);
-                    lastTapTime = Time.time;
+                    if (Time.time - lastTapTime > tapCooldown)
+                    {
+                        initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+                        currentMovableTiles = GetCurrentMovableTiles(touch.position);
+                        lastTapTime = Time.time;
+                    }
                     break;
 
                 case TouchPhase.Moved:
                     // Update the current touch position and calculate the offset
+                    Debug.Log("entering moved phase");
                     currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
                     offset = currentTouchPosition - initialTouchPosition;
 
@@ -167,8 +171,10 @@ public class MovableTileDrag : MonoBehaviour
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
+                //Debug.Log("iterating row " + row);
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
+                    //Debug.Log("iterating col " + col);
                     Transform tile = currentMovableTiles[col, row];
 
                     if (tile != null)
