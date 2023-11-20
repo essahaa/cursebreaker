@@ -37,7 +37,8 @@ public class MovableTileGrid : MonoBehaviour
     void Start()
     {
         ReadCSV(); // Read the CSV file.
-        ReadLevelDataFromCSV(); // Read the level data from the CSV.
+        //ReadLevelDataFromCSV(); // Read the level data from the CSV.
+        LoadLevel(selectedLevel);
     }
 
     public int CheckSelectedLevel()
