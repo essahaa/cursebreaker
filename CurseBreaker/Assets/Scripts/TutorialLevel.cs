@@ -17,7 +17,7 @@ public class TutorialLevel : MonoBehaviour
 
     public Canvas shadowCanvas;
 
-    private GameObject arrow;
+    public GameObject arrow;
     private GameObject lynara;
     private GameObject dialogBubble;
 
@@ -109,6 +109,7 @@ public class TutorialLevel : MonoBehaviour
             Vector3 arrowposition = new Vector3(0.1f, 0.7f, 0);
             arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
             arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+            arrow.SetActive(false);
 
             Vector3 lynaraPosition = new Vector3(-0.6f, -2.4f, 0);
             lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
@@ -345,6 +346,7 @@ public class TutorialLevel : MonoBehaviour
     {
         if(firstMovementDone)
         {
+            arrow.SetActive(false);
             MovableTile tileToDestroy = movableTiles[6, 5].GetComponent<MovableTile>();
             Destroy(tileToDestroy.gameObject);
             Debug.Log("tutorial completed");
@@ -371,7 +373,7 @@ public class TutorialLevel : MonoBehaviour
         arrow.SetActive(false);
         arrow.transform.position = new Vector3(1.2f, 0, 0);
         arrow.transform.rotation = Quaternion.Euler(0, 0, 270);
-        arrow.SetActive(true);
+        
         UpdateMovableTilesArray();
     }
 }

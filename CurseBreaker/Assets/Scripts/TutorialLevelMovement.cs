@@ -62,8 +62,14 @@ public class TutorialLevelMovement : MonoBehaviour
 
                         if (clickCount <= speechBubbleThreshold)
                         {
+                            if (clickCount == 3)
+                            {
+                                tutorialLevel.arrow.SetActive(true);
+                            }
                             // Show next speech bubble
                             tutorialLevel.ShowNextSpeechBubble(clickCount);
+
+                            
                         }
                         else if (tutorialLevel.tutorialDone)
                         {
@@ -80,6 +86,7 @@ public class TutorialLevelMovement : MonoBehaviour
                         {
                             if (clickCount > speechBubbleThreshold && secondMoveCanBeDone)
                             {
+                                tutorialLevel.arrow.SetActive(true);
                                 tutorialLevel.ShowNextSpeechBubble(5);
                                 secondMoveCanBeDone = false;
 
