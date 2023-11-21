@@ -6,8 +6,6 @@ using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class TutorialLevel : MonoBehaviour
 {
@@ -34,6 +32,7 @@ public class TutorialLevel : MonoBehaviour
 
     public TextAsset csvFile;
     public BackgroundGrid backgroundGrid;
+    public MovableTileGrid movableTileGrid;
     
     public Animator animator;
 
@@ -49,86 +48,25 @@ public class TutorialLevel : MonoBehaviour
 
     public int gridSizeX = 10; //number of columns, width of the grid
     public int gridSizeY = 10; //number of rows, height of the grid
-    private int movableTilePoolSize;
-    private int evilTilePoolSize;
 
-    private Transform[] currentMovableTiles;
+    private Transform[,] currentMovableTiles;
     private Transform[,] movableTiles;
     public Vector3[,] initialTilePositions;
-
-    private Queue<GameObject> normalTilePool = new Queue<GameObject>();
-    private Queue<GameObject> evilTilePool = new Queue<GameObject>();
 
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+        //movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
         backgroundGenerated = false;
-
-        // Pre-instantiate Normal Tiles
-        for (int i = 0; i < movableTilePoolSize; i++)
-        {
-            GameObject newTile = Instantiate(movableTilePrefab);
-            newTile.SetActive(false);
-            normalTilePool.Enqueue(newTile);
-        }
-
-        // Pre-instantiate Evil Tiles
-        for (int i = 0; i < evilTilePoolSize; i++)
-        {
-            GameObject newTile = Instantiate(evilTilePrefab);
-            newTile.SetActive(false);
-            evilTilePool.Enqueue(newTile);
-        }
 
         ReadLevelDataFromCSV();
         GeneratePrefabs();
-    }
-
-    public GameObject GetTile(string tileType)
-    {
-        switch (tileType)
-        {
-            case "Normal":
-                return GetFromPool(normalTilePool, movableTilePrefab);
-            case "Evil":
-                return GetFromPool(evilTilePool, evilTilePrefab);
-            default:
-                return null;
-        }
-    }
-
-    private GameObject GetFromPool(Queue<GameObject> pool, GameObject prefab)
-    {
-        if (pool.Count > 0)
-        {
-            return pool.Dequeue();
-        }
-        else
-        {
-            return Instantiate(prefab);
-        }
-    }
-
-    public void ReturnTile(GameObject tile, string tileType)
-    {
-        tile.SetActive(false);
-        Debug.Log("tile disabled");
-        if (tileType == "Normal")
-        {
-            normalTilePool.Enqueue(tile);
-        }
-        else if (tileType == "Evil")
-        {
-            evilTilePool.Enqueue(tile);
-        }
     }
 
     public void ReadLevelDataFromCSV()
     {
         using (var reader = new StreamReader(new MemoryStream(csvFile.bytes)))
         {
-            movableTilePoolSize = 0;
-            evilTilePoolSize = 0;
             string line;
             while ((line = reader.ReadLine()) != null)
             {
@@ -158,14 +96,6 @@ public class TutorialLevel : MonoBehaviour
 
                         GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
                         
-                        if(tileType == "Normal")
-                        {
-                            movableTilePoolSize++;
-                        }
-                        else
-                        {
-                            evilTilePoolSize++;
-                        }
                     }
                     else
                     {
@@ -178,8 +108,6 @@ public class TutorialLevel : MonoBehaviour
 
     void GeneratePrefabs()
     {      
-            float tileSize = backgroundGrid.backgroundTileSize;
-
             Vector3 arrowposition = new Vector3(0.1f, 0.7f, 0);
             arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
             arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
@@ -210,11 +138,10 @@ public class TutorialLevel : MonoBehaviour
             if (backgroundGridCell != null)
             {
                 Vector3 position = backgroundGridCell.position;
-                GameObject tile = GetTile(tileType);
-      
-                tile.transform.position = position;
+                GameObject tilePrefab = GetTile(tileType);
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+                //tile.transform.position = position;
                 tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
-                tile.SetActive(true);
 
                 MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
                 if (movableTileComponent != null)
@@ -229,6 +156,19 @@ public class TutorialLevel : MonoBehaviour
                     movableTiles[column, row] = movableTileComponent.transform;
                 }
             }
+        }
+    }
+
+    public GameObject GetTile(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            default:
+                return null;
         }
     }
 
@@ -271,10 +211,11 @@ public class TutorialLevel : MonoBehaviour
         return movableTiles;
     }
 
-    public Transform[] FindAdjacentMovableTilesInRow(int rowIndex)
+    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
     {
         int numCols = movableTiles.GetLength(0); // Number of columns.
-        Transform[] tilesInRow = new Transform[numCols];
+        int numRows = movableTiles.GetLength(1); // Number of rows.
+        Transform[,] tilesInRow = new Transform[numCols, numRows];
 
         if (rowIndex >= 0 && rowIndex < movableTiles.GetLength(1))
         {
@@ -285,7 +226,7 @@ public class TutorialLevel : MonoBehaviour
                     ((col > 0 && movableTiles[col - 1, rowIndex] != null) ||
                      (col < numCols - 1 && movableTiles[col + 1, rowIndex] != null)))
                 {
-                    tilesInRow[col] = movableTiles[col, rowIndex];
+                    tilesInRow[col, rowIndex] = movableTiles[col, rowIndex];
                 }
             }
         }
@@ -293,10 +234,11 @@ public class TutorialLevel : MonoBehaviour
         return tilesInRow;
     }
 
-    public Transform[] FindAdjacentMovableTilesInColumn(int columnIndex)
+    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
+        int numCols = movableTiles.GetLength(0); // Number of columns.
         int numRows = movableTiles.GetLength(1); // Number of rows.
-        Transform[] tilesInColumn = new Transform[numRows]; 
+        Transform[,] tilesInColumn = new Transform[numCols, numRows]; 
 
         if (columnIndex >= 0 && columnIndex < movableTiles.GetLength(0))
         {
@@ -306,7 +248,7 @@ public class TutorialLevel : MonoBehaviour
                     ((row > 0 && movableTiles[columnIndex, row - 1] != null) ||
                      (row < numRows - 1 && movableTiles[columnIndex, row + 1] != null)))
                 {
-                    tilesInColumn[row] = movableTiles[columnIndex, row];
+                    tilesInColumn[columnIndex, row] = movableTiles[columnIndex, row];
                 }
             }
         }
@@ -314,46 +256,54 @@ public class TutorialLevel : MonoBehaviour
         return tilesInColumn;
     }
 
-    public Transform[] TutorialLevelFindCurrentMovables()
+    public Transform[,] TutorialLevelFindCurrentMovables(int columnIndex, int rowIndex)
     {
         if (!firstMovementDone)
         {
-            rowIndex = 5;
             currentMovableTiles = FindAdjacentMovableTilesInRow(rowIndex);
         }
         else if (firstMovementDone)
         {
-            columnIndex = 5;
             currentMovableTiles = FindAdjacentMovableTilesInColumn(columnIndex);
         }
 
         return currentMovableTiles;
     }
 
-    public Vector3[,] TutorialLevelGetInitialPositions(Transform[] currentMovableTiles)
+    public Vector3[,] TutorialLevelGetInitialPositions(Transform[,] currentMovableTiles)
     {
         // Initialize the array for initial positions
         initialTilePositions = new Vector3[gridSizeY, gridSizeX];
 
-        foreach (Transform tile in currentMovableTiles)
+        // Store the initial positions of movable tiles in the row or column.
+        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
         {
-            if (tile != null)
+            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
             {
-                MovableTile movableTile = tile.GetComponent<MovableTile>();
-                if (movableTile != null)
+                if (currentMovableTiles[col, row] != null)
                 {
-                    int row = movableTile.Row;
-                    int col = movableTile.Column;
-                    initialTilePositions[col, row] = tile.position;
-                }
-                else
-                {
-                    Debug.LogError("MovableTile component not found on tile.");
+                    initialTilePositions[col, row] = currentMovableTiles[col, row].position;
                 }
             }
         }
 
         return initialTilePositions;
+    }
+
+    public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
+    {
+        //empty row or column that has been moved
+        for (int i = 0; i < currentMovableTiles.GetLength(0); i++)
+        {
+            for (int j = 0; j < currentMovableTiles.GetLength(1); j++)
+            {
+                Transform cTile = currentMovableTiles[i, j];
+                if (cTile != null && (cTile.CompareTag("MovableTile") || cTile.CompareTag("EvilTile")))
+                {
+                    movableTiles[i, j] = null;
+                }
+            }
+        }
     }
 
     public void ShowNextSpeechBubble(int number)
@@ -398,7 +348,7 @@ public class TutorialLevel : MonoBehaviour
         if(firstMovementDone)
         {
             MovableTile tileToDestroy = movableTiles[6, 5].GetComponent<MovableTile>();
-            ReturnTile(tileToDestroy.gameObject, tileToDestroy.TileType);
+            Destroy(tileToDestroy.gameObject);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
