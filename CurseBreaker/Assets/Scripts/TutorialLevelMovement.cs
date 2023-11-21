@@ -178,32 +178,23 @@ public class TutorialLevelMovement : MonoBehaviour
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
-                //Debug.Log("iterating row " + row);
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
-                    //Debug.Log("iterating col " + col);
                     Transform tile = currentMovableTiles[col, row];
 
                     if (tile != null)
                     {
-                        MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
-                        // Skip the locked tiles
-                        if (movableTileComponent.IsLocked)
-                        {
-                            Debug.Log($"Locked Tile at [{col}, {row}] Position: {tile.position}");
-                            continue;
-                        }
                         Vector3 targetPosition;
 
                         if (currentMoveType == "horizontal")
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(offset.x, 0f, 0f);
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
+                            targetPosition.x = Mathf.Clamp(targetPosition.x, -0.5f, 0.8f);
                         }
                         else
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
-                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+                            targetPosition.y = Mathf.Clamp(targetPosition.y, -0.8f, 0.5f);
                         }
 
                         foreach (Transform otherTile in currentMovableTiles)
