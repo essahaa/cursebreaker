@@ -169,30 +169,6 @@ public class TutorialLevelMovement : MonoBehaviour
         }
     }
 
-    private void SetInitialTilePositions()
-    {
-        if (!allElementsNull)
-        {
-            initialTilePositions = new Vector3[currentMovableTiles.GetLength(0), currentMovableTiles.GetLength(1)];
-
-            // Store the initial positions of all movable tiles in the row or column.
-            for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
-            {
-                for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
-                {
-                    if (currentMovableTiles[col, row] != null)
-                    {
-                        initialTilePositions[col, row] = currentMovableTiles[col, row].position;
-                    }
-                }
-            }
-        }
-        else
-        {
-            Debug.Log("currentmovabletiles null");
-        }
-    }
-
     private void MoveTiles(Vector3 offset)
     {
         if (!allElementsNull && isMoved)

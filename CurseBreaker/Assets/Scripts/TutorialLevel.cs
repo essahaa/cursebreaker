@@ -32,7 +32,6 @@ public class TutorialLevel : MonoBehaviour
 
     public TextAsset csvFile;
     public BackgroundGrid backgroundGrid;
-    public MovableTileGrid movableTileGrid;
     
     public Animator animator;
 
@@ -56,7 +55,6 @@ public class TutorialLevel : MonoBehaviour
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        //movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
         backgroundGenerated = false;
 
         ReadLevelDataFromCSV();
