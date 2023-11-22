@@ -14,6 +14,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
     private bool tileInSamePosition = false;
+    private bool targetPositionInLock = false;
 
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles;
@@ -58,7 +59,6 @@ public class MovableTileDrag : MonoBehaviour
 
                 case TouchPhase.Moved:
                     // Update the current touch position and calculate the offset
-                    Debug.Log("entering moved phase");
                     currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
                     offset = currentTouchPosition - initialTouchPosition;
 
@@ -168,24 +168,18 @@ public class MovableTileDrag : MonoBehaviour
         {
             FindObjectOfType<AudioManager>().Play("liik");
 
+            int [] firstMovableTile = getFirstAndLastMovableTile();
+
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
                 //Debug.Log("iterating row " + row);
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
-                    //Debug.Log("iterating col " + col);
                     Transform tile = currentMovableTiles[col, row];
 
                     if (tile != null)
                     {
-                        MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
-                        // Skip the locked tiles
-                        if (movableTileComponent.IsLocked)
-                        {
-                            Debug.Log($"Locked Tile at [{col}, {row}] Position: {tile.position}");
-                            continue;
-                        }
                         Vector3 targetPosition;
 
                         if (currentMoveType == "horizontal")
@@ -198,9 +192,10 @@ public class MovableTileDrag : MonoBehaviour
                             targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
                             targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
                         }
-
+                        
                         foreach (Transform otherTile in currentMovableTiles)
                         {
+                            
                             if (otherTile != null && otherTile != tile)
                             {
                                 Vector3 otherTilePosition = otherTile.position;
@@ -213,7 +208,9 @@ public class MovableTileDrag : MonoBehaviour
                             }
                         }
 
-                        if (!tileInSamePosition)
+                        CheckForLockCollition(targetPosition);
+
+                        if (!tileInSamePosition && !targetPositionInLock)
                         {
                             // Update the tile's position to the target position.
                             tile.position = targetPosition;
@@ -224,11 +221,69 @@ public class MovableTileDrag : MonoBehaviour
 
                             // Update the movableTileGrid with the new position.
                             movableTileGrid.UpdateMovableTile(column, newRow, tile);
+                        }else if(targetPositionInLock)
+                        {
+                            targetPositionInLock = false;
                         }
                     }
                 }
             }
         }
+    }
+
+    private int[] getFirstAndLastMovableTile()
+    {
+        //Array allTiles = new Array();
+        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+        {
+            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+            {
+                Transform tile = currentMovableTiles[col, row];
+
+                if (tile != null)
+                {
+                    int[] newArray = { row, col };
+                    return newArray;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void CheckForLockCollition(Vector3 targetPosition)
+    {
+        List<BoxCollider2D> lockTileColliders = GetLockColliders();
+
+        foreach (BoxCollider2D collider in lockTileColliders)
+        {
+            if(collider.bounds.Contains(targetPosition)) {
+                //return true;
+                targetPositionInLock = true; break;
+            }
+        }
+        //return false;
+    }
+
+    private List<BoxCollider2D> GetLockColliders()
+    {
+        List<BoxCollider2D> lockTileColliders = new List<BoxCollider2D>();
+
+        foreach (Transform tileInGrid in movableTiles)
+        {
+            //Debug.Log("tileInGrid: " + tileInGrid);
+            if (tileInGrid != null && tileInGrid.childCount > 0)
+            {
+                //Debug.Log("child found");
+                Transform tileChild = tileInGrid.GetChild(0);
+                if (tileChild.CompareTag("LockTile"))
+                {
+                    //Debug.Log("lock found");
+                    lockTileColliders.Add(tileInGrid.gameObject.GetComponent<BoxCollider2D>());
+                }
+            }
+        }
+
+        return lockTileColliders;
     }
 
     private void SnapTilesToGrid()
