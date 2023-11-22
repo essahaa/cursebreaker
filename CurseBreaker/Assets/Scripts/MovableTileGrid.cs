@@ -31,6 +31,7 @@ public class MovableTileGrid : MonoBehaviour
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
     private bool backgroundGenerated = false;
+    private bool[,] visited;
 
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
@@ -236,8 +237,6 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
-
-
     public void DestroyExistingMovableTiles()
     {
         // Clear the references in the movableTiles array.
@@ -263,11 +262,6 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV();
-    }
-
-    public Transform[,] GetMovableTiles()
-    {
-        return movableTiles;
     }
 
     public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
@@ -443,169 +437,167 @@ public class MovableTileGrid : MonoBehaviour
         return hasMovableTile;
     }
 
-public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
-{
-    int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-    int numRows = movableTiles.GetLength(1);
-    Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
-
-    // Initialize all tiles as null or some default state as required.
-    for (int col = 0; col < numCols; col++)
+    public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
     {
-        tilesInRow[col, rowIndex] = null;
-    }
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numRows = movableTiles.GetLength(1);
+        Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
 
-    bool inSequence = false;
-    List<Transform> sequenceTiles = new List<Transform>();
-
-    for (int col = 0; col < numCols; col++)
-    {
-        Transform tile = movableTiles[col, rowIndex];
-
-        // If we encounter a LockTile or null, reset the sequence.
-        if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
+        // Initialize all tiles as null or some default state as required.
+        for (int col = 0; col < numCols; col++)
         {
-            if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid row needs at least 2 tiles.
+            tilesInRow[col, rowIndex] = null;
+        }
+
+        bool inSequence = false;
+        List<Transform> sequenceTiles = new List<Transform>();
+
+        for (int col = 0; col < numCols; col++)
+        {
+            Transform tile = movableTiles[col, rowIndex];
+
+            // If we encounter a LockTile or null, reset the sequence.
+            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
             {
-                foreach (Transform validTile in sequenceTiles)
+                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid row needs at least 2 tiles.
                 {
-                    MovableTile tileData = validTile.GetComponent<MovableTile>();
-                    tilesInRow[tileData.Column, rowIndex] = validTile;
-                    // Lock the parent tile if it has a child LockTile.
-                    if (HasChildLockTile(validTile))
+                    foreach (Transform validTile in sequenceTiles)
                     {
-                        tileData.IsLocked = true;
+                        MovableTile tileData = validTile.GetComponent<MovableTile>();
+                        tilesInRow[tileData.Column, rowIndex] = validTile;
+                        // Lock the parent tile if it has a child LockTile.
+                        if (HasChildLockTile(validTile))
+                        {
+                            tileData.IsLocked = true;
+                        }
                     }
                 }
+                // Reset the sequence regardless of its validity because of the LockTile or gap.
+                sequenceTiles.Clear();
+                inSequence = false;
+                continue;
             }
-            // Reset the sequence regardless of its validity because of the LockTile or gap.
-            sequenceTiles.Clear();
-            inSequence = false;
-            continue;
-        }
 
-        // Add to current sequence if we are in one.
-        if (inSequence)
-        {
-            sequenceTiles.Add(tile);
-        }
-        else
-        {
-            // Start a new sequence if we're not already in one.
-            sequenceTiles.Clear();
-            sequenceTiles.Add(tile);
-            inSequence = true;
-        }
-    }
-
-    // Handle the case where the last tile in the row is not a LockTile and we have a valid sequence.
-    if (inSequence && sequenceTiles.Count >= 2)
-    {
-        foreach (Transform validTile in sequenceTiles)
-        {
-            MovableTile tileData = validTile.GetComponent<MovableTile>();
-            tilesInRow[tileData.Column, rowIndex] = validTile;
-            // Lock the parent tile if it has a child LockTile.
-            if (HasChildLockTile(validTile))
+            // Add to current sequence if we are in one.
+            if (inSequence)
             {
-                tileData.IsLocked = true;
+                sequenceTiles.Add(tile);
+            }
+            else
+            {
+                // Start a new sequence if we're not already in one.
+                sequenceTiles.Clear();
+                sequenceTiles.Add(tile);
+                inSequence = true;
             }
         }
-    }
 
-    return tilesInRow;
-}
-
-public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
-{
-    int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
-    int numRows = movableTiles.GetLength(1);
-    Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
-
-    // Initialize all tiles in the column as null or some default state as required.
-    for (int row = 0; row < numRows; row++)
-    {
-        tilesInColumn[columnIndex, row] = null;
-    }
-
-    bool inSequence = false;
-    List<Transform> sequenceTiles = new List<Transform>();
-
-    for (int row = 0; row < numRows; row++)
-    {
-        Transform tile = movableTiles[columnIndex, row];
-
-        // If we encounter a LockTile or null, reset the sequence.
-        if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
+        // Handle the case where the last tile in the row is not a LockTile and we have a valid sequence.
+        if (inSequence && sequenceTiles.Count >= 2)
         {
-            if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid column needs at least 2 tiles.
+            foreach (Transform validTile in sequenceTiles)
             {
-                foreach (Transform validTile in sequenceTiles)
+                MovableTile tileData = validTile.GetComponent<MovableTile>();
+                tilesInRow[tileData.Column, rowIndex] = validTile;
+                // Lock the parent tile if it has a child LockTile.
+                if (HasChildLockTile(validTile))
                 {
-                    MovableTile tileData = validTile.GetComponent<MovableTile>();
-                    tilesInColumn[columnIndex, tileData.Row] = validTile;
-                    // Lock the parent tile if it has a child LockTile.
-                    if (HasChildLockTile(validTile))
-                    {
-                        tileData.IsLocked = true;
-                    }
+                    tileData.IsLocked = true;
                 }
             }
-            // Reset the sequence regardless of its validity because of the LockTile or gap.
-            sequenceTiles.Clear();
-            inSequence = false;
-            continue;
         }
 
-        // Add to current sequence if we are in one.
-        if (inSequence)
-        {
-            sequenceTiles.Add(tile);
-        }
-        else
-        {
-            // Start a new sequence if we're not already in one.
-            sequenceTiles.Clear();
-            sequenceTiles.Add(tile);
-            inSequence = true;
-        }
+        return tilesInRow;
     }
 
-    // Handle the case where the last tile in the column is not a LockTile and we have a valid sequence.
-    if (inSequence && sequenceTiles.Count >= 2)
+    public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
-        foreach (Transform validTile in sequenceTiles)
+        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numRows = movableTiles.GetLength(1);
+        Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
+
+        // Initialize all tiles in the column as null or some default state as required.
+        for (int row = 0; row < numRows; row++)
         {
-            MovableTile tileData = validTile.GetComponent<MovableTile>();
-            tilesInColumn[columnIndex, tileData.Row] = validTile;
-            // Lock the parent tile if it has a child LockTile.
-            if (HasChildLockTile(validTile))
+            tilesInColumn[columnIndex, row] = null;
+        }
+
+        bool inSequence = false;
+        List<Transform> sequenceTiles = new List<Transform>();
+
+        for (int row = 0; row < numRows; row++)
+        {
+            Transform tile = movableTiles[columnIndex, row];
+
+            // If we encounter a LockTile or null, reset the sequence.
+            if (tile == null || (tile.GetComponent<MovableTile>().IsLocked))
             {
-                tileData.IsLocked = true;
+                if (inSequence && sequenceTiles.Count >= 2) // Assuming a valid column needs at least 2 tiles.
+                {
+                    foreach (Transform validTile in sequenceTiles)
+                    {
+                        MovableTile tileData = validTile.GetComponent<MovableTile>();
+                        tilesInColumn[columnIndex, tileData.Row] = validTile;
+                        // Lock the parent tile if it has a child LockTile.
+                        if (HasChildLockTile(validTile))
+                        {
+                            tileData.IsLocked = true;
+                        }
+                    }
+                }
+                // Reset the sequence regardless of its validity because of the LockTile or gap.
+                sequenceTiles.Clear();
+                inSequence = false;
+                continue;
+            }
+
+            // Add to current sequence if we are in one.
+            if (inSequence)
+            {
+                sequenceTiles.Add(tile);
+            }
+            else
+            {
+                // Start a new sequence if we're not already in one.
+                sequenceTiles.Clear();
+                sequenceTiles.Add(tile);
+                inSequence = true;
             }
         }
-    }
 
-    return tilesInColumn;
-}
-
-    private bool HasChildLockTile(Transform parentTile)
-{
-    // Iterate through child objects of the parentTile.
-    foreach (Transform child in parentTile)
-    {
-        // Check if the child is a LockTile.
-        if (child.CompareTag("LockTile"))
+        // Handle the case where the last tile in the column is not a LockTile and we have a valid sequence.
+        if (inSequence && sequenceTiles.Count >= 2)
         {
-            return true;
+            foreach (Transform validTile in sequenceTiles)
+            {
+                MovableTile tileData = validTile.GetComponent<MovableTile>();
+                tilesInColumn[columnIndex, tileData.Row] = validTile;
+                // Lock the parent tile if it has a child LockTile.
+                if (HasChildLockTile(validTile))
+                {
+                    tileData.IsLocked = true;
+                }
+            }
         }
+
+        return tilesInColumn;
     }
 
-    // Return false if no child LockTile was found.
-    return false;
-}
+        private bool HasChildLockTile(Transform parentTile)
+    {
+        // Iterate through child objects of the parentTile.
+        foreach (Transform child in parentTile)
+        {
+            // Check if the child is a LockTile.
+            if (child.CompareTag("LockTile"))
+            {
+                return true;
+            }
+        }
 
-
+        // Return false if no child LockTile was found.
+        return false;
+    }
 
     // Function to find and return movable tiles in a specified row.
     public Transform[,] FindAllMovableTilesInRow(int rowIndex)
@@ -635,7 +627,6 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         return tilesInRow;
     }
 
-
     // Function to find and return movable tiles in a specified column.
     public Transform[,] FindAllMovableTilesInColumn(int columnIndex)
     {
@@ -664,139 +655,152 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
         return tilesInColumn;
     }
 
+    private bool IsRelevantTile(Transform tile)
+    {
+        return tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile");
+    }
 
     public bool IsMovableTilesGroupConnected()
     {
-        // Create a 2D array to keep track of visited tiles.
-        bool[,] visited = new bool[gridSizeX, gridSizeY];
+        visited = new bool[gridSizeX, gridSizeY];
+        List<Transform> largestGroupTiles = new List<Transform>();
+        bool movableTileDestroyed = false;
+        bool evilTileDestroyed = false;
 
-        // Find the first MovableTile as the starting point for traversal.
-        Transform startTile = null;
+        // Iterate over all tiles to find the largest connected group
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
                 Transform tile = movableTiles[x, y];
-                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile")))
+                if (tile != null && !visited[x, y] && IsRelevantTile(tile))
                 {
-                    startTile = tile;
-                    break;
-                }
-            }
-            if (startTile != null) break;
-        }
-
-        if (startTile == null) return true; // No MovableTiles are present, group is still "connected."
-
-        // Perform a depth-first search (DFS) to traverse and mark connected tiles.
-        bool result = DepthFirstSearch(startTile, visited);
-
-        bool onlyEvilTiles = true; // Flag to track if the disconnected group contains only EvilTiles.
-
-        // Check if there are any unvisited MovableTiles.
-        for (int x = 0; x < gridSizeX; x++)
-        {
-            for (int y = 0; y < gridSizeY; y++)
-            {
-                Transform tile = movableTiles[x, y];
-                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile")) && !visited[x, y])
-                {
-                    movableTiles[x, y] = null;
-                    result = false; // There's an unvisited tile, group is not connected.
-                    Destroy(tile.gameObject); // Destroy the disconnected tile.
-                    
-                    if (!tile.CompareTag("EvilTile"))
+                    List<Transform> currentGroupTiles = DepthFirstSearch(tile, visited);
+                    if (currentGroupTiles.Count > largestGroupTiles.Count)
                     {
-                        onlyEvilTiles = false;
+                        largestGroupTiles = currentGroupTiles;
                     }
                 }
             }
         }
-        
-        if (!result)
+
+        // Destroy tiles not in the largest group and check their types
+        for (int x = 0; x < gridSizeX; x++)
         {
-            if (!onlyEvilTiles)
+            for (int y = 0; y < gridSizeY; y++)
             {
-                Debug.Log("Game Over: MovableTiles group is not connected.");
-                GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
-                if (levelFailedBox != null)
+                Transform tile = movableTiles[x, y];
+                if (tile != null && !largestGroupTiles.Contains(tile))
                 {
-                    animator = levelFailedBox.GetComponent<Animator>();
+                    if (tile.CompareTag("MovableTile"))
+                    {
+                        movableTileDestroyed = true;
+                    }
+                    else if (tile.CompareTag("EvilTile"))
+                    {
+                        evilTileDestroyed = true;
+                    }
+                    Destroy(tile.gameObject);
+                }
+            }
+        }
+
+        if (movableTileDestroyed)
+        {
+            // Logic to handle level failure
+            HandleLevelFailure();
+            return false;
+        }
+        else if (evilTileDestroyed)
+        {
+            // Continue gameplay if only EvilTiles are destroyed
+            Debug.Log("The disconnected group contains only EvilTiles.");
+            if (CountEvilTiles() == 0)
+            {
+                Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+                if (levelCompletedBox != null)
+                {
+                    animator = levelCompletedBox.GetComponent<Animator>();
                 }
                 animator.SetTrigger("LevelEnd");
-            }
-            else
-            {
-                Debug.Log("The disconnected group contains only EvilTiles.");
-                if (CountEvilTiles() == 0)
-                {
-                    Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                    GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-                    if (levelCompletedBox != null)
-                    {
-                        animator = levelCompletedBox.GetComponent<Animator>();
-                    }
-                    animator.SetTrigger("LevelEnd");
 
-                }
             }
-            
+            return true;
         }
-        
-        return result;
+        else
+        {
+            return true;
+        }
     }
 
+    private void HandleLevelFailure()
+    {
+        // Implement the logic to handle level failure
+        // e.g., showing a game over screen, resetting the level, etc.
+        Debug.Log("Game Over: MovableTiles group is not connected.");
+        GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
+        if (levelFailedBox != null)
+        {
+            animator = levelFailedBox.GetComponent<Animator>();
+        }
+        animator.SetTrigger("LevelEnd");
+    }
 
+    private List<Transform> DepthFirstSearch(Transform tile, bool[,] visited)
+    {
+        List<Transform> groupTiles = new List<Transform>();
+        InternalDFS(tile, visited, groupTiles);
+        return groupTiles;
+    }
 
-
-
-    private bool DepthFirstSearch(Transform tile, bool[,] visited)
+    private void InternalDFS(Transform tile, bool[,] visited, List<Transform> groupTiles)
     {
         int x = tile.GetComponent<MovableTile>().Column;
         int y = tile.GetComponent<MovableTile>().Row;
 
-        visited[x, y] = true; // Mark the tile as visited.
+        visited[x, y] = true;
+        groupTiles.Add(tile);
 
-        bool result = true; // Initialize the result as true.
-
-        // Check neighbors and perform DFS on connected MovableTiles.
+        // Check the left neighbor
         if (x > 0 && !visited[x - 1, y])
         {
             Transform leftNeighbor = movableTiles[x - 1, y];
             if (leftNeighbor != null && IsTileOrChildConnectable(leftNeighbor))
             {
-                result &= DepthFirstSearch(leftNeighbor, visited);
+                InternalDFS(leftNeighbor, visited, groupTiles);
             }
         }
 
+        // Check the right neighbor
         if (x < gridSizeX - 1 && !visited[x + 1, y])
         {
             Transform rightNeighbor = movableTiles[x + 1, y];
-        if (rightNeighbor != null && IsTileOrChildConnectable(rightNeighbor))
-        {
-            result &= DepthFirstSearch(rightNeighbor, visited);
-        }
+            if (rightNeighbor != null && IsTileOrChildConnectable(rightNeighbor))
+            {
+                InternalDFS(rightNeighbor, visited, groupTiles);
+            }
         }
 
+        // Check the lower neighbor
         if (y > 0 && !visited[x, y - 1])
         {
             Transform lowerNeighbor = movableTiles[x, y - 1];
             if (lowerNeighbor != null && IsTileOrChildConnectable(lowerNeighbor))
             {
-                result &= DepthFirstSearch(lowerNeighbor, visited);
+                InternalDFS(lowerNeighbor, visited, groupTiles);
             }
         }
 
+        // Check the upper neighbor
         if (y < gridSizeY - 1 && !visited[x, y + 1])
         {
             Transform upperNeighbor = movableTiles[x, y + 1];
             if (upperNeighbor != null && IsTileOrChildConnectable(upperNeighbor))
             {
-                result &= DepthFirstSearch(upperNeighbor, visited);
+                InternalDFS(upperNeighbor, visited, groupTiles);
             }
         }
-
-        return result;
     }
 
     private bool IsTileOrChildConnectable(Transform tile)
@@ -894,36 +898,35 @@ public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
 
 
     private void DestroyChildTiles(Transform parentTile)
-{
-    bool lockTileDestroyed = false; // Flag to check if a lock tile was destroyed
-
-    // Iterate through child objects of the parentTile.
-    foreach (Transform child in parentTile)
     {
-        // Check if the child is a KeyTile or LockTile.
-        if (child.CompareTag("KeyTile") || child.CompareTag("LockTile"))
-        {
-            // Destroy the child object.
-            Destroy(child.gameObject);
+        bool lockTileDestroyed = false; // Flag to check if a lock tile was destroyed
 
-            if (child.CompareTag("LockTile"))
+        // Iterate through child objects of the parentTile.
+        foreach (Transform child in parentTile)
+        {
+            // Check if the child is a KeyTile or LockTile.
+            if (child.CompareTag("KeyTile") || child.CompareTag("LockTile"))
             {
-                lockTileDestroyed = true;
+                // Destroy the child object.
+                Destroy(child.gameObject);
+
+                if (child.CompareTag("LockTile"))
+                {
+                    lockTileDestroyed = true;
+                }
+            }
+        }
+
+        // If a lock tile was destroyed, update the parent tile's isLocked status
+        if (lockTileDestroyed)
+        {
+            MovableTile parentTileComponent = parentTile.GetComponent<MovableTile>();
+            if (parentTileComponent != null)
+            {
+                parentTileComponent.IsLocked = false;
             }
         }
     }
-
-    // If a lock tile was destroyed, update the parent tile's isLocked status
-    if (lockTileDestroyed)
-    {
-        MovableTile parentTileComponent = parentTile.GetComponent<MovableTile>();
-        if (parentTileComponent != null)
-        {
-            parentTileComponent.IsLocked = false;
-        }
-    }
-}
-
 
 }
 
