@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using TMPro; // Add this at the top of your script
 
 public class MovableTileDrag : MonoBehaviour
 {
@@ -29,7 +30,8 @@ public class MovableTileDrag : MonoBehaviour
 
     public float tapCooldown = 0.5f; // Time in seconds to ignore taps after the first tap
     private float lastTapTime;
-
+    public int moveCounter = 0;
+    public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
 
     private void Start()
     {
@@ -369,6 +371,22 @@ public class MovableTileDrag : MonoBehaviour
                 currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                 Debug.Log("movetype change: " + currentMoveType);
                 movableTileGrid.IsMovableTilesGroupConnected();
+
+                moveCounter++; // Increment the counter here
+                Debug.Log("Move Count: " + moveCounter);
+
+                GameObject textObject = GameObject.Find("GameMovesText");
+                // Update TextMeshPro UI
+                if (textObject != null)
+                {
+                    TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+                    if (textComponentFromOtherObject != null)
+                    {
+                        textComponentFromOtherObject.text = moveCounter.ToString();
+                    }
+                    Debug.Log("Toimiikst‰‰?");
+                }
+
             }
             else if (!isSnappedToNewPlace)
             {
