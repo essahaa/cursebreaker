@@ -166,7 +166,7 @@ public class MovableTileDrag : MonoBehaviour
     {
         if (!allElementsNull)
         {
-            FindObjectOfType<AudioManager>().Play("liik");
+           
 
             int [] firstMovableTile = getFirstAndLastMovableTile();
 
@@ -292,6 +292,7 @@ public class MovableTileDrag : MonoBehaviour
 
         if (!allElementsNull)
         {
+            FindObjectOfType<AudioManager>().Play("liik");
             if (tileInSamePosition)
             {
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
