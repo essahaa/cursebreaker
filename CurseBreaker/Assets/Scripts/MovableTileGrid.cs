@@ -699,8 +699,9 @@ public class MovableTileGrid : MonoBehaviour
                     else if (tile.CompareTag("EvilTile"))
                     {
                         evilTileDestroyed = true;
-                    }
+                    } 
                     Destroy(tile.gameObject);
+                    movableTiles[x, y] = null;
                 }
             }
         }
