@@ -372,6 +372,7 @@ public class MovableTileDrag : MonoBehaviour
                 currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                 Debug.Log("movetype change: " + currentMoveType);
                 movableTileGrid.IsMovableTilesGroupConnected();
+                movableTileGrid.RotateArrow();
 
                 moveCounter++; // Increment the counter here
                 Debug.Log("Move Count: " + moveCounter);

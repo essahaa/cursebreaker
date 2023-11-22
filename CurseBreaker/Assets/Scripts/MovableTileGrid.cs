@@ -10,13 +10,12 @@ using System.Runtime.InteropServices.WindowsRuntime;
 public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
-    public Sprite glowingTile;
-    public Sprite tile;
     public GameObject evilTilePrefab;
-    public Sprite glowingTileEvil;
-    public Sprite evilTile;
     public GameObject lockTilePrefab;
-    public GameObject keyTilePrefab; // Assign this in the Inspector with your KeyTile prefab.
+    public GameObject keyTilePrefab;
+    public GameObject arrowPrefab;
+
+    private GameObject arrow;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
@@ -27,6 +26,7 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeY; //number of rows, height of the grid
 
     private int selectedLevel = 1; // The level you want to generate.
+    private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -40,6 +40,7 @@ public class MovableTileGrid : MonoBehaviour
         ReadCSV(); // Read the CSV file.
         LevelManager levelManager = FindObjectOfType<LevelManager>();
         LoadLevel(selectedLevel);
+        
     }
 
     public int CheckSelectedLevel()
@@ -47,10 +48,33 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
+    private void GenerateArrowPrefab()
+    {
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+
+        Vector3 arrowposition = new Vector3(0f, 3f, 0);
+        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
+        arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+    }
+
+    public void RotateArrow()
+    {
+        if(rotation > 360)
+        {
+            rotation = 0;
+        } 
+        else
+        {
+            rotation += 90;
+        }
+        
+        arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
+        Debug.Log("rotated " + rotation);
+    }
+
     public void LoadLevel(int levelNumber)
     {
         selectedLevel = levelNumber;
-
         //TÄHÄN TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
     }
@@ -152,6 +176,7 @@ public class MovableTileGrid : MonoBehaviour
         {
             backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
             backgroundGenerated = true;
+            GenerateArrowPrefab();
         }
         
         GameObject tilePrefab = GetTilePrefab(tileType, isLocked, isKey);
@@ -252,6 +277,7 @@ public class MovableTileGrid : MonoBehaviour
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
+        Destroy(arrow);
 
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
