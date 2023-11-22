@@ -295,6 +295,22 @@ MonoBehaviour:
     pitch: 2.23
     loop: 0
     source: {fileID: 0}
+  - name: riddedred
+    description: 
+    clip: {fileID: 8300000, guid: 7a3f51a7f6e63b54da33f5fc8a84f38a, type: 3}
+    duration: 1
+    volume: 0.693
+    pitch: 2.23
+    loop: 0
+    source: {fileID: 0}
+  - name: youfail
+    description: 
+    clip: {fileID: 8300000, guid: 3a2da7a14c8109d498781dd73457c314, type: 3}
+    duration: 1
+    volume: 0.693
+    pitch: 1.58
+    loop: 0
+    source: {fileID: 0}
 --- !u!4 &35921517
 Transform:
   m_ObjectHideFlags: 0
@@ -2312,6 +2328,7 @@ MonoBehaviour:
   lynaraPrefab: {fileID: 642847183060046940, guid: 7d22c4f824c8a294fba6ee79ba7fa15d, type: 3}
   dialogBubblePrefab: {fileID: 2367951043776471772, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
   shadowCanvas: {fileID: 2050504635}
+  arrow: {fileID: 0}
   csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   backgroundGrid: {fileID: 68879168}
   animator: {fileID: 0}

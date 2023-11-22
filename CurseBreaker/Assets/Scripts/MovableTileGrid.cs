@@ -328,6 +328,7 @@ public class MovableTileGrid : MonoBehaviour
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && CheckNeighbours(col, row) != true)
                 {
                     //no neighbors found, destroy tile
+                    FindObjectOfType<AudioManager>().Play("riddedred");
                     Debug.Log("destroy tile " + col + " , " + row);
 
                     movableTiles[col, row] = null;
@@ -344,6 +345,7 @@ public class MovableTileGrid : MonoBehaviour
                             animator = levelFailedBox.GetComponent<Animator>();
                         }
                         animator.SetTrigger("LevelEnd");
+                        FindObjectOfType<AudioManager>().Play("youfail");
                     }
                     else
                     {
