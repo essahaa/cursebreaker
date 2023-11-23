@@ -203,19 +203,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 193862849}
-        m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
-        m_MethodName: LoadLevel
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &136868929
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,63 +338,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136868929}
   m_CullTransparentMesh: 1
---- !u!1 &193862848
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 193862850}
-  - component: {fileID: 193862849}
-  m_Layer: 0
-  m_Name: Level
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &193862849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193862848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e8b77cfef3d8134395a43ce4085806b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movableTilePrefab: {fileID: 0}
-  glowingTile: {fileID: 0}
-  tile: {fileID: 0}
-  evilTilePrefab: {fileID: 0}
-  glowingTileEvil: {fileID: 0}
-  evilTile: {fileID: 0}
-  lockTilePrefab: {fileID: 0}
-  keyTilePrefab: {fileID: 0}
-  csvFile: {fileID: 0}
-  movableTileSize: 1
-  animator: {fileID: 0}
-  gridSizeX: 0
-  gridSizeY: 0
---- !u!4 &193862850
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193862848}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 167.71246, y: 50.83191, z: -31.687075}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1370389737}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &379796575
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +657,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 531336026}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1028632348}
+        m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
+        m_MethodName: LoadLevel
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &531336026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -840,6 +783,60 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 645132113}
   m_CullTransparentMesh: 1
+--- !u!1 &1028632346
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1028632347}
+  - component: {fileID: 1028632348}
+  m_Layer: 0
+  m_Name: LevelSelector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1028632347
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028632346}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 904.28955, y: 193.61328, z: 4.987121}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1370389737}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1028632348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028632346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e8b77cfef3d8134395a43ce4085806b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movableTilePrefab: {fileID: 0}
+  evilTilePrefab: {fileID: 0}
+  lockTilePrefab: {fileID: 0}
+  keyTilePrefab: {fileID: 0}
+  arrowPrefab: {fileID: 0}
+  csvFile: {fileID: 0}
+  movableTileSize: 1
+  animator: {fileID: 0}
+  gridSizeX: 0
+  gridSizeY: 0
 --- !u!1 &1192159922
 GameObject:
   m_ObjectHideFlags: 0
@@ -1130,7 +1127,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1260042019}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1028632348}
+        m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
+        m_MethodName: LoadLevel
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1260042019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1433,7 +1442,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 193862850}
   - {fileID: 2088664024}
   - {fileID: 111203140}
   - {fileID: 1597932980}
@@ -1442,6 +1450,7 @@ RectTransform:
   - {fileID: 1713802256}
   - {fileID: 645132114}
   - {fileID: 1289959112}
+  - {fileID: 1028632347}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2062,14 +2071,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1370389738}
-        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: Gameboard
-        m_Mode: 1
+      - m_Target: {fileID: 1028632348}
+        m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
+        m_MethodName: LoadLevel
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
