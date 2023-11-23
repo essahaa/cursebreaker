@@ -74,6 +74,8 @@ public class MovableTileGrid : MonoBehaviour
 
     public void LoadLevel(int levelNumber)
     {
+        ReadCSV(); // Read the CSV file.
+        SceneManager.LoadScene("Gameboard");
         selectedLevel = levelNumber;
         //TÄHÄN TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
