@@ -1952,7 +1952,7 @@ MonoBehaviour:
     description: 
     clip: {fileID: 8300000, guid: 3a2da7a14c8109d498781dd73457c314, type: 3}
     duration: 1
-    volume: 0.693
+    volume: 0
     pitch: 1.41
     loop: 0
     source: {fileID: 0}

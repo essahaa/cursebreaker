@@ -288,6 +288,7 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV();
+        FindObjectOfType<AudioManager>().StopPlaying("youfail");
     }
 
     public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
