@@ -25,7 +25,7 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeX; //number of columns, width of the grid
     public int gridSizeY; //number of rows, height of the grid
 
-    private int selectedLevel = 1; // The level you want to generate.
+    private int selectedLevel = -1; // The level you want to generate.
     private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
@@ -39,6 +39,10 @@ public class MovableTileGrid : MonoBehaviour
     {
         ReadCSV(); // Read the CSV file.
         LevelManager levelManager = FindObjectOfType<LevelManager>();
+        if(selectedLevel < 0)
+        {
+            selectedLevel = 1;
+        }
         LoadLevel(selectedLevel);
         
     }
@@ -70,6 +74,14 @@ public class MovableTileGrid : MonoBehaviour
         
         arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
         Debug.Log("rotated " + rotation);
+    }
+
+    public void LoadSceneAndLevel(int levelNumber)
+    {
+        selectedLevel = levelNumber;
+        SceneManager.LoadScene("Gameboard");
+        
+        LoadLevel(levelNumber);
     }
 
     public void LoadLevel(int levelNumber)
