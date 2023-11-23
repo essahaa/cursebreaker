@@ -33,12 +33,15 @@ public class MovableTileDrag : MonoBehaviour
     public int moveCounter = 0;
     public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
 
+    List<BoxCollider2D> lockTileColliders = new List<BoxCollider2D>();
+
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         movableTiles = movableTileGrid.movableTiles;
+        lockTileColliders = GetLockColliders();
     }
 
     private void Update()
@@ -87,15 +90,11 @@ public class MovableTileDrag : MonoBehaviour
         if (hit.collider != null)
         {
             GameObject tile = hit.collider.gameObject;
-            Debug.Log(tile);
             // Check if the object hit is a tile
             if (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("KeyTile"))
             {
-                Debug.Log(tile + " in if");
                 rowIndex = tile.GetComponent<MovableTile>().Row;
                 columnIndex = tile.GetComponent<MovableTile>().Column;
-
-                Debug.Log(tile + " row, col " + rowIndex + columnIndex);
 
                 // Find all the movable tiles in the specified row or column.
                 if (currentMoveType == "horizontal")
@@ -108,7 +107,7 @@ public class MovableTileDrag : MonoBehaviour
                 }
 
                 CheckNonNullAndChangeSprites();
-                SetInitialTilePositions();
+                SetInitialTilePositions();                
 
                 return currentMovableTiles;
             }
@@ -158,24 +157,17 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            Debug.Log("currentmovabletiles null");
-        }
     }
 
     private void MoveTiles(Vector3 offset)
     {
         if (!allElementsNull)
         {
-           
-
             int [] firstMovableTile = getFirstAndLastMovableTile();
 
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
-                //Debug.Log("iterating row " + row);
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
                     Transform tile = currentMovableTiles[col, row];
@@ -183,16 +175,40 @@ public class MovableTileDrag : MonoBehaviour
                     if (tile != null)
                     {
                         Vector3 targetPosition;
+                        Vector3 targetPositionForCollition;
 
                         if (currentMoveType == "horizontal")
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(offset.x, 0f, 0f);
                             targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
+
+                            if (offset.x >= 0)
+                            {
+                                targetPositionForCollition = initialTilePositions[col, row] + new Vector3(offset.x + (movableTileGrid.movableTileSize / 4), 0f, 0f);
+                                targetPositionInLock = CheckForLockCollition(targetPositionForCollition);
+                            }
+                            else if (offset.x < 0)
+                            {
+                                targetPositionForCollition = initialTilePositions[col, row] + new Vector3(offset.x - (movableTileGrid.movableTileSize / 4), 0f, 0f);
+                                targetPositionInLock = CheckForLockCollition(targetPositionForCollition);
+                            }
                         }
                         else
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
                             targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
+
+                            if (offset.y >= 0)
+                            {
+                                targetPositionForCollition = initialTilePositions[col, row] + new Vector3(0f, offset.y + (movableTileGrid.movableTileSize / 4), 0f);
+                                targetPositionInLock = CheckForLockCollition(targetPositionForCollition);
+                            }
+                            else if (offset.y < 0)
+                            {
+                                targetPositionForCollition = initialTilePositions[col, row] + new Vector3(0f, offset.y - (movableTileGrid.movableTileSize / 4), 0f);
+                                targetPositionInLock = CheckForLockCollition(targetPositionForCollition);
+                            }
+                            
                         }
                         
                         foreach (Transform otherTile in currentMovableTiles)
@@ -210,7 +226,6 @@ public class MovableTileDrag : MonoBehaviour
                             }
                         }
 
-                        CheckForLockCollition(targetPosition);
 
                         if (!tileInSamePosition && !targetPositionInLock)
                         {
@@ -223,7 +238,8 @@ public class MovableTileDrag : MonoBehaviour
 
                             // Update the movableTileGrid with the new position.
                             movableTileGrid.UpdateMovableTile(column, newRow, tile);
-                        }else if(targetPositionInLock)
+                        }
+                        else if(targetPositionInLock)
                         {
                             targetPositionInLock = false;
                         }
@@ -252,24 +268,20 @@ public class MovableTileDrag : MonoBehaviour
         return null;
     }
 
-    private void CheckForLockCollition(Vector3 targetPosition)
+    private bool CheckForLockCollition(Vector3 targetPosition)
     {
-        List<BoxCollider2D> lockTileColliders = GetLockColliders();
-
         foreach (BoxCollider2D collider in lockTileColliders)
         {
-            if(collider.bounds.Contains(targetPosition)) {
-                //return true;
-                targetPositionInLock = true; break;
+            if (collider.bounds.Contains(targetPosition))
+            {
+                return true; // Collision detected
             }
         }
-        //return false;
+        return false; // No collision
     }
 
     private List<BoxCollider2D> GetLockColliders()
     {
-        List<BoxCollider2D> lockTileColliders = new List<BoxCollider2D>();
-
         foreach (Transform tileInGrid in movableTiles)
         {
             //Debug.Log("tileInGrid: " + tileInGrid);
@@ -279,7 +291,7 @@ public class MovableTileDrag : MonoBehaviour
                 Transform tileChild = tileInGrid.GetChild(0);
                 if (tileChild.CompareTag("LockTile"))
                 {
-                    //Debug.Log("lock found");
+                    Debug.Log("lock found " + tileChild.position);
                     lockTileColliders.Add(tileInGrid.gameObject.GetComponent<BoxCollider2D>());
                 }
             }
@@ -329,7 +341,6 @@ public class MovableTileDrag : MonoBehaviour
                         // Skip the locked tiles
                         if (movableTileComponent.IsLocked)
                         {
-                            Debug.Log($"Locked Tile Final Position at [{movableTileComponent.Column}, {movableTileComponent.Row}]: {tile.position}");
                             continue;
                         }
 
@@ -346,7 +357,6 @@ public class MovableTileDrag : MonoBehaviour
 
                         // Update the movableTileGrid with the new position.
                         movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
-                        Debug.Log("Snapped to row: " + movableTileComponent.Row + ", column: " + movableTileComponent.Column + " tile position " + tile.position);
 
                         if (tile.position == initialTilePositions[col, row])
                         {
@@ -356,7 +366,6 @@ public class MovableTileDrag : MonoBehaviour
                         {
                             isSnappedToNewPlace = true;
                         }
-                        Debug.Log("issnappedtonewplace " + isSnappedToNewPlace);
                     }
                 }
             }
@@ -370,12 +379,10 @@ public class MovableTileDrag : MonoBehaviour
 
                 // Toggle between "horizontal" and "vertical" move types.
                 currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-                Debug.Log("movetype change: " + currentMoveType);
                 movableTileGrid.IsMovableTilesGroupConnected();
                 movableTileGrid.RotateArrow();
 
                 moveCounter++; // Increment the counter here
-                Debug.Log("Move Count: " + moveCounter);
 
                 GameObject textObject = GameObject.Find("GameMovesText");
                 // Update TextMeshPro UI
@@ -386,14 +393,12 @@ public class MovableTileDrag : MonoBehaviour
                     {
                         textComponentFromOtherObject.text = moveCounter.ToString();
                     }
-                    Debug.Log("Toimiikst‰‰?");
                 }
 
             }
             else if (!isSnappedToNewPlace)
             {
                 currentMoveType = (currentMoveType == "horizontal") ? "horizontal" : "vertical";
-                Debug.Log("movetype still same: " + currentMoveType);
             }
 
             //empty current movable tiles array
