@@ -6,6 +6,7 @@ using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TutorialLevel : MonoBehaviour
 {
@@ -14,12 +15,16 @@ public class TutorialLevel : MonoBehaviour
     public GameObject arrowPrefab;
     public GameObject lynaraPrefab;
     public GameObject dialogBubblePrefab;
+    public Sprite overlay_0;
+    public Sprite overlay_1;
+    public Sprite overlay_2;
 
     public Canvas shadowCanvas;
 
     public GameObject arrow;
     private GameObject lynara;
     private GameObject dialogBubble;
+    public Image overlay;
 
     private string dialogue1 = "Hi there! I'm here to guide you.";
     private string dialogue2 = "Your objective is to move the yellow tiles row by row so that the red tile isn't connected to the yellow ones.";
@@ -56,6 +61,9 @@ public class TutorialLevel : MonoBehaviour
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         backgroundGenerated = false;
+
+        GameObject overlayObject = GameObject.Find("Overlay");
+        overlay = overlayObject.GetComponent<Image>();
 
         ReadLevelDataFromCSV();
         GeneratePrefabs();
@@ -118,7 +126,6 @@ public class TutorialLevel : MonoBehaviour
             Vector3 dialogPosition = new Vector3(0.4f, -4f, 0);
             dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity);
             dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
-
     }
 
     public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)

@@ -65,6 +65,7 @@ public class TutorialLevelMovement : MonoBehaviour
                             if (clickCount == 3)
                             {
                                 tutorialLevel.arrow.SetActive(true);
+                                tutorialLevel.overlay.sprite = tutorialLevel.overlay_1;
                             }
                             // Show next speech bubble
                             tutorialLevel.ShowNextSpeechBubble(clickCount);
@@ -88,6 +89,7 @@ public class TutorialLevelMovement : MonoBehaviour
                             {
                                 tutorialLevel.arrow.SetActive(true);
                                 tutorialLevel.ShowNextSpeechBubble(5);
+                                tutorialLevel.overlay.sprite = tutorialLevel.overlay_2;
                                 secondMoveCanBeDone = false;
 
                             }
