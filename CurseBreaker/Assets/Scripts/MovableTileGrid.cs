@@ -43,6 +43,11 @@ public class MovableTileGrid : MonoBehaviour
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
+        }else
+        {
+            PlayerPrefs.SetInt("selectedLevel", 1);
+            selectedLevel = 1;
+            LoadLevel(selectedLevel);
         }
     }
 
