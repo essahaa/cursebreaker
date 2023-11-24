@@ -18,28 +18,29 @@ public class WellDoneScreenManager : MonoBehaviour
     public MovableTileGrid movableTileGrid;
     //private MovableTileDrag movableTileDrag;
     public int currentLevel; // Current level number
-    public int moveCounter = 1;
+    public int moveCount = 0;
 
     void Start()
     {
         // Attach the method to the button click event
         //showStarsButton.onClick.AddListener(OnShowStarsButtonClick);
 
-        // Get references to MovableTileGrid and MovableTileDrag
+        // Get references to MovableTileGrid
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
-        //movableTileDrag = GameObject.FindGameObjectWithTag("MovableTileDrag").GetComponent<MovableTileDrag>();
 
         // Set current level
         currentLevel = movableTileGrid.selectedLevel;
-
+        Debug.Log("Current level: " + currentLevel);
         
     }
 
-    public void LoadCounter()
+    public void SetCounter()
     {
         int moveCounter = PlayerPrefs.GetInt("counter");
-        Debug.Log(moveCounter);
+        Debug.Log("Moves in SetCounter = " + moveCounter);
+        moveCount = moveCounter;
     }
+
 
     public void OnShowStarsButtonClick()
     {
@@ -49,35 +50,21 @@ public class WellDoneScreenManager : MonoBehaviour
 
 
 
-private IEnumerator ShowStarsRoutine(int numberOfStars)
-{
-    Debug.Log($"Showing {numberOfStars} stars");
-
-    foreach (Star star in Stars)
+    private IEnumerator ShowStarsRoutine(int numberOfStars)
     {
-        if (star != null && star.YellowStar != null)
+        foreach (Star star in Stars)
         {
             star.YellowStar.transform.localScale = Vector3.zero;
         }
-        else
-        {
-            Debug.LogError("Star or YellowStar is null");
-        }
-    }
 
-        int maxIndex = Math.Min(numberOfStars, Stars.Length);
+        // Ensure the number of stars does not exceed the length of the array
+        int maxIndex = Mathf.Min(numberOfStars, Stars.Length);
         for (int i = 0; i < maxIndex; i++)
-        {
-        if (Stars[i] != null)
         {
             yield return StartCoroutine(EnlargeAndShrinkStar(Stars[i]));
         }
-        else
-        {
-            Debug.LogError($"Star {i} is null");
-        }
     }
-}
+
     public IEnumerator StartStarsWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -93,26 +80,26 @@ private IEnumerator ShowStarsRoutine(int numberOfStars)
 
     public int CalculateStarsBasedOnMoves()
     {
-        // Ensure this method initializes moveCounter properly
-        //moveCounter = movableTileGrid.getMoveCount(moveCounter);
-        //Debug.Log($"MoveCounter in StartsWithDelay  {moveCounter}");
-        //Debug.Log($"Calculating stars for {moveCounter} moves.");
+        SetCounter();
+        
+        Debug.Log($"Calculating stars for {moveCount} moves.");
+
         // Switch case for different levels
         switch (currentLevel)
         {
             case 1:
-                if (moveCounter <= 3) return 3;
-                else if (moveCounter <= 5) return 2; 
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 5) return 2; 
                 else return 1; 
 
             case 2:
-                if (moveCounter <= 3) return 3;
-                else if (moveCounter <= 5) return 2;
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 5) return 2;
                 else return 1;
             
             case 3:
-                if (moveCounter <= 3) return 3;
-                else if (moveCounter <= 5) return 2;
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 5) return 2;
                 else return 1;
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
