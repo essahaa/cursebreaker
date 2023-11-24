@@ -424,4 +424,8 @@ public class MovableTileDrag : MonoBehaviour
         }
 
     }
+    public void SaveCounter()
+    {
+        PlayerPrefs.SetInt("counter", moveCounter);
+    }
 }

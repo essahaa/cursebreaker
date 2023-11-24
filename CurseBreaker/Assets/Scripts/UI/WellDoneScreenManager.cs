@@ -30,14 +30,10 @@ public class WellDoneScreenManager : MonoBehaviour
 
         // Set current level
         currentLevel = movableTileGrid.selectedLevel;
-        //moveCounter = movableTileGrid.getMoveCount();
-        if (movableTileGrid != null)
+
+        public void LoadCounter()
         {
-            moveCounter = movableTileGrid.getMoveCount(moveCounter);
-        }
-        else
-        {
-            Debug.LogError("MovableTileGrid is not found!");
+            int moveCounter = PlayerPrefs.GetInt(counter);
         }
     }
 
@@ -96,7 +92,7 @@ private IEnumerator ShowStarsRoutine(int numberOfStars)
         // Ensure this method initializes moveCounter properly
         //moveCounter = movableTileGrid.getMoveCount(moveCounter);
         //Debug.Log($"MoveCounter in StartsWithDelay  {moveCounter}");
-        Debug.Log($"Calculating stars for {moveCounter} moves.");
+        //Debug.Log($"Calculating stars for {moveCounter} moves.");
         // Switch case for different levels
         switch (currentLevel)
         {

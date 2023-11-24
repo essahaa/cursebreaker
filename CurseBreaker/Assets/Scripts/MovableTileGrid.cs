@@ -25,7 +25,7 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeX; //number of columns, width of the grid
     public int gridSizeY; //number of rows, height of the grid
 
-    private int selectedLevel; // The level you want to generate.
+    public int selectedLevel; // The level you want to generate.
     private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
