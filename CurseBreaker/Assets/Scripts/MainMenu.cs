@@ -7,9 +7,34 @@ public class MainMenu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene("Tutorial_level");
+        if(PlayerPrefs.GetInt("selectedLevel") < 1)
+        {
+            SceneManager.LoadScene("Tutorial_level");
+        }else
+        {
+            UseLatestLevel();
+            SceneManager.LoadScene("Gameboard");
+        }
+        
         //loads next scene in build queue:
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void PlayTutorial()
+    {
+        SceneManager.LoadScene("Tutorial_level");
+    }
+
+    public void UseLatestLevel()
+    {
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        PlayerPrefs.SetInt("selectedLevel", currentLevel);
+    }
+
+    public void DeletePrefs()
+    {
+        PlayerPrefs.DeleteAll();
+        Debug.Log("Prefs deleted");
     }
 
     public void Gameboard()

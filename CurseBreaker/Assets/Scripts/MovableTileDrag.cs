@@ -16,6 +16,7 @@ public class MovableTileDrag : MonoBehaviour
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
     private bool tileInSamePosition = false;
     private bool targetPositionInLock = false;
+    private bool levelFailed = false;
 
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles;
@@ -41,7 +42,7 @@ public class MovableTileDrag : MonoBehaviour
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         movableTiles = movableTileGrid.movableTiles;
-        lockTileColliders = GetLockColliders();
+        
     }
 
     private void Update()
@@ -57,7 +58,8 @@ public class MovableTileDrag : MonoBehaviour
                     if (Time.time - lastTapTime > tapCooldown)
                     {
                         initialTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-                        currentMovableTiles = GetCurrentMovableTiles(touch.position);
+                        lockTileColliders = GetLockColliders();
+                        currentMovableTiles = GetCurrentMovableTiles(touch.position); 
                         lastTapTime = Time.time;
                     }
                     break;
@@ -376,24 +378,29 @@ public class MovableTileDrag : MonoBehaviour
             {
                 //Update movableTiles array with new snapped positions
                 movableTiles = movableTileGrid.UpdateMovableTilesArray();
+                levelFailed = movableTileGrid.levelFailed;
+                Debug.Log("level failed on drag " + levelFailed);
 
-                // Toggle between "horizontal" and "vertical" move types.
-                currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-                movableTileGrid.IsMovableTilesGroupConnected();
-                movableTileGrid.RotateArrow();
-
-                moveCounter++; // Increment the counter here
-
-                GameObject textObject = GameObject.Find("GameMovesText");
-                // Update TextMeshPro UI
-                if (textObject != null)
+                if(!levelFailed)
                 {
-                    TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
-                    if (textComponentFromOtherObject != null)
+                    // Toggle between "horizontal" and "vertical" move types.
+                    currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
+                    movableTileGrid.IsMovableTilesGroupConnected();
+                    movableTileGrid.RotateArrow();
+
+                    moveCounter++; // Increment the counter here
+
+                    GameObject textObject = GameObject.Find("GameMovesText");
+                    // Update TextMeshPro UI
+                    if (textObject != null)
                     {
-                        textComponentFromOtherObject.text = moveCounter.ToString();
+                        TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+                        if (textComponentFromOtherObject != null)
+                        {
+                            textComponentFromOtherObject.text = moveCounter.ToString();
+                        }
                     }
-                }
+                }             
 
             }
             else if (!isSnappedToNewPlace)
@@ -428,4 +435,6 @@ public class MovableTileDrag : MonoBehaviour
     {
         PlayerPrefs.SetInt("counter", moveCounter);
     }
+
+    
 }

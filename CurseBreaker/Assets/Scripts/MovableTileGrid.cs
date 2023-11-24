@@ -32,6 +32,7 @@ public class MovableTileGrid : MonoBehaviour
 
     private bool backgroundGenerated = false;
     private bool[,] visited;
+    public bool levelFailed = false;
 
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
@@ -43,6 +44,11 @@ public class MovableTileGrid : MonoBehaviour
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
+        }else
+        {
+            PlayerPrefs.SetInt("selectedLevel", 1);
+            selectedLevel = 1;
+            LoadLevel(selectedLevel);
         }
     }
 
@@ -53,11 +59,9 @@ public class MovableTileGrid : MonoBehaviour
 
     private void GenerateArrowPrefab()
     {
-        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+        
     }
 
     public void RotateArrow()
@@ -105,6 +109,7 @@ public class MovableTileGrid : MonoBehaviour
 
     public void ReadLevelDataFromCSV()
     {
+        levelFailed = false;
         bool arraySizeSet = false; // Add a flag to track if array size is set.
         bool noMoreLevels = true; // Flag to check if there are no more levels.
 
@@ -360,18 +365,56 @@ public class MovableTileGrid : MonoBehaviour
 
                 if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && CheckNeighbours(col, row) != true)
                 {
-                    //no neighbors found, destroy tile
-                    FindObjectOfType<AudioManager>().Play("riddedred");
-                    Debug.Log("destroy tile " + col + " , " + row);
-
-                    movableTiles[col, row] = null;
-
-                    GameObject tileToDestroy = tile.gameObject; // Get the GameObject.
-                    Destroy(tileToDestroy);
-
-                    if(tile.CompareTag("MovableTile"))
+                    if (!HasChildLockTile(tile))
                     {
-                        Debug.Log("level failed koska yks tippu");
+                        //no neighbors found, destroy tile
+                        FindObjectOfType<AudioManager>().Play("riddedred");
+                        Debug.Log("destroy tile " + col + " , " + row);
+                        movableTiles[col, row] = null;
+
+                        GameObject tileToDestroy = tile.gameObject; // Get the GameObject.
+                        Destroy(tileToDestroy);
+
+                        if (tile.CompareTag("MovableTile"))
+                        {
+                            Debug.Log("level failed koska yks tippu");
+                            levelFailed = true;
+                            GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
+                            if (levelFailedBox != null)
+                            {
+                                animator = levelFailedBox.GetComponent<Animator>();
+                            }
+                            animator.SetTrigger("LevelEnd");
+                            FindObjectOfType<AudioManager>().Play("youfail");
+                        }
+                        else
+                        {
+                            if (CountEvilTiles() == 0)
+                            {
+                                Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                                GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+
+                                int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
+                                int newCurrentLevel = selectedLevel + 1;
+                                if (newCurrentLevel > currentLevel)
+                                {
+                                    PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
+                                }
+
+                                if (levelCompletedBox != null)
+                                {
+                                    animator = levelCompletedBox.GetComponent<Animator>();
+                                }
+                                animator.SetTrigger("LevelEnd");
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //locked tile cannot be destroyed, level fails if it is left alone
+                        Debug.Log("level failed locked");
+                        levelFailed = true;
                         GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
                         if (levelFailedBox != null)
                         {
@@ -380,23 +423,7 @@ public class MovableTileGrid : MonoBehaviour
                         animator.SetTrigger("LevelEnd");
                         FindObjectOfType<AudioManager>().Play("youfail");
                     }
-                    else
-                    {
-                        if(CountEvilTiles() == 0)
-                        {
-                            Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-                            if (levelCompletedBox != null)
-                            {
-                                animator = levelCompletedBox.GetComponent<Animator>();
-                            }
-                            animator.SetTrigger("LevelEnd");
-
-                        }
-                        
-                    }
                 }
-               
             }
         }
 
