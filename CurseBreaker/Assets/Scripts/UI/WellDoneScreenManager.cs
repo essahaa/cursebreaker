@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class WellDoneScreenManager : MonoBehaviour
 {
@@ -31,10 +32,13 @@ public class WellDoneScreenManager : MonoBehaviour
         // Set current level
         currentLevel = movableTileGrid.selectedLevel;
 
-        public void LoadCounter()
-        {
-            int moveCounter = PlayerPrefs.GetInt(counter);
-        }
+        
+    }
+
+    public void LoadCounter()
+    {
+        int moveCounter = PlayerPrefs.GetInt("counter");
+        Debug.Log(moveCounter);
     }
 
     public void OnShowStarsButtonClick()
