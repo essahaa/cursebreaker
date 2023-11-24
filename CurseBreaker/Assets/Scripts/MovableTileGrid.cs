@@ -58,11 +58,9 @@ public class MovableTileGrid : MonoBehaviour
 
     private void GenerateArrowPrefab()
     {
-        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+        
     }
 
     public void RotateArrow()
