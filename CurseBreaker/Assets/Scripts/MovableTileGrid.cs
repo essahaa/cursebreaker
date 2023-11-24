@@ -58,11 +58,9 @@ public class MovableTileGrid : MonoBehaviour
 
     private void GenerateArrowPrefab()
     {
-        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+        
     }
 
     public void RotateArrow()
@@ -391,6 +389,14 @@ public class MovableTileGrid : MonoBehaviour
                         {
                             Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+
+                            int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
+                            int newCurrentLevel = selectedLevel + 1;
+                            if (newCurrentLevel > currentLevel)
+                            {
+                                PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
+                            }
+
                             if (levelCompletedBox != null)
                             {
                                 animator = levelCompletedBox.GetComponent<Animator>();
