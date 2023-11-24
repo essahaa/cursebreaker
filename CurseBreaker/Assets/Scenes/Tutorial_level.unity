@@ -3256,9 +3256,9 @@ MonoBehaviour:
   arrowPrefab: {fileID: 1116196204006266678, guid: c54891ec82a5f5041b70c00c5563ef7e, type: 3}
   lynaraPrefab: {fileID: 642847183060046940, guid: 7d22c4f824c8a294fba6ee79ba7fa15d, type: 3}
   dialogBubblePrefab: {fileID: 2367951043776471772, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
-  overlay_0: {fileID: 0}
-  overlay_1: {fileID: 0}
-  overlay_2: {fileID: 0}
+  overlay_0: {fileID: 21300000, guid: 5465c116b674e4645b6b6737278904c1, type: 3}
+  overlay_1: {fileID: 21300000, guid: c25003d7f85294442b35766250b7fc99, type: 3}
+  overlay_2: {fileID: 21300000, guid: 7d1c1b2a39f880b43a182dfb52702f84, type: 3}
   shadowCanvas: {fileID: 2050504635}
   arrow: {fileID: 0}
   overlay: {fileID: 0}

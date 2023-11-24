@@ -25,7 +25,7 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeX; //number of columns, width of the grid
     public int gridSizeY; //number of rows, height of the grid
 
-    private int selectedLevel = -1; // The level you want to generate.
+    private int selectedLevel; // The level you want to generate.
     private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
@@ -39,12 +39,11 @@ public class MovableTileGrid : MonoBehaviour
     {
         ReadCSV(); // Read the CSV file.
         LevelManager levelManager = FindObjectOfType<LevelManager>();
-        if(selectedLevel < 0)
+        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        if(selectedLevel > 0)
         {
-            selectedLevel = 1;
+            LoadLevel(selectedLevel);
         }
-        LoadLevel(selectedLevel);
-        
     }
 
     public int CheckSelectedLevel()
@@ -78,14 +77,13 @@ public class MovableTileGrid : MonoBehaviour
 
     public void LoadSceneAndLevel(int levelNumber)
     {
-        selectedLevel = levelNumber;
+        PlayerPrefs.SetInt("selectedLevel", levelNumber);
         SceneManager.LoadScene("Gameboard");
-        
-        LoadLevel(levelNumber);
     }
 
     public void LoadLevel(int levelNumber)
     {
+        PlayerPrefs.SetInt("selectedLevel", levelNumber);
         selectedLevel = levelNumber;
         //TÄHÄN TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
@@ -93,7 +91,9 @@ public class MovableTileGrid : MonoBehaviour
 
     public void NextLevel()
     {
-        selectedLevel = selectedLevel + 1;
+        int newSelectedLevel = selectedLevel + 1;
+        PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+        selectedLevel = newSelectedLevel;
         DestroyExistingMovableTiles();
     }
 

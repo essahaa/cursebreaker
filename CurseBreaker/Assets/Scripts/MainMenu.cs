@@ -8,7 +8,6 @@ public class MainMenu : MonoBehaviour
     public void Play()
     {
         SceneManager.LoadScene("Tutorial_level");
-
         //loads next scene in build queue:
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -16,8 +15,6 @@ public class MainMenu : MonoBehaviour
     public void Gameboard()
     {
         SceneManager.LoadScene("Gameboard");
-
-   
     }
 
     public void LevelSelection()
