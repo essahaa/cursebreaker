@@ -101,6 +101,10 @@ public class WellDoneScreenManager : MonoBehaviour
                 if (moveCount <= 3) return 3;
                 else if (moveCount <= 5) return 2;
                 else return 1;
+            case 4:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 7) return 2;
+                else return 1;
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
                 return 1; // Default to 1 star if level not recognized

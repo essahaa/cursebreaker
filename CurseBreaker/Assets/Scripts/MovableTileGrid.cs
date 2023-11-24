@@ -405,6 +405,8 @@ public class MovableTileGrid : MonoBehaviour
                                 {
                                     animator = levelCompletedBox.GetComponent<Animator>();
                                 }
+                                WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
+                                manager.OnShowStarsButtonClick();
                                 animator.SetTrigger("LevelEnd");
 
                             }
