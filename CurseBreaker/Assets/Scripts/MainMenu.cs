@@ -12,6 +12,7 @@ public class MainMenu : MonoBehaviour
             SceneManager.LoadScene("Tutorial_level");
         }else
         {
+            UseLatestLevel();
             SceneManager.LoadScene("Gameboard");
         }
         
@@ -22,6 +23,12 @@ public class MainMenu : MonoBehaviour
     public void PlayTutorial()
     {
         SceneManager.LoadScene("Tutorial_level");
+    }
+
+    public void UseLatestLevel()
+    {
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        PlayerPrefs.SetInt("selectedLevel", currentLevel);
     }
 
     public void DeletePrefs()

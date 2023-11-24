@@ -389,6 +389,14 @@ public class MovableTileGrid : MonoBehaviour
                         {
                             Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+
+                            int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
+                            int newCurrentLevel = selectedLevel + 1;
+                            if (newCurrentLevel > currentLevel)
+                            {
+                                PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
+                            }
+
                             if (levelCompletedBox != null)
                             {
                                 animator = levelCompletedBox.GetComponent<Animator>();
