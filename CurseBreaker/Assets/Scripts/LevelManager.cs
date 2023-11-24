@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
+    /*
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector)
     private List<LevelData> levels = new List<LevelData>();
 
@@ -37,14 +38,19 @@ public class LevelManager : MonoBehaviour
         // Split the line by commas and parse each element
         string[] elements = line.Split(';');
         LevelData level = new LevelData();
-        // Assume the first element is the level name, the second is the difficulty, etc.
-        level.LevelNumber = int.Parse(elements[0]);
-        level.GridSizeX = int.Parse(elements[4]);
-        level.GridSizeY = int.Parse(elements[5]);
-        // Add more parsing as per your level design
+
+        if (elements.Length >= 1 && int.TryParse(elements[0], out int levelNumber))
+        {
+            level.LevelNumber = levelNumber;
+            level.GridSizeX = int.Parse(elements[4]);
+            level.GridSizeY = int.Parse(elements[5]);
+
+
+        }
 
         MovableTileData tile = ParseTileData(elements);
         level.Tiles.Add(tile);
+
         return level;
     }
 
@@ -86,6 +92,6 @@ public class LevelManager : MonoBehaviour
         public bool IsLocked;
         public bool IsKey;
     }
-    
+    */
 }
 
