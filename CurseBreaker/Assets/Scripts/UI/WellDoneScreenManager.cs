@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class WellDoneScreenManager : MonoBehaviour
 {
@@ -13,25 +14,72 @@ public class WellDoneScreenManager : MonoBehaviour
     // Reference to the button that triggers the stars
     [SerializeField] Button showStarsButton;
 
+    public MovableTileGrid movableTileGrid;
+    //private MovableTileDrag movableTileDrag;
+    public int currentLevel; // Current level number
+    public int moveCounter = 1;
+
     void Start()
     {
         // Attach the method to the button click event
-        showStarsButton.onClick.AddListener(OnShowStarsButtonClick);
+        //showStarsButton.onClick.AddListener(OnShowStarsButtonClick);
+
+        // Get references to MovableTileGrid and MovableTileDrag
+        movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+        //movableTileDrag = GameObject.FindGameObjectWithTag("MovableTileDrag").GetComponent<MovableTileDrag>();
+
+        // Set current level
+        currentLevel = movableTileGrid.selectedLevel;
+
+        public void LoadCounter()
+        {
+            int moveCounter = PlayerPrefs.GetInt(counter);
+        }
     }
 
-    private void OnShowStarsButtonClick()
+    public void OnShowStarsButtonClick()
     {
         // Call ShowStars after a delay
         StartCoroutine(StartStarsWithDelay(1f));
     }
 
-    private IEnumerator StartStarsWithDelay(float delay)
+
+
+private IEnumerator ShowStarsRoutine(int numberOfStars)
+{
+    Debug.Log($"Showing {numberOfStars} stars");
+
+    foreach (Star star in Stars)
     {
-        // Wait for the specified delay
+        if (star != null && star.YellowStar != null)
+        {
+            star.YellowStar.transform.localScale = Vector3.zero;
+        }
+        else
+        {
+            Debug.LogError("Star or YellowStar is null");
+        }
+    }
+
+        int maxIndex = Math.Min(numberOfStars, Stars.Length);
+        for (int i = 0; i < maxIndex; i++)
+        {
+        if (Stars[i] != null)
+        {
+            yield return StartCoroutine(EnlargeAndShrinkStar(Stars[i]));
+        }
+        else
+        {
+            Debug.LogError($"Star {i} is null");
+        }
+    }
+}
+    public IEnumerator StartStarsWithDelay(float delay)
+    {
         yield return new WaitForSeconds(delay);
 
-        // Call ShowStars after the delay
-        ShowStars(3);
+        
+        ShowStars(CalculateStarsBasedOnMoves()); // Pass the move counter here
     }
 
     public void ShowStars(int numberOfStars)
@@ -39,18 +87,35 @@ public class WellDoneScreenManager : MonoBehaviour
         StartCoroutine(ShowStarsRoutine(numberOfStars));
     }
 
-    private IEnumerator ShowStarsRoutine(int numberOfStars)
+    public int CalculateStarsBasedOnMoves()
     {
-        foreach (Star star in Stars)
+        // Ensure this method initializes moveCounter properly
+        //moveCounter = movableTileGrid.getMoveCount(moveCounter);
+        //Debug.Log($"MoveCounter in StartsWithDelay  {moveCounter}");
+        //Debug.Log($"Calculating stars for {moveCounter} moves.");
+        // Switch case for different levels
+        switch (currentLevel)
         {
-            star.YellowStar.transform.localScale = Vector3.zero;
-        }
+            case 1:
+                if (moveCounter <= 3) return 3;
+                else if (moveCounter <= 5) return 2; 
+                else return 1; 
 
-        for (int i = 0; i < numberOfStars; i++)
-        {
-            yield return StartCoroutine(EnlargeAndShrinkStar(Stars[i]));
+            case 2:
+                if (moveCounter <= 3) return 3;
+                else if (moveCounter <= 5) return 2;
+                else return 1;
+            
+            case 3:
+                if (moveCounter <= 3) return 3;
+                else if (moveCounter <= 5) return 2;
+                else return 1;
+            default:
+                Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
+                return 1; // Default to 1 star if level not recognized
         }
     }
+
 
     private IEnumerator EnlargeAndShrinkStar(Star star)
     {
