@@ -93,5 +93,34 @@ public class LevelManager : MonoBehaviour
         public bool IsKey;
     }
     */
+
+    public void UpdateProgression(int completedLevel)
+    {
+        int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
+        int newCurrentLevel = completedLevel + 1;
+        if (newCurrentLevel > currentLevel)
+        {
+            PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
+        }
+
+        int currentCharacter = PlayerPrefs.GetInt("currentCharacter");
+        switch (newCurrentLevel)
+        {
+            case 5: case 20: case 30: case 40: case 50:
+                UpdateCharacter(currentCharacter);
+                break;
+        }
+    }
+
+    private void CompleteCharacter(int currentCharacter)
+    {
+
+    }
+
+    private void UpdateCharacter(int characterIndex)
+    {
+        int newCharacterIndex = characterIndex + 1;
+        PlayerPrefs.SetInt("currentCharacter", newCharacterIndex);
+    }
 }
 

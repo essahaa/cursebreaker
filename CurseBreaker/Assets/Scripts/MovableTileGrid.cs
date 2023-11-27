@@ -15,6 +15,8 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject keyTilePrefab;
     public GameObject arrowPrefab;
 
+    LevelManager levelManager;
+
     private GameObject arrow;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
@@ -39,8 +41,9 @@ public class MovableTileGrid : MonoBehaviour
     void Start()
     {
         ReadCSV(); // Read the CSV file.
-        LevelManager levelManager = FindObjectOfType<LevelManager>();
+        levelManager = FindObjectOfType<LevelManager>();
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        Debug.Log("currentCharacter: " + PlayerPrefs.GetInt("currentCharacter"));
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
@@ -59,9 +62,11 @@ public class MovableTileGrid : MonoBehaviour
 
     private void GenerateArrowPrefab()
     {
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        
+        arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
     }
 
     public void RotateArrow()
@@ -89,7 +94,7 @@ public class MovableTileGrid : MonoBehaviour
     {
         PlayerPrefs.SetInt("selectedLevel", levelNumber);
         selectedLevel = levelNumber;
-        //TÄHÄN TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
+        //Tï¿½Hï¿½N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
     }
 
@@ -422,6 +427,24 @@ public class MovableTileGrid : MonoBehaviour
                         }
                         animator.SetTrigger("LevelEnd");
                         FindObjectOfType<AudioManager>().Play("youfail");
+                    }
+                    else
+                    {
+                        if(CountEvilTiles() == 0)
+                        {
+                            Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+
+                            levelManager.UpdateProgression(selectedLevel);
+
+                            if (levelCompletedBox != null)
+                            {
+                                animator = levelCompletedBox.GetComponent<Animator>();
+                            }
+                            animator.SetTrigger("LevelEnd");
+
+                        }
+                        
                     }
                 }
             }
