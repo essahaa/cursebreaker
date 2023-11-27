@@ -389,7 +389,7 @@ public class MovableTileDrag : MonoBehaviour
                     movableTileGrid.RotateArrow();
 
                     moveCounter++; // Increment the counter here
-
+                    SaveCounter();
                     GameObject textObject = GameObject.Find("GameMovesText");
                     // Update TextMeshPro UI
                     if (textObject != null)
@@ -431,7 +431,7 @@ public class MovableTileDrag : MonoBehaviour
         }
 
     }
-    public void SaveCounter(int moveCounter)
+    public void SaveCounter()
     {
         PlayerPrefs.SetInt("counter", moveCounter);
     }
