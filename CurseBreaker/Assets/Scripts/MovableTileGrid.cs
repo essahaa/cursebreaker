@@ -38,6 +38,7 @@ public class MovableTileGrid : MonoBehaviour
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
     public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
+    public Button nextLevelButton;
 
     void Start()
     {
