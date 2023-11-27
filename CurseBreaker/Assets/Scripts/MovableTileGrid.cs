@@ -394,7 +394,7 @@ public class MovableTileGrid : MonoBehaviour
                         }
                         else
                         {
-                            if (CountEvilTiles() == 0)
+                            if (CountEvilTiles() == 0 && !levelFailed)
                             {
                                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                                 GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
