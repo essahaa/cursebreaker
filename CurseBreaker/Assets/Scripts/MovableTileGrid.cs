@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TMPro;
 
 public class MovableTileGrid : MonoBehaviour
 {
@@ -36,6 +37,8 @@ public class MovableTileGrid : MonoBehaviour
 
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
+    public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
+
     void Start()
     {
         ReadCSV(); // Read the CSV file.
@@ -50,6 +53,7 @@ public class MovableTileGrid : MonoBehaviour
             selectedLevel = 1;
             LoadLevel(selectedLevel);
         }
+        ShowLevelText();
     }
 
     public int CheckSelectedLevel()
@@ -99,6 +103,7 @@ public class MovableTileGrid : MonoBehaviour
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
         selectedLevel = newSelectedLevel;
         DestroyExistingMovableTiles();
+        ShowLevelText();
     }
 
     private void ReadCSV()
@@ -993,6 +998,20 @@ public class MovableTileGrid : MonoBehaviour
             if (parentTileComponent != null)
             {
                 parentTileComponent.IsLocked = false;
+            }
+        }
+    }
+    private void ShowLevelText()
+    {
+        GameObject textObject = GameObject.Find("ShowLevelText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = selectedLevel.ToString();
+               
             }
         }
     }
