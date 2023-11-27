@@ -4741,7 +4741,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You dropped yellow tile
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 50818389d31d5494fb82033ff1ee24fb, type: 2}
   m_sharedMaterial: {fileID: 3865834586410915766, guid: 50818389d31d5494fb82033ff1ee24fb, type: 2}
@@ -5546,7 +5546,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: LevelEnd
+          m_StringArgument: ContinueButtonEnd
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1484253798}
