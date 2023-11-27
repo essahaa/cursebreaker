@@ -27,7 +27,6 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeY; //number of rows, height of the grid
 
     public int selectedLevel; // The level you want to generate.
-    private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -69,17 +68,8 @@ public class MovableTileGrid : MonoBehaviour
         
     }
 
-    public void RotateArrow()
-    {
-        if(rotation > 360)
-        {
-            rotation = 0;
-        } 
-        else
-        {
-            rotation += 90;
-        }
-        
+    public void RotateArrow(int rotation)
+    {  
         arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
         Debug.Log("rotated " + rotation);
     }

@@ -387,7 +387,16 @@ public class MovableTileDrag : MonoBehaviour
                     // Toggle between "horizontal" and "vertical" move types.
                     currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                     movableTileGrid.IsMovableTilesGroupConnected();
-                    movableTileGrid.RotateArrow();
+
+                    if(currentMoveType == "horizontal")
+                    {
+                        movableTileGrid.RotateArrow(0);
+                    }
+                    else
+                    {
+                        movableTileGrid.RotateArrow(90);
+                    }
+                    
 
                     moveCounter++; // Increment the counter here
                     SaveCounter();
