@@ -284,6 +284,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private List<BoxCollider2D> GetLockColliders()
     {
+        lockTileColliders.Clear(); 
         foreach (Transform tileInGrid in movableTiles)
         {
             //Debug.Log("tileInGrid: " + tileInGrid);
