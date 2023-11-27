@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 
+
 public class MovableTileGrid : MonoBehaviour
 {
     public GameObject movableTilePrefab;
@@ -37,7 +38,8 @@ public class MovableTileGrid : MonoBehaviour
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
     public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
-    public Button nextLevelButton;
+
+    private bool nextLevelButtonClicked = false;
 
     void Start()
     {
@@ -90,11 +92,28 @@ public class MovableTileGrid : MonoBehaviour
 
     public void NextLevel()
     {
+        // Check if the button has already been clicked
+        if (nextLevelButtonClicked)
+        {
+            return; // Do nothing if the button has already been clicked
+        }
+
+        // If not clicked, proceed with the next level logic
         int newSelectedLevel = selectedLevel + 1;
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
         selectedLevel = newSelectedLevel;
         DestroyExistingMovableTiles();
         ShowLevelText();
+
+        // Set the flag to true to indicate that the button has been clicked
+        nextLevelButtonClicked = true;
+        Invoke("ResetButtonClickedFlag", 5f);
+    }
+
+    // Method to reset the nextLevelButtonClicked flag to false
+    private void ResetButtonClickedFlag()
+    {
+        nextLevelButtonClicked = false;
     }
 
     private void ReadCSV()
@@ -1002,10 +1021,11 @@ public class MovableTileGrid : MonoBehaviour
             if (textComponentFromOtherObject != null)
             {
                 textComponentFromOtherObject.text = selectedLevel.ToString();
-               
+
             }
         }
     }
+
 
 }
 
