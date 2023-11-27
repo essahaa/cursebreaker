@@ -38,6 +38,7 @@ public class MovableTileGrid : MonoBehaviour
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
     public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
+    public TextMeshProUGUI levelFailedText; // Reference to your TextMeshPro UI component
 
     private bool nextLevelButtonClicked = false;
 
@@ -826,6 +827,7 @@ public class MovableTileGrid : MonoBehaviour
         if (levelFailedBox != null)
         {
             animator = levelFailedBox.GetComponent<Animator>();
+            ShowLevelFailedText();
         }
         animator.SetTrigger("LevelEnd");
     }
@@ -1010,6 +1012,7 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
+
     private void ShowLevelText()
     {
         GameObject textObject = GameObject.Find("ShowLevelText");
@@ -1025,6 +1028,19 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    private void ShowLevelFailedText()
+        {
+            GameObject textObject = GameObject.Find("MoveText");
+            // Update TextMeshPro UI
+            if (textObject != null)
+            {
+                TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+                if (textComponentFromOtherObject != null)
+                {
+                    textComponentFromOtherObject.text = "Yellow tile dropped.";
 
+                }
+            }
+        }
 }
 
