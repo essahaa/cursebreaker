@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TMPro;
+
 
 public class MovableTileGrid : MonoBehaviour
 {
@@ -26,7 +28,6 @@ public class MovableTileGrid : MonoBehaviour
     public int gridSizeY; //number of rows, height of the grid
 
     public int selectedLevel; // The level you want to generate.
-    private int rotation = 0;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -35,6 +36,11 @@ public class MovableTileGrid : MonoBehaviour
     public bool levelFailed = false;
 
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
+
+    public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
+    public TextMeshProUGUI levelFailedText; // Reference to your TextMeshPro UI component
+
+    private bool nextLevelButtonClicked = false;
 
     void Start()
     {
@@ -50,6 +56,7 @@ public class MovableTileGrid : MonoBehaviour
             selectedLevel = 1;
             LoadLevel(selectedLevel);
         }
+        ShowLevelText();
     }
 
     public int CheckSelectedLevel()
@@ -60,21 +67,11 @@ public class MovableTileGrid : MonoBehaviour
     private void GenerateArrowPrefab()
     {
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
-        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        
+        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);    
     }
 
-    public void RotateArrow()
-    {
-        if(rotation > 360)
-        {
-            rotation = 0;
-        } 
-        else
-        {
-            rotation += 90;
-        }
-        
+    public void RotateArrow(int rotation)
+    {  
         arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
         Debug.Log("rotated " + rotation);
     }
@@ -95,10 +92,28 @@ public class MovableTileGrid : MonoBehaviour
 
     public void NextLevel()
     {
+        // Check if the button has already been clicked
+        if (nextLevelButtonClicked)
+        {
+            return; // Do nothing if the button has already been clicked
+        }
+
+        // If not clicked, proceed with the next level logic
         int newSelectedLevel = selectedLevel + 1;
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
         selectedLevel = newSelectedLevel;
         DestroyExistingMovableTiles();
+        ShowLevelText();
+
+        // Set the flag to true to indicate that the button has been clicked
+        nextLevelButtonClicked = true;
+        Invoke("ResetButtonClickedFlag", 5f);
+    }
+
+    // Method to reset the nextLevelButtonClicked flag to false
+    private void ResetButtonClickedFlag()
+    {
+        nextLevelButtonClicked = false;
     }
 
     private void ReadCSV()
@@ -389,7 +404,7 @@ public class MovableTileGrid : MonoBehaviour
                         }
                         else
                         {
-                            if (CountEvilTiles() == 0)
+                            if (CountEvilTiles() == 0 && !levelFailed)
                             {
                                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                                 GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
@@ -812,6 +827,7 @@ public class MovableTileGrid : MonoBehaviour
         if (levelFailedBox != null)
         {
             animator = levelFailedBox.GetComponent<Animator>();
+            ShowLevelFailedText();
         }
         animator.SetTrigger("LevelEnd");
     }
@@ -997,5 +1013,34 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    private void ShowLevelText()
+    {
+        GameObject textObject = GameObject.Find("ShowLevelText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = selectedLevel.ToString();
+
+            }
+        }
+    }
+
+    private void ShowLevelFailedText()
+        {
+            GameObject textObject = GameObject.Find("MoveText");
+            // Update TextMeshPro UI
+            if (textObject != null)
+            {
+                TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+                if (textComponentFromOtherObject != null)
+                {
+                    textComponentFromOtherObject.text = "Yellow tile dropped.";
+
+                }
+            }
+        }
 }
 

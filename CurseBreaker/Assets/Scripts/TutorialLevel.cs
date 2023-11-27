@@ -7,6 +7,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase.Analytics;
 
 public class TutorialLevel : MonoBehaviour
 {
@@ -67,6 +68,13 @@ public class TutorialLevel : MonoBehaviour
 
         ReadLevelDataFromCSV();
         GeneratePrefabs();
+        LogTutorialStartEvent();
+    }
+
+    private void LogTutorialStartEvent()
+    {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("tutorial_started");
+   
     }
 
     public void ReadLevelDataFromCSV()
@@ -371,7 +379,14 @@ public class TutorialLevel : MonoBehaviour
             animator = levelCompletedBox.GetComponent<Animator>();
         }
         animator.SetTrigger("LevelEnd");
-        
+
+        LogTutorialCompletionEvent();
+    }
+
+    private void LogTutorialCompletionEvent()
+    {
+        FirebaseAnalytics.LogEvent("tutorial_completed");
+
     }
 
     public void ChangeMovementDone()
