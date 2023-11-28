@@ -3156,10 +3156,10 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: riddedred
     description: 
-    clip: {fileID: 8300000, guid: 7a3f51a7f6e63b54da33f5fc8a84f38a, type: 3}
+    clip: {fileID: 8300000, guid: 94635f9b024156148b035f30f8a63c89, type: 3}
     duration: 1
     volume: 0.693
-    pitch: 1.58
+    pitch: 1.01
     loop: 0
     source: {fileID: 0}
   - name: youfail
@@ -6085,7 +6085,7 @@ MonoBehaviour:
   ShrinkDuration: 0.25
   showStarsButton: {fileID: 1467024236}
   movableTileGrid: {fileID: 0}
-  currentLevel: 0
+  selectedLevel: 0
   moveCount: 0
 --- !u!1 &1619145636
 GameObject:
