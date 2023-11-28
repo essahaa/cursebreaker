@@ -49,7 +49,7 @@ public class MovableTileGrid : MonoBehaviour
         ReadCSV(); // Read the CSV file.
         levelManager = FindObjectOfType<LevelManager>();
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        Debug.Log("currentCharacter: " + PlayerPrefs.GetInt("currentCharacter"));
+        levelManager.getSideCharacter();
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
@@ -107,8 +107,27 @@ public class MovableTileGrid : MonoBehaviour
         int newSelectedLevel = selectedLevel + 1;
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
         selectedLevel = newSelectedLevel;
-        DestroyExistingMovableTiles();
-        ShowLevelText();
+
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        int currentCharacter = PlayerPrefs.GetInt("currentCharacter"); //one larger than the onscreen characters index
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        animator = levelCompletedBox.GetComponent<Animator>(); 
+        
+        switch (currentLevel)
+        {
+            case 5:
+            case 20:
+            case 30:
+            case 40:
+            case 50:
+                levelManager.PlayCharacterCompleteSequence(currentCharacter);
+                break;
+            default:
+                animator.SetTrigger("ContinueButtonEnd");
+                DestroyExistingMovableTiles();
+                ShowLevelText();
+                break;
+        }
 
         // Set the flag to true to indicate that the button has been clicked
         nextLevelButtonClicked = true;
@@ -414,13 +433,6 @@ public class MovableTileGrid : MonoBehaviour
                                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                                 GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
 
-                                int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
-                                int newCurrentLevel = selectedLevel + 1;
-                                if (newCurrentLevel > currentLevel)
-                                {
-                                    PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
-                                }
-
                                 if (levelCompletedBox != null)
                                 {
                                     animator = levelCompletedBox.GetComponent<Animator>();
@@ -428,7 +440,7 @@ public class MovableTileGrid : MonoBehaviour
                                 WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
                                 manager.OnShowStarsButtonClick();
                                 animator.SetTrigger("LevelEnd");
-
+                                levelManager.UpdateProgression(selectedLevel);
                             }
                         }
                     }
@@ -444,24 +456,6 @@ public class MovableTileGrid : MonoBehaviour
                         }
                         animator.SetTrigger("LevelEnd");
                         FindObjectOfType<AudioManager>().Play("youfail");
-                    }
-                    else
-                    {
-                        if(CountEvilTiles() == 0)
-                        {
-                            Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-
-                            levelManager.UpdateProgression(selectedLevel);
-
-                            if (levelCompletedBox != null)
-                            {
-                                animator = levelCompletedBox.GetComponent<Animator>();
-                            }
-                            animator.SetTrigger("LevelEnd");
-
-                        }
-                        
                     }
                 }
             }

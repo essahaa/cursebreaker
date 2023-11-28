@@ -5,9 +5,44 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class LevelManager : MonoBehaviour
 {
+    private MovableTileGrid movableTileGrid;
+
+    private GameObject dialogBubble;
+    public GameObject dialogBubblePrefab;
+    private Image charImage;
+    private Sprite curedCharSprite;
+
+    private int tapCounter;
+    private bool countTaps = false;
+
+    private string dialogue1_1 = "I am cured! yay!";
+    private string dialogue1_2 = "Yst. Terv. Jänö";
+    private string dialogue2_1 = "I am also cured! yay!";
+    private string dialogue2_2 = "Yst. Terv. Dr Dog Sausage";
+
+    private void Start()
+    {
+        movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+    }
+
+    private void Update()
+    {
+        if (countTaps && Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if(touch.phase == TouchPhase.Began)
+            {
+                tapCounter++;
+                ShowNextSpeechBubble();
+            }
+        }
+    }
     /*
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector)
     private List<LevelData> levels = new List<LevelData>();
@@ -112,15 +147,146 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void CompleteCharacter(int currentCharacter)
+    public void getSideCharacter()
     {
+        int charIndex = PlayerPrefs.GetInt("currentCharacter");
+        GameObject charObject = GameObject.FindWithTag("SideCharacter");
+        charImage = charObject.GetComponent<Image>();
+        Sprite[] spritesheet = null;
+        Sprite[] altSpritesheet = null;
+        string spriteName = "";
+        string altSpriteName = "";
+        Sprite charSprite = null;
 
+        switch(charIndex)
+        {
+            case 0:
+                //bunny sprites
+                spritesheet = Resources.LoadAll<Sprite>("sideCharacters-0");
+                spriteName = "sideCharacters-0_3";
+                altSpritesheet = Resources.LoadAll<Sprite>("sideCharacters-0");
+                altSpriteName = "sideCharacters-0_4";
+                break;
+            case 1:
+                //dog sprites
+                spritesheet = Resources.LoadAll<Sprite>("sideCharacters-1");
+                spriteName = "sideCharacters-1_1";
+                altSpritesheet = Resources.LoadAll<Sprite>("sideCharacters-1");
+                altSpriteName = "sideCharacters-1_5";
+                break;
+            case 2:
+                //owl sprites
+                spritesheet = Resources.LoadAll<Sprite>("sideCharacters-0");
+                spriteName = "sideCharacters-0_2";
+                altSpritesheet = Resources.LoadAll<Sprite>("sideCharacters-0");
+                altSpriteName = "sideCharacters-0_2";
+                break;
+            case 3:
+                //cat sprites
+                spritesheet = Resources.LoadAll<Sprite>("sideCharacters-1");
+                spriteName = "sideCharacters-1_10";
+                altSpritesheet = Resources.LoadAll<Sprite>("sideCharacters-1");
+                altSpriteName = "sideCharacters-1_2";
+                break;
+            case 4:
+                //ox sprites
+                spritesheet = Resources.LoadAll<Sprite>("sideCharacters-1");
+                spriteName = "sideCharacters-1_9";
+                altSpritesheet = Resources.LoadAll<Sprite>("sideCharacters-0");
+                altSpriteName = "sideCharacters-0_1";
+                break;
+        }
+
+        if(charIndex >= 0)
+        {
+            foreach(Sprite sprite in spritesheet)
+            {
+                if(sprite.name == spriteName)
+                {
+                    charSprite = sprite;
+                }
+            }
+            foreach (Sprite sprite in altSpritesheet)
+            {
+                if (sprite.name == altSpriteName)
+                {
+                    curedCharSprite = sprite;
+                }
+            }
+        }
+
+        charImage.sprite = charSprite;
     }
 
     private void UpdateCharacter(int characterIndex)
     {
         int newCharacterIndex = characterIndex + 1;
         PlayerPrefs.SetInt("currentCharacter", newCharacterIndex);
+    }
+
+    public void PlayCharacterCompleteSequence(int charIndex)
+    {
+        GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
+
+        countTaps = true;
+        tapCounter = 1;
+
+        Vector3 dialogPosition = new Vector3(0, -4f, 0);
+        dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity, levelCompletedBox.transform);
+        dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+
+        charImage.sprite = curedCharSprite;
+        ShowNextSpeechBubble();
+    }
+
+    public void ShowNextSpeechBubble()
+    {
+        TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
+        tmp.text = "";
+        int charIndex = PlayerPrefs.GetInt("currentCharacter");
+
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        Animator animator = levelCompletedBox.GetComponent<Animator>();
+
+        switch (charIndex)
+        {
+            case 1:
+                switch(tapCounter)
+                {
+                    case 1:
+                        tmp.text = dialogue1_1;
+                        break;
+                    case 2:
+                        tmp.text = dialogue1_2;
+                        break;
+                    default:
+                        animator.SetTrigger("LevelEnd");
+                        Destroy(dialogBubble);
+                        countTaps = false;
+                        movableTileGrid.DestroyExistingMovableTiles();
+                        getSideCharacter();
+                        break;
+                }
+                break;
+            case 2:
+                switch (tapCounter)
+                {
+                    case 1:
+                        tmp.text = dialogue2_1;
+                        break;
+                    case 2:
+                        tmp.text = dialogue2_2;
+                        break;
+                    default:
+                        animator.SetTrigger("LevelEnd");
+                        Destroy(dialogBubble);
+                        countTaps = false;
+                        movableTileGrid.DestroyExistingMovableTiles();
+                        getSideCharacter();
+                        break;
+                }
+                break;
+        }
     }
 }
 
