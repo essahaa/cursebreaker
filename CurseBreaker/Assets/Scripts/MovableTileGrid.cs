@@ -16,7 +16,7 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject lockTilePrefab;
     public GameObject keyTilePrefab;
     public GameObject arrowPrefab;
-
+    public HeartSystem heartSystem;
     LevelManager levelManager;
 
     private GameObject arrow;
@@ -60,6 +60,8 @@ public class MovableTileGrid : MonoBehaviour
             LoadLevel(selectedLevel);
         }
         ShowLevelText();
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        
     }
 
     public int CheckSelectedLevel()
@@ -417,6 +419,7 @@ public class MovableTileGrid : MonoBehaviour
                             }
                             animator.SetTrigger("LevelEnd");
                             FindObjectOfType<AudioManager>().Play("youfail");
+                            heartSystem.LoseHeart();
                         }
                         else
                         {
@@ -448,6 +451,7 @@ public class MovableTileGrid : MonoBehaviour
                         }
                         animator.SetTrigger("LevelEnd");
                         FindObjectOfType<AudioManager>().Play("youfail");
+                        heartSystem.LoseHeart();
                     }
                 }
             }
@@ -831,6 +835,7 @@ public class MovableTileGrid : MonoBehaviour
             ShowLevelFailedText();
         }
         animator.SetTrigger("LevelEnd");
+        heartSystem.LoseHeart();
     }
 
     private List<Transform> DepthFirstSearch(Transform tile, bool[,] visited)
