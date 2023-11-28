@@ -302,7 +302,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void getSideCharacter()
+    public void GetSideCharacter()
     {
         int charIndex = PlayerPrefs.GetInt("currentCharacter");
         GameObject charObject = GameObject.FindWithTag("SideCharacter");
@@ -419,7 +419,7 @@ public class LevelManager : MonoBehaviour
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        getSideCharacter();
+                        GetSideCharacter();
                         break;
                 }
                 break;
@@ -437,7 +437,7 @@ public class LevelManager : MonoBehaviour
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        getSideCharacter();
+                        GetSideCharacter();
                         break;
                 }
                 break;

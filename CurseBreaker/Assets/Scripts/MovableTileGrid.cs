@@ -49,7 +49,7 @@ public class MovableTileGrid : MonoBehaviour
         ReadCSV(); // Read the CSV file.
         levelManager = FindObjectOfType<LevelManager>();
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        levelManager.getSideCharacter();
+        levelManager.GetSideCharacter();
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
