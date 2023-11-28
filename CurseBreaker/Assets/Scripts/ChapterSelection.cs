@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro; // Add this at the top of your script
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class ChapterSelectionController : MonoBehaviour
 {
     public GameObject[] levelButtons;
+    public MovableTileGrid movableTileGrid;
+    private int currentLevel; //latest completed level
+    private int selectedCharacter;
 
     void Awake()
     {
@@ -16,7 +21,75 @@ public class ChapterSelectionController : MonoBehaviour
 
     private void Start()
     {
+        currentLevel = PlayerPrefs.GetInt("currentLevel");
+        selectedCharacter = PlayerPrefs.GetInt("selectedCharacter");
+
+        CheckLevelProgression();
         SetupStarsForLevels();
+    }
+
+    public void setSelectedCharacter(int index)
+    {
+        Debug.Log("setting char " + index);
+        PlayerPrefs.SetInt("selectedCharacter", index);
+    }
+
+    private void CheckLevelProgression()
+    {
+        int[] levelsToGenerate = null;
+
+        switch (selectedCharacter)
+        {
+            case 0:
+                levelsToGenerate = new int[] { 1, 2, 3, 4, 5 };
+                break;
+            case 1:
+                levelsToGenerate = new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                break;
+            case 2:
+                levelsToGenerate = new int[] { 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+                break;
+            case 3:
+                levelsToGenerate = new int[] { 26, 27, 28, 29, 30, 31, 32, 33, 34, 35 };
+                break;
+            case 4:
+                levelsToGenerate = new int[] { 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 };
+                break;
+        }
+
+        foreach (GameObject button in levelButtons)
+        {
+            GameObject parent = button.transform.parent.gameObject;
+            string name = parent.name;
+            char lastCharacter = name[name.Length - 1];
+            int i = (int)char.GetNumericValue(lastCharacter);
+
+            if (levelsToGenerate.Length > i && levelsToGenerate[i] > 0 && levelsToGenerate[i] <= currentLevel)
+            {
+                Button buttonComponent = button.GetComponent<Button>();
+
+                GameObject levelSelector = GameObject.FindWithTag("LevelSelector");
+                buttonComponent.onClick.AddListener(() => HandleLevelSelection(levelsToGenerate[i]));
+
+                foreach (Transform child in button.transform)
+                {
+                    if (child.name.Contains("Text"))
+                    {
+                        TextMeshProUGUI textInput = child.GetComponent<TextMeshProUGUI>();
+                        textInput.text = levelsToGenerate[i].ToString();
+                    }
+                }
+            }
+            else
+            {
+                parent.SetActive(false);
+            }
+        }
+    }
+
+    private void HandleLevelSelection(int levelNumber)
+    {
+        movableTileGrid.LoadSceneAndLevel(levelNumber);
     }
 
     private void SetupStarsForLevels()

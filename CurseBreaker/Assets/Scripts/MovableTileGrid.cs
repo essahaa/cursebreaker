@@ -47,21 +47,28 @@ public class MovableTileGrid : MonoBehaviour
     void Start()
     {
         ReadCSV(); // Read the CSV file.
-        levelManager = FindObjectOfType<LevelManager>();
+
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        levelManager.GetSideCharacter();
-        if(selectedLevel > 0)
+
+        if (FindObjectOfType<LevelManager>() != null)
         {
-            LoadLevel(selectedLevel);
-        }else
-        {
-            PlayerPrefs.SetInt("selectedLevel", 1);
-            selectedLevel = 1;
-            LoadLevel(selectedLevel);
+            levelManager = FindObjectOfType<LevelManager>();
+            levelManager.getSideCharacter();
+
+            if (selectedLevel > 0)
+            {
+                LoadLevel(selectedLevel);
+            }
+            else
+            {
+                PlayerPrefs.SetInt("selectedLevel", 1);
+                selectedLevel = 1;
+                LoadLevel(selectedLevel);
+            }
+            ShowLevelText();
         }
-        ShowLevelText();
+
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
-        
     }
 
     public int CheckSelectedLevel()

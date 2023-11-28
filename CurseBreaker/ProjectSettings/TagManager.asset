@@ -14,6 +14,9 @@ TagManager:
   - KeyTile
   - LockTile
   - BackgroundTile
+  - CharSelectionAvatar
+  - SelectLevelButton
+  - LevelSelector
   layers:
   - Default
   - TransparentFX
