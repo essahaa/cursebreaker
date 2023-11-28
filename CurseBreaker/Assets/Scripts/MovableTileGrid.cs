@@ -67,6 +67,12 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
+    public void TriggerUpdateProgression()
+    {
+        //for testing purposes
+        levelManager.UpdateProgression(selectedLevel);
+    }
+
     private void GenerateArrowPrefab()
     {
         Vector3 arrowposition = new Vector3(0f, 3f, 0);

@@ -5539,18 +5539,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1179355405}
-        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
-        m_MethodName: SetTrigger
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: ContinueButtonEnd
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1484253798}
         m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
         m_MethodName: NextLevel
@@ -6088,7 +6076,6 @@ MonoBehaviour:
   showStarsButton: {fileID: 1467024236}
   movableTileGrid: {fileID: 0}
   selectedLevel: 0
-  currentLevel: 0
   moveCount: 0
 --- !u!1 &1619145636
 GameObject:
