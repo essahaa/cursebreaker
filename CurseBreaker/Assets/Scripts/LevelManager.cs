@@ -11,7 +11,16 @@ using TMPro;
 public class LevelManager : MonoBehaviour
 {
     private MovableTileGrid movableTileGrid;
-
+    //public TextAsset csvFile;
+    //private List<LevelData> levels = new List<LevelData>();
+    /*
+    public GameObject movableTilePrefab;
+    public GameObject evilTilePrefab;
+    public GameObject lockTilePrefab;
+    public GameObject keyTilePrefab;
+    public GameObject arrowPrefab;
+    public GameObject arrow;
+    */
     private GameObject dialogBubble;
     public GameObject dialogBubblePrefab;
     private Image charImage;
@@ -28,6 +37,7 @@ public class LevelManager : MonoBehaviour
     private void Start()
     {
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
+        //LoadLevels();
     }
 
     private void Update()
@@ -44,12 +54,17 @@ public class LevelManager : MonoBehaviour
         }
     }
     /*
-    public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector)
-    private List<LevelData> levels = new List<LevelData>();
-
-    void Start()
+    public void LoadLevel(int levelNumber)
     {
-        LoadLevels();
+        if (levels.Count == 0 || levels.Count < levelNumber)
+        {
+            LoadLevels();
+        }
+        else if(levels.Count > 0)
+        {
+            LevelData levelToLoad = GetLevelData(levelNumber);
+            GenerateLevel(levelToLoad);
+        }     
     }
 
     void LoadLevels()
@@ -61,54 +76,86 @@ public class LevelManager : MonoBehaviour
         }
 
         string[] lines = csvFile.text.Split(new[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
+        levels = new List<LevelData>(); // Initialize the levels list
+
+        // First, create levels without tiles
+        foreach (string line in lines)
         {
-            LevelData level = ParseLevelData(line);
-            levels.Add(level);
+            if (!string.IsNullOrWhiteSpace(line) && !line.Trim().Equals(";;;;;;;;"))
+            {
+                CreateLevelIfNotExists(line);
+            }
+        }
+
+        // Then, add tiles to each level
+        foreach (string line in lines)
+        {
+            if (!string.IsNullOrWhiteSpace(line) && !line.Trim().Equals(";;;;;;;;"))
+            {
+                AddTileToLevel(line);
+            }
         }
     }
 
-    LevelData ParseLevelData(string line)
+    void CreateLevelIfNotExists(string line)
     {
-        // Split the line by commas and parse each element
         string[] elements = line.Split(';');
-        LevelData level = new LevelData();
-
-        if (elements.Length >= 1 && int.TryParse(elements[0], out int levelNumber))
+        if (elements.Length >= 8 && int.TryParse(elements[0], out int levelNumber) && levels.All(l => l.LevelNumber != levelNumber))
         {
-            level.LevelNumber = levelNumber;
-            level.GridSizeX = int.Parse(elements[4]);
-            level.GridSizeY = int.Parse(elements[5]);
-
-
+            LevelData newLevel = new LevelData
+            {
+                LevelNumber = levelNumber,
+                GridSizeX = int.Parse(elements[4]),
+                GridSizeY = int.Parse(elements[5]),
+                Tiles = new List<MovableTileData>()
+            };
+            levels.Add(newLevel);
         }
+    }
 
-        MovableTileData tile = ParseTileData(elements);
-        level.Tiles.Add(tile);
-
-        return level;
+    void AddTileToLevel(string line)
+    {
+        string[] elements = line.Split(';');
+        if (elements.Length >= 8 && int.TryParse(elements[0], out int levelNumber))
+        {
+            LevelData level = levels.FirstOrDefault(l => l.LevelNumber == levelNumber);
+            if (level != null)
+            {
+                MovableTileData tile = ParseTileData(elements);
+                level.Tiles.Add(tile);
+            }
+        }
     }
 
     MovableTileData ParseTileData(string[] tileElements)
-    {       
-        MovableTileData tile = new MovableTileData();
-        // Parse the tileElements to fill in the tile data
-        tile.Column = int.Parse(tileElements[1]);
-        tile.Row = int.Parse(tileElements[2]);
-        tile.TileType = tileElements[3];
-        tile.IsLocked = tileElements[6].ToLower().Equals("true");
-        tile.IsKey = tileElements[7].ToLower().Equals("true");
- 
-        return tile;
-    }
+    {
+        MovableTileData tileData = new MovableTileData();
 
+        tileData.Column = int.Parse(tileElements[1]);
+        tileData.Row = int.Parse(tileElements[2]);
+        tileData.TileType = tileElements[3];
+        tileData.IsLocked = tileElements[6].ToLower().Equals("true");
+        tileData.IsKey = tileElements[7].ToLower().Equals("true");
+
+        return tileData;
+    }
 
     public LevelData GetLevelData(int levelNumber)
     {
-        // You can add more robust checking here (e.g., if levelNumber is within the range)
-        return levels.FirstOrDefault(level => level.LevelNumber == levelNumber);
-    }
+        Debug.Log("Searching for level: " + levelNumber);
+        LevelData foundLevel = levels.FirstOrDefault(level => level.LevelNumber == levelNumber);
 
+        if (foundLevel != null)
+        {
+            Debug.Log("Found level: " + foundLevel.LevelNumber);
+        }
+        else
+        {
+            Debug.LogWarning("Level not found: " + levelNumber);
+        }
+
+        return foundLevel;
+    }
 
     public class LevelData
     {
@@ -120,12 +167,120 @@ public class LevelManager : MonoBehaviour
 
     public class MovableTileData
     {
-        public int Level;
-        public int Row;
         public int Column;
+        public int Row;
         public string TileType;
         public bool IsLocked;
         public bool IsKey;
+    }
+
+    void GenerateLevel(LevelData levelData)
+    {
+        BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+
+        if (!movableTileGrid.backgroundGenerated)
+        {
+            backgroundGrid.GenerateBackgroundGrid(levelData.GridSizeX, levelData.GridSizeY);
+            movableTileGrid.ChangeBgGenerated();
+            GenerateArrowPrefab();
+        }
+
+        foreach (MovableTileData tileData in levelData.Tiles)
+        {
+            GenerateTile(tileData, levelData.GridSizeX, levelData.GridSizeY, backgroundGrid);
+        }
+    }
+
+    void GenerateTile(MovableTileData tileData, int gridSizeX, int gridSizeY, BackgroundGrid backgroundGrid)
+    {
+        int column = tileData.Column;
+        int row = tileData.Row;
+        string tileType = tileData.TileType;
+        bool isLocked = tileData.IsLocked;
+        bool isKey = tileData.IsKey;
+
+        if (column < gridSizeX && row < gridSizeY)
+        {
+            // Check if the position exists in the backgroundGrid array
+            if (backgroundGrid.backgroundGrid[column, row] != null)
+            {
+                // Get the position from the backgroundGrid array
+                Vector3 position = backgroundGrid.backgroundGrid[column, row].position;
+                GameObject tilePrefab = GetTilePrefab(tileType);
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
+                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                
+                // add individual Animator controllers
+                tile.AddComponent<Animator>();
+                Animator animator = tile.GetComponent<Animator>();
+                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(GetAnimationController(tileType));
+
+                MovableTile tileComponent = tile.GetComponent<MovableTile>();
+                if (tileComponent != null)
+                {
+                    tileComponent.Column = tileData.Column;
+                    tileComponent.Row = tileData.Row;
+                    tileComponent.TileType = tileData.TileType;
+                    tileComponent.IsLocked = tileData.IsLocked;
+                    tileComponent.IsKey = tileData.IsKey;
+                }
+
+                // Check if the lock tile is being created
+                if (isLocked)
+                {
+                    GameObject lockTile = Instantiate(lockTilePrefab, position, Quaternion.identity);
+                    lockTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                    lockTile.transform.SetParent(tile.transform);
+                }
+                if (isKey)
+                {
+                    GameObject keyTile = Instantiate(keyTilePrefab, position, Quaternion.identity);
+                    keyTile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
+                    keyTile.transform.SetParent(tile.transform);
+                }
+
+                movableTileGrid.UpdateMovableTile(column, row, tile.transform);
+                movableTileGrid.UpdateMovableTilesArray();
+            }
+        }
+    }
+
+    private GameObject GetTilePrefab(string tileType)
+    {
+        // Choose the appropriate prefab based on the tileType.
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            default:
+                return movableTilePrefab;
+        }
+    }
+
+    private string GetAnimationController(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return "TileController";
+            case "Evil":
+                return "EvilTileController";
+            default:
+                return null;
+        }
+    }
+
+    private void GenerateArrowPrefab()
+    {
+        Vector3 arrowposition = new Vector3(0f, 3f, 0);
+        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
+    }
+
+    public void RotateArrow(int rotation)
+    {
+        arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
     }
     */
 
