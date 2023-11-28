@@ -17,6 +17,8 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject keyTilePrefab;
     public GameObject arrowPrefab;
 
+    LevelManager levelManager;
+
     private GameObject arrow;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
@@ -45,8 +47,9 @@ public class MovableTileGrid : MonoBehaviour
     void Start()
     {
         ReadCSV(); // Read the CSV file.
-        LevelManager levelManager = FindObjectOfType<LevelManager>();
+        levelManager = FindObjectOfType<LevelManager>();
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        levelManager.getSideCharacter();
         if(selectedLevel > 0)
         {
             LoadLevel(selectedLevel);
@@ -64,6 +67,12 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
+    public void TriggerUpdateProgression()
+    {
+        //for testing purposes
+        levelManager.UpdateProgression(selectedLevel);
+    }
+
     private void GenerateArrowPrefab()
     {
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
@@ -73,7 +82,6 @@ public class MovableTileGrid : MonoBehaviour
     public void RotateArrow(int rotation)
     {  
         arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
-        Debug.Log("rotated " + rotation);
     }
 
     public void LoadSceneAndLevel(int levelNumber)
@@ -86,7 +94,7 @@ public class MovableTileGrid : MonoBehaviour
     {
         PlayerPrefs.SetInt("selectedLevel", levelNumber);
         selectedLevel = levelNumber;
-        //TÄHÄN TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
+        //Tï¿½Hï¿½N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
     }
 
@@ -102,8 +110,27 @@ public class MovableTileGrid : MonoBehaviour
         int newSelectedLevel = selectedLevel + 1;
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
         selectedLevel = newSelectedLevel;
-        DestroyExistingMovableTiles();
-        ShowLevelText();
+
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        int currentCharacter = PlayerPrefs.GetInt("currentCharacter"); //one larger than the onscreen characters index
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        animator = levelCompletedBox.GetComponent<Animator>(); 
+        
+        switch (currentLevel)
+        {
+            case 5:
+            case 20:
+            case 30:
+            case 40:
+            case 50:
+                levelManager.PlayCharacterCompleteSequence(currentCharacter);
+                break;
+            default:
+                animator.SetTrigger("ContinueButtonEnd");
+                DestroyExistingMovableTiles();
+                ShowLevelText();
+                break;
+        }
 
         // Set the flag to true to indicate that the button has been clicked
         nextLevelButtonClicked = true;
@@ -138,7 +165,6 @@ public class MovableTileGrid : MonoBehaviour
                 if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
                 {
                     noMoreLevels = false; // We found a matching level.
-                    Debug.Log("level " + values[0] + " selectedlevel " + selectedLevel);
                     // Parse data from the CSV line.
                     int column = int.Parse(values[1]);
                     int row = int.Parse(values[2]);
@@ -149,15 +175,12 @@ public class MovableTileGrid : MonoBehaviour
                     bool isLocked = isLockedStr == "true";
                     bool isKey = values[7].ToLower() == "true";
 
-
-
                     // Set the array size only once.
                     if (!arraySizeSet)
                     {
                         movableTiles = new Transform[gridSizeX, gridSizeY];
                         arraySizeSet = true; // Update the flag.
                     }
-
                     GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY, isLocked, isKey);
                 }
             }
@@ -167,12 +190,10 @@ public class MovableTileGrid : MonoBehaviour
             Debug.Log("No more levels in the CSV file.");
             SceneManager.LoadScene("MainMenu");
         }
-
     }
 
     private GameObject GetTilePrefab(string tileType, bool isLocked, bool isKey)
     {
-
         // Choose the appropriate prefab based on the tileType.
         switch (tileType)
         {
@@ -180,10 +201,8 @@ public class MovableTileGrid : MonoBehaviour
                         return movableTilePrefab;
             case "Evil":
                         return evilTilePrefab;
-                
-            // Add more cases for other tile types as needed.
             default:
-                return movableTilePrefab; // Default to a fallback prefab.
+                return movableTilePrefab;
         }
     }
 
@@ -256,7 +275,6 @@ public class MovableTileGrid : MonoBehaviour
     void CreateLockTileOnMovableTile(int column, int row, bool isLocked)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        //Debug.Log("CreateLockTileOnMovableTile - Column: " + column + ", Row: " + row + ", isLocked: " + isLocked);
 
         if (column >= 0 && column < gridSizeX && row >= 0 && row < gridSizeY)
         {
@@ -274,7 +292,6 @@ public class MovableTileGrid : MonoBehaviour
     void CreateKeyTileOnMovableTile(int column, int row, bool isKey)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        Debug.Log("CreateKeyTileOnMovableTile - Column: " + column + ", Row: " + row + ", isKey: " + isKey);
 
         if (column >= 0 && column < gridSizeX && row >= 0 && row < gridSizeY)
         {
@@ -384,7 +401,6 @@ public class MovableTileGrid : MonoBehaviour
                     {
                         //no neighbors found, destroy tile
                         FindObjectOfType<AudioManager>().Play("riddedred");
-                        Debug.Log("destroy tile " + col + " , " + row);
                         movableTiles[col, row] = null;
 
                         GameObject tileToDestroy = tile.gameObject; // Get the GameObject.
@@ -409,13 +425,6 @@ public class MovableTileGrid : MonoBehaviour
                                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
                                 GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
 
-                                int currentLevel = PlayerPrefs.GetInt("currentLevel"); //latest level in progression
-                                int newCurrentLevel = selectedLevel + 1;
-                                if (newCurrentLevel > currentLevel)
-                                {
-                                    PlayerPrefs.SetInt("currentLevel", newCurrentLevel);
-                                }
-
                                 if (levelCompletedBox != null)
                                 {
                                     animator = levelCompletedBox.GetComponent<Animator>();
@@ -423,7 +432,7 @@ public class MovableTileGrid : MonoBehaviour
                                 WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
                                 manager.OnShowStarsButtonClick();
                                 animator.SetTrigger("LevelEnd");
-
+                                levelManager.UpdateProgression(selectedLevel);
                             }
                         }
                     }
@@ -443,7 +452,6 @@ public class MovableTileGrid : MonoBehaviour
                 }
             }
         }
-
         return movableTiles;
     }
 
@@ -468,7 +476,6 @@ public class MovableTileGrid : MonoBehaviour
                 }
             }
         }
-
         return count;
     }
 
@@ -522,9 +529,9 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
     {
-        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numCols = movableTiles.GetLength(0);
         int numRows = movableTiles.GetLength(1);
-        Transform[,] tilesInRow = new Transform[numCols, numRows]; // Only declared once at the start.
+        Transform[,] tilesInRow = new Transform[numCols, numRows];
 
         // Initialize all tiles as null or some default state as required.
         for (int col = 0; col < numCols; col++)
@@ -595,9 +602,9 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] FindAdjacentMovableTilesInColumn(int columnIndex)
     {
-        int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
+        int numCols = movableTiles.GetLength(0);
         int numRows = movableTiles.GetLength(1);
-        Transform[,] tilesInColumn = new Transform[numCols, numRows]; // Only declared once at the start.
+        Transform[,] tilesInColumn = new Transform[numCols, numRows];
 
         // Initialize all tiles in the column as null or some default state as required.
         for (int row = 0; row < numRows; row++)
@@ -685,8 +692,6 @@ public class MovableTileGrid : MonoBehaviour
     // Function to find and return movable tiles in a specified row.
     public Transform[,] FindAllMovableTilesInRow(int rowIndex)
     {
-        Debug.Log("rowindex in findmovable " + rowIndex);
-
         int numRows = movableTiles.GetLength(1);
         int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
         Transform[,] tilesInRow = new Transform[numCols, numRows];
@@ -713,8 +718,6 @@ public class MovableTileGrid : MonoBehaviour
     // Function to find and return movable tiles in a specified column.
     public Transform[,] FindAllMovableTilesInColumn(int columnIndex)
     {
-        Debug.Log("colindex in findmovable " + columnIndex);
-
         int numCols = movableTiles.GetLength(0); // Assuming movableTiles is in [col, row] format.
         int numRows = movableTiles.GetLength(1);
         Transform[,] tilesInColumn = new Transform[numCols, numRows];
@@ -820,8 +823,6 @@ public class MovableTileGrid : MonoBehaviour
 
     private void HandleLevelFailure()
     {
-        // Implement the logic to handle level failure
-        // e.g., showing a game over screen, resetting the level, etc.
         Debug.Log("Game Over: MovableTiles group is not connected.");
         GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
         if (levelFailedBox != null)
@@ -909,40 +910,40 @@ public class MovableTileGrid : MonoBehaviour
     }
 
     public void DestroyKeyAndLockTilesIfNeighbor()
-{
-    for (int x = 0; x < gridSizeX; x++)
     {
-        for (int y = 0; y < gridSizeY; y++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            Transform tile = movableTiles[x, y];
-
-            if (tile != null && HasKeyTileChild(tile))
+            for (int y = 0; y < gridSizeY; y++)
             {
-                // Check neighbors in all four directions.
-                if (IsLockTileAt(x + 1, y))
+                Transform tile = movableTiles[x, y];
+
+                if (tile != null && HasKeyTileChild(tile))
                 {
-                    DestroyChildTiles(tile);
-                    DestroyChildTiles(movableTiles[x + 1, y]);
-                }
-                if (IsLockTileAt(x - 1, y))
-                {
-                    DestroyChildTiles(tile);
-                    DestroyChildTiles(movableTiles[x - 1, y]);
-                }
-                if (IsLockTileAt(x, y + 1))
-                {
-                    DestroyChildTiles(tile);
-                    DestroyChildTiles(movableTiles[x, y + 1]);
-                }
-                if (IsLockTileAt(x, y - 1))
-                {
-                    DestroyChildTiles(tile);
-                    DestroyChildTiles(movableTiles[x, y - 1]);
+                    // Check neighbors in all four directions.
+                    if (IsLockTileAt(x + 1, y))
+                    {
+                        DestroyChildTiles(tile);
+                        DestroyChildTiles(movableTiles[x + 1, y]);
+                    }
+                    if (IsLockTileAt(x - 1, y))
+                    {
+                        DestroyChildTiles(tile);
+                        DestroyChildTiles(movableTiles[x - 1, y]);
+                    }
+                    if (IsLockTileAt(x, y + 1))
+                    {
+                        DestroyChildTiles(tile);
+                        DestroyChildTiles(movableTiles[x, y + 1]);
+                    }
+                    if (IsLockTileAt(x, y - 1))
+                    {
+                        DestroyChildTiles(tile);
+                        DestroyChildTiles(movableTiles[x, y - 1]);
+                    }
                 }
             }
         }
     }
-}
 
     private bool HasKeyTileChild(Transform parentTile)
     {
@@ -1029,18 +1030,18 @@ public class MovableTileGrid : MonoBehaviour
     }
 
     private void ShowLevelFailedText()
+    {
+        GameObject textObject = GameObject.Find("MoveText");
+        // Update TextMeshPro UI
+        if (textObject != null)
         {
-            GameObject textObject = GameObject.Find("MoveText");
-            // Update TextMeshPro UI
-            if (textObject != null)
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
             {
-                TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
-                if (textComponentFromOtherObject != null)
-                {
-                    textComponentFromOtherObject.text = "Yellow tile dropped.";
+                textComponentFromOtherObject.text = "Yellow tile dropped.";
 
-                }
             }
         }
+    }
 }
 

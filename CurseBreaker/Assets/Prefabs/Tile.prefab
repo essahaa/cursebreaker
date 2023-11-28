@@ -188,3 +188,5 @@ MonoBehaviour:
   movableTileGrid: {fileID: 0}
   tutorialLevel: {fileID: 0}
   tapCooldown: 0.5
+  moveCounter: 0
+  myText: {fileID: 0}
