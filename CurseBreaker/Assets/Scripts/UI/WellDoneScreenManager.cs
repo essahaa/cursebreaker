@@ -17,7 +17,7 @@ public class WellDoneScreenManager : MonoBehaviour
 
     public MovableTileGrid movableTileGrid;
     //private MovableTileDrag movableTileDrag;
-    public int currentLevel; // Current level number
+    public int selectedLevel; // Current level number
     public int moveCount = 0;
 
     void Start()
@@ -29,8 +29,8 @@ public class WellDoneScreenManager : MonoBehaviour
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         // Set current level
-        currentLevel = movableTileGrid.selectedLevel;
-        Debug.Log("Current level: " + currentLevel);
+        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        Debug.Log("Current level: " + selectedLevel);
         
     }
 
@@ -76,6 +76,9 @@ public class WellDoneScreenManager : MonoBehaviour
     public void ShowStars(int numberOfStars)
     {
         StartCoroutine(ShowStarsRoutine(numberOfStars));
+
+        // Save the stars with a level-specific key
+        PlayerPrefs.SetInt("Level_" + selectedLevel + "_Stars", numberOfStars);
     }
 
     public int CalculateStarsBasedOnMoves()
@@ -85,7 +88,7 @@ public class WellDoneScreenManager : MonoBehaviour
         Debug.Log($"Calculating stars for {moveCount} moves.");
 
         // Switch case for different levels
-        switch (currentLevel)
+        switch (selectedLevel)
         {
             case 1:
                 if (moveCount <= 3) return 3;
@@ -108,6 +111,8 @@ public class WellDoneScreenManager : MonoBehaviour
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
                 return 1; // Default to 1 star if level not recognized
+                
+                
         }
     }
 

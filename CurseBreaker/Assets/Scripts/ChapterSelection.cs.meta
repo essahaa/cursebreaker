@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 494e3770c01d9ef4994e4109596683bf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - levelButtonPrefab: {instanceID: 0}
+  - starDisplayPrefab: {fileID: 7421359052174739049, guid: 067b4f4e697d8c749a350fa76ef532f0, type: 3}
+  - parentTransform: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

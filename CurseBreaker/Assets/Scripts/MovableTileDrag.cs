@@ -75,6 +75,7 @@ public class MovableTileDrag : MonoBehaviour
 
                 case TouchPhase.Ended:
                     SnapTilesToGrid();
+                    targetPositionInLock = false;
                     break;
             }
         }
@@ -166,12 +167,18 @@ public class MovableTileDrag : MonoBehaviour
         if (!allElementsNull)
         {
             int [] firstMovableTile = getFirstAndLastMovableTile();
+            
 
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
                 {
+                    if (targetPositionInLock)
+                    {
+                        break;
+                    }
+
                     Transform tile = currentMovableTiles[col, row];
 
                     if (tile != null)
@@ -212,7 +219,12 @@ public class MovableTileDrag : MonoBehaviour
                             }
                             
                         }
-                        
+
+                        if (targetPositionInLock)
+                        {
+                            continue;
+                        }
+
                         foreach (Transform otherTile in currentMovableTiles)
                         {
                             
@@ -241,11 +253,12 @@ public class MovableTileDrag : MonoBehaviour
                             // Update the movableTileGrid with the new position.
                             movableTileGrid.UpdateMovableTile(column, newRow, tile);
                         }
-                        else if(targetPositionInLock)
-                        {
-                            targetPositionInLock = false;
-                        }
                     }
+                }
+
+                if (targetPositionInLock)
+                {
+                    break;
                 }
             }
         }
@@ -284,6 +297,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private List<BoxCollider2D> GetLockColliders()
     {
+        lockTileColliders.Clear(); 
         foreach (Transform tileInGrid in movableTiles)
         {
             //Debug.Log("tileInGrid: " + tileInGrid);
@@ -386,7 +400,16 @@ public class MovableTileDrag : MonoBehaviour
                     // Toggle between "horizontal" and "vertical" move types.
                     currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
                     movableTileGrid.IsMovableTilesGroupConnected();
-                    movableTileGrid.RotateArrow();
+
+                    if(currentMoveType == "horizontal")
+                    {
+                        movableTileGrid.RotateArrow(0);
+                    }
+                    else
+                    {
+                        movableTileGrid.RotateArrow(90);
+                    }
+                    
 
                     moveCounter++; // Increment the counter here
                     SaveCounter();

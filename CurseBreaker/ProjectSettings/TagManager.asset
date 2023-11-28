@@ -16,6 +16,7 @@ TagManager:
   - LevelManager
   - KeyTile
   - particles
+  - SelectLevelButton
   layers:
   - Default
   - TransparentFX
