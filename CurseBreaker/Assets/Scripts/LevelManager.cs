@@ -415,7 +415,7 @@ public class LevelManager : MonoBehaviour
                         tmp.text = dialogue1_2;
                         break;
                     default:
-                        animator.SetTrigger("LevelEnd");
+                        animator.SetTrigger("ContinueButtonEnd");
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
@@ -433,7 +433,7 @@ public class LevelManager : MonoBehaviour
                         tmp.text = dialogue2_2;
                         break;
                     default:
-                        animator.SetTrigger("LevelEnd");
+                        animator.SetTrigger("ContinueButtonEnd");
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
