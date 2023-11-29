@@ -101,7 +101,14 @@ public class HeartSystem : MonoBehaviour
 
     public bool CanPlay()
     {
-        return currentHearts > 0;
+        if(currentHearts > 0){
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
     }
 
 }
