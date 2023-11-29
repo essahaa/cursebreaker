@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Analytics;
+using UnityEngine.SceneManagement;
 
 public class TutorialLevel : MonoBehaviour
 {
@@ -202,13 +203,10 @@ public class TutorialLevel : MonoBehaviour
 
     }
 
-    public void ChangeMovementDone()
+    public void LoadGameboard()
     {
-        firstMovementDone = true;
-        hand.SetActive(false);
-        hand.transform.position = new Vector3(1.2f, 0, 0);
-        hand.transform.rotation = Quaternion.Euler(0, 0, 270);
-
+        Debug.Log("attempting load");
+        SceneManager.LoadScene("Gameboard");
     }
 }
 

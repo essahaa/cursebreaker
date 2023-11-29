@@ -392,8 +392,9 @@ public class LevelManager : MonoBehaviour
         tapCounter = 1;
 
         dialogBubble = GameObject.FindWithTag("DialogBox");
-        Image image = dialogBubble.GetComponent<Image>();
+        SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
         image.enabled = true;
+        Debug.Log("image enabled: " + image);
 
         charImage.sprite = curedCharSprite;
         ShowNextSpeechBubble();
