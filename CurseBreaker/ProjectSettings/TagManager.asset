@@ -17,6 +17,7 @@ TagManager:
   - CharSelectionAvatar
   - SelectLevelButton
   - LevelSelector
+  - DialogBox
   layers:
   - Default
   - TransparentFX
