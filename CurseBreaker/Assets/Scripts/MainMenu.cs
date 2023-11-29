@@ -5,15 +5,25 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    public HeartSystem heartSystem;
     public void Play()
     {
-        if(PlayerPrefs.GetInt("selectedLevel") < 1)
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        if (heartSystem.CanPlay())
         {
-            SceneManager.LoadScene("Tutorial_level");
-        }else
+            if (PlayerPrefs.GetInt("selectedLevel") < 1)
+            {
+                SceneManager.LoadScene("Tutorial_level");
+            }
+            else
+            {
+                UseLatestLevel();
+                SceneManager.LoadScene("Gameboard");
+            }
+        }
+        else
         {
-            UseLatestLevel();
-            SceneManager.LoadScene("Gameboard");
+            Debug.Log("No hearts left! Watch an ad or wait.");
         }
         
         //loads next scene in build queue:
