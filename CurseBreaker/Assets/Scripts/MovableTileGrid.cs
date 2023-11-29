@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
+using Firebase.Analytics;
 
 
 public class MovableTileGrid : MonoBehaviour
@@ -103,6 +104,7 @@ public class MovableTileGrid : MonoBehaviour
     {
         PlayerPrefs.SetInt("selectedLevel", levelNumber);
         selectedLevel = levelNumber;
+        FirebaseAnalytics.LogEvent("level_started", "level_number", levelNumber.ToString());
         //T�H�N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
     }
@@ -419,31 +421,14 @@ public class MovableTileGrid : MonoBehaviour
                         if (tile.CompareTag("MovableTile"))
                         {
                             Debug.Log("level failed koska yks tippu");
-                            levelFailed = true;
-                            GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
-                            if (levelFailedBox != null)
-                            {
-                                animator = levelFailedBox.GetComponent<Animator>();
-                            }
-                            animator.SetTrigger("LevelEnd");
-                            FindObjectOfType<AudioManager>().Play("youfail");
-                            heartSystem.LoseHeart();
+                            HandleLevelFailure();
                         }
                         else
                         {
                             if (CountEvilTiles() == 0 && !levelFailed)
                             {
                                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                                GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-
-                                if (levelCompletedBox != null)
-                                {
-                                    animator = levelCompletedBox.GetComponent<Animator>();
-                                }
-                                WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
-                                manager.OnShowStarsButtonClick();
-                                animator.SetTrigger("LevelEnd");
-                                levelManager.UpdateProgression(selectedLevel);
+                                HandleLevelCompleted();
                             }
                         }
                     }
@@ -451,15 +436,7 @@ public class MovableTileGrid : MonoBehaviour
                     {
                         //locked tile cannot be destroyed, level fails if it is left alone
                         Debug.Log("level failed locked");
-                        levelFailed = true;
-                        GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
-                        if (levelFailedBox != null)
-                        {
-                            animator = levelFailedBox.GetComponent<Animator>();
-                        }
-                        animator.SetTrigger("LevelEnd");
-                        FindObjectOfType<AudioManager>().Play("youfail");
-                        heartSystem.LoseHeart();
+                        HandleLevelFailure();
                     }
                 }
             }
@@ -807,6 +784,7 @@ public class MovableTileGrid : MonoBehaviour
         if (movableTileDestroyed)
         {
             // Logic to handle level failure
+            Debug.Log("Game Over: MovableTiles group is not connected.");
             HandleLevelFailure();
             return false;
         }
@@ -817,12 +795,7 @@ public class MovableTileGrid : MonoBehaviour
             if (CountEvilTiles() == 0)
             {
                 Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-                if (levelCompletedBox != null)
-                {
-                    animator = levelCompletedBox.GetComponent<Animator>();
-                }
-                animator.SetTrigger("LevelEnd");
+                HandleLevelCompleted();
 
             }
             return true;
@@ -833,9 +806,23 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    private void HandleLevelCompleted()
+    {
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        if (levelCompletedBox != null)
+        {
+            animator = levelCompletedBox.GetComponent<Animator>();
+        }
+        WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
+        manager.OnShowStarsButtonClick();
+        animator.SetTrigger("LevelEnd");
+        levelManager.UpdateProgression(selectedLevel);
+        FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+    }
+
     private void HandleLevelFailure()
     {
-        Debug.Log("Game Over: MovableTiles group is not connected.");
+        levelFailed = true;
         GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
         if (levelFailedBox != null)
         {
@@ -843,7 +830,9 @@ public class MovableTileGrid : MonoBehaviour
             ShowLevelFailedText();
         }
         animator.SetTrigger("LevelEnd");
+        FindObjectOfType<AudioManager>().Play("youfail");
         heartSystem.LoseHeart();
+        FirebaseAnalytics.LogEvent("level_failed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
     }
 
     private List<Transform> DepthFirstSearch(Transform tile, bool[,] visited)
