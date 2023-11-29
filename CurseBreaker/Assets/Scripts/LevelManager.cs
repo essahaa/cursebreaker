@@ -296,7 +296,7 @@ public class LevelManager : MonoBehaviour
         int currentCharacter = PlayerPrefs.GetInt("currentCharacter");
         switch (newCurrentLevel)
         {
-            case 5: case 20: case 30: case 40: case 50:
+            case 6: case 16: case 26: case 36: case 46:
                 UpdateCharacter(currentCharacter);
                 break;
         }
@@ -419,7 +419,6 @@ public class LevelManager : MonoBehaviour
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        GetSideCharacter();
                         break;
                 }
                 break;
@@ -437,7 +436,6 @@ public class LevelManager : MonoBehaviour
                         Destroy(dialogBubble);
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        GetSideCharacter();
                         break;
                 }
                 break;

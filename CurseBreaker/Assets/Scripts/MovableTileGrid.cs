@@ -54,7 +54,6 @@ public class MovableTileGrid : MonoBehaviour
         if (FindObjectOfType<LevelManager>() != null)
         {
             levelManager = FindObjectOfType<LevelManager>();
-            levelManager.GetSideCharacter();
 
             if (selectedLevel > 0)
             {
@@ -349,7 +348,7 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV();
-        FindObjectOfType<AudioManager>().StopPlaying("youfail");
+        
     }
 
     public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
@@ -814,10 +813,12 @@ public class MovableTileGrid : MonoBehaviour
             animator = levelCompletedBox.GetComponent<Animator>();
         }
         WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
+        levelManager.GetSideCharacter();
         manager.OnShowStarsButtonClick();
         animator.SetTrigger("LevelEnd");
         levelManager.UpdateProgression(selectedLevel);
         FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+        FindObjectOfType<AudioManager>().Play("winner");
     }
 
     private void HandleLevelFailure()
@@ -829,6 +830,7 @@ public class MovableTileGrid : MonoBehaviour
             animator = levelFailedBox.GetComponent<Animator>();
             ShowLevelFailedText();
         }
+        levelManager.GetSideCharacter();
         animator.SetTrigger("LevelEnd");
         FindObjectOfType<AudioManager>().Play("youfail");
         heartSystem.LoseHeart();
