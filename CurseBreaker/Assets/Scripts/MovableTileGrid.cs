@@ -348,7 +348,7 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV();
-        FindObjectOfType<AudioManager>().StopPlaying("youfail");
+        
     }
 
     public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
@@ -818,6 +818,7 @@ public class MovableTileGrid : MonoBehaviour
         animator.SetTrigger("LevelEnd");
         levelManager.UpdateProgression(selectedLevel);
         FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+        FindObjectOfType<AudioManager>().Play("winner");
     }
 
     private void HandleLevelFailure()
