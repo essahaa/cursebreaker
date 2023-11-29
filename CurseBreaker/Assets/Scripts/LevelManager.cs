@@ -22,17 +22,22 @@ public class LevelManager : MonoBehaviour
     public GameObject arrow;
     */
     private GameObject dialogBubble;
-    public GameObject dialogBubblePrefab;
     private Image charImage;
     private Sprite curedCharSprite;
 
     private int tapCounter;
     private bool countTaps = false;
 
-    private string dialogue1_1 = "I am cured! yay!";
-    private string dialogue1_2 = "Yst. Terv. Jänö";
-    private string dialogue2_1 = "I am also cured! yay!";
-    private string dialogue2_2 = "Yst. Terv. Dr Dog Sausage";
+    private string dialogue1_1 = "You have completed all of my levels!";
+    private string dialogue1_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue2_1 = "You have completed all of my levels!";
+    private string dialogue2_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue3_1 = "You have completed all of my levels!";
+    private string dialogue3_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue4_1 = "You have completed all of my levels!";
+    private string dialogue4_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue5_1 = "You have completed all of my levels!";
+    private string dialogue5_2 = "Thank you breaking my curse! I feel much better.";
 
     private void Start()
     {
@@ -386,9 +391,9 @@ public class LevelManager : MonoBehaviour
         countTaps = true;
         tapCounter = 1;
 
-        Vector3 dialogPosition = new Vector3(0, -4f, 0);
-        dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity, levelCompletedBox.transform);
-        dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+        dialogBubble = GameObject.FindWithTag("DialogBox");
+        Image image = dialogBubble.GetComponent<Image>();
+        image.enabled = true;
 
         charImage.sprite = curedCharSprite;
         ShowNextSpeechBubble();
@@ -430,6 +435,57 @@ public class LevelManager : MonoBehaviour
                         break;
                     case 2:
                         tmp.text = dialogue2_2;
+                        break;
+                    default:
+                        animator.SetTrigger("ContinueButtonEnd");
+                        Destroy(dialogBubble);
+                        countTaps = false;
+                        movableTileGrid.DestroyExistingMovableTiles();
+                        break;
+                }
+                break;
+            case 3:
+                switch (tapCounter)
+                {
+                    case 1:
+                        tmp.text = dialogue3_1;
+                        break;
+                    case 2:
+                        tmp.text = dialogue3_2;
+                        break;
+                    default:
+                        animator.SetTrigger("ContinueButtonEnd");
+                        Destroy(dialogBubble);
+                        countTaps = false;
+                        movableTileGrid.DestroyExistingMovableTiles();
+                        break;
+                }
+                break;
+            case 4:
+                switch (tapCounter)
+                {
+                    case 1:
+                        tmp.text = dialogue4_1;
+                        break;
+                    case 2:
+                        tmp.text = dialogue4_2;
+                        break;
+                    default:
+                        animator.SetTrigger("ContinueButtonEnd");
+                        Destroy(dialogBubble);
+                        countTaps = false;
+                        movableTileGrid.DestroyExistingMovableTiles();
+                        break;
+                }
+                break;
+            case 5:
+                switch (tapCounter)
+                {
+                    case 1:
+                        tmp.text = dialogue5_1;
+                        break;
+                    case 2:
+                        tmp.text = dialogue5_2;
                         break;
                     default:
                         animator.SetTrigger("ContinueButtonEnd");
