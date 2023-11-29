@@ -61,7 +61,7 @@ public class TutorialLevel : MonoBehaviour
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        backgroundGenerated = false;
+        backgroundGrid.GenerateBackgroundGrid(7, 7);
 
         GameObject overlayObject = GameObject.Find("Overlay");
         overlay = overlayObject.GetComponent<Image>();
@@ -108,7 +108,7 @@ public class TutorialLevel : MonoBehaviour
                             movableTiles = new Transform[gridSizeX, gridSizeY];
                         }
 
-                        GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY);
+               
                         
                     }
                     else
@@ -136,42 +136,7 @@ public class TutorialLevel : MonoBehaviour
             dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
     }
 
-    public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY)
-    {
-        if (!backgroundGenerated)
-        {
-            backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
-            backgroundGenerated = true;
-        }
-
-            if (column < gridSizeX && row < gridSizeY)
-        {
-            // Cache the reference to the background grid cell
-            Transform backgroundGridCell = backgroundGrid.backgroundGrid[column, row];
-
-            if (backgroundGridCell != null)
-            {
-                Vector3 position = backgroundGridCell.position;
-                GameObject tilePrefab = GetTile(tileType);
-                GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
-                //tile.transform.position = position;
-                tile.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
-
-                MovableTile movableTileComponent = tile.GetComponent<MovableTile>();
-                if (movableTileComponent != null)
-                {
-                    movableTileComponent.Level = selectedLevel;
-                    movableTileComponent.Row = row;
-                    movableTileComponent.Column = column;
-                    movableTileComponent.TileType = tileType;
-                    movableTileComponent.GridSizeX = gridSizeX;
-                    movableTileComponent.GridSizeY = gridSizeY;
-
-                    movableTiles[column, row] = movableTileComponent.transform;
-                }
-            }
-        }
-    }
+   
 
     public GameObject GetTile(string tileType)
     {
