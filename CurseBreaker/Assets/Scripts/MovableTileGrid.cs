@@ -127,11 +127,12 @@ public class MovableTileGrid : MonoBehaviour
         
         switch (currentLevel)
         {
-            case 5:
-            case 15:
-            case 25:
-            case 35:
-            case 45:
+            //trigger when this level is about to begin
+            case 6:
+            case 16:
+            case 26:
+            case 36:
+            case 46:
                 levelManager.PlayCharacterCompleteSequence(currentCharacter);
                 break;
             default:
