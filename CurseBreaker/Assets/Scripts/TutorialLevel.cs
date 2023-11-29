@@ -13,16 +13,11 @@ public class TutorialLevel : MonoBehaviour
 {
     public GameObject movableTilePrefab;
     public GameObject evilTilePrefab;
-    public GameObject arrowPrefab;
+    public GameObject handPrefab;
     public GameObject lynaraPrefab;
     public GameObject dialogBubblePrefab;
-    public Sprite overlay_0;
-    public Sprite overlay_1;
-    public Sprite overlay_2;
 
-    public Canvas shadowCanvas;
-
-    public GameObject arrow;
+    public GameObject hand;
     private GameObject lynara;
     private GameObject dialogBubble;
     public Image overlay;
@@ -30,22 +25,25 @@ public class TutorialLevel : MonoBehaviour
     private string dialogue1 = "Hi there! I'm here to guide you.";
     private string dialogue2 = "Your objective is to move the yellow tiles row by row so that the red tile isn't connected to the yellow ones.";
     private string dialogue3 = "In this game, you have to move the puzzles so that every other move is horizontal and every other vertical.";
-    private string dialogue4 = "To move a row, just tap and hold it, then drag it to right.";
-    private string dialogue5 = "Great job! Now, you need to know that there must be atleast 2 tiles in the row for you to be able to move it.";
-    private string dialogue6 = "Let’s do another one! Tap and hold the column in the middle and slide it downwards.";
-    private string dialogue7 = "Fantastic! You’ve completed the level.";
-    private string dialogue8 = "Now that you've mastered the basics, it's time to tackle more challenging puzzles!";
+    private string dialogue4 = "Here is the arrow telling if your move needs to be horizontal or vertical.";
+    private string dialogue5 = "To move a row, just tap and hold it, then drag it to right.";
+    private string dialogue6 = "Oh no! Now the level failed! The row was dragged too far from the tile cluster and the yellow tiles dropped!";
+    private string dialogue7 = "Let's try again! To move a row, just tap and hold it, then drag it to right.";
+    private string dialogue8 = "Great job! Now, you need to know that there must be atleast 2 tiles in the row for you to be able to move it.";
+    private string dialogue9 = "Let’s do another one! Tap and hold the column in the middle and slide it downwards.";
+    private string dialogue10 = "Fantastic! You’ve completed the level.";
+    private string dialogue11 = "Now that you've mastered the basics, it's time to tackle more challenging puzzles!";
 
-    public TextAsset csvFile;
     public BackgroundGrid backgroundGrid;
-    
+    GameObject animation_hand;
+    GameObject yellow_glow;
+
     public Animator animator;
+    public Animator tutorial_animator;
 
     public bool firstMovementDone = false;
     public bool tutorialDone = false;
 
-    private Transform[,] currentMovableTiles;
-    private Transform[,] movableTiles;
     public Vector3[,] initialTilePositions;
 
     public float tapCooldown = 0.5f; // Time in seconds to ignore taps after the first tap
@@ -57,9 +55,10 @@ public class TutorialLevel : MonoBehaviour
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
         backgroundGrid.GenerateBackgroundGrid(10, 10);
 
-        GameObject overlayObject = GameObject.Find("Overlay");
-        overlay = overlayObject.GetComponent<Image>();
-
+        animation_hand = GameObject.Find("Hand");
+        animation_hand.SetActive(false);
+        yellow_glow = GameObject.Find("YellowGlow");
+        yellow_glow.SetActive(false);
         GeneratePrefabs();
         LogTutorialStartEvent();
     }
@@ -94,24 +93,33 @@ public class TutorialLevel : MonoBehaviour
 
     void GeneratePrefabs()
     {      
-            Vector3 arrowposition = new Vector3(0.1f, 0.7f, 0);
-            arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-            arrow.transform.localScale = new Vector3(backgroundGrid.backgroundTileSize, backgroundGrid.backgroundTileSize, 1);
-            arrow.SetActive(false);
+        Vector3 handposition = new Vector3(0.8f, 2, 0);
+        hand = Instantiate(handPrefab, handposition, Quaternion.identity);
+        hand.transform.rotation = Quaternion.Euler(0, 0, 12);
+        hand.transform.localScale = new Vector3(0.3f, 0.3f, 1);
+        hand.GetComponent<SpriteRenderer>().sortingOrder = 2;
+        hand.SetActive(false);
 
-            Vector3 lynaraPosition = new Vector3(-0.6f, -2.4f, 0);
-            lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
-            lynara.transform.localScale = new Vector3(0.9f, 0.9f, 1);
+        Vector3 lynaraPosition = new Vector3(-0.6f, -2.4f, 0);
+        lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
+        lynara.transform.localScale = new Vector3(0.9f, 0.9f, 1);
 
-            Vector3 dialogPosition = new Vector3(0.4f, -4f, 0);
-            dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity);
-            dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+        Vector3 dialogPosition = new Vector3(0.4f, -4f, 0);
+        dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity);
+        dialogBubble.transform.localScale = new Vector3(0.5f, 0.5f, 1);
     }
 
     public void ShowNextSpeechBubble(int number)
     {
         TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
         number = number + 1;
+
+        
+        GameObject tilemoving = GameObject.Find("TileMovingAnimation");
+        if (tilemoving != null)
+        {
+            tutorial_animator = tilemoving.GetComponent<Animator>();
+        }
 
         switch (number)
         {
@@ -125,19 +133,30 @@ public class TutorialLevel : MonoBehaviour
                 tmp.text = dialogue3;
                 break;
             case 4:
+                hand.SetActive(true);
                 tmp.text = dialogue4;
                 break;
             case 5:
+                hand.SetActive(false);
                 tmp.text = dialogue5;
                 break;
             case 6:
+                animation_hand.SetActive(true);
+                tutorial_animator.SetBool("tutorial_fail", true);
                 tmp.text = dialogue6;
                 break;
             case 7:
+                tutorial_animator.SetBool("tutorial_fail", false);
+                tutorial_animator.SetTrigger("tutorial_horizontal");
                 tmp.text = dialogue7;
                 break;
             case 8:
                 tmp.text = dialogue8;
+                break;
+            case 9:
+                yellow_glow.SetActive(true);
+                tutorial_animator.SetTrigger("tutorial_vertical");
+                tmp.text = dialogue9;
                 break;
             default:
                 tmp.text = dialogue1;
@@ -149,7 +168,7 @@ public class TutorialLevel : MonoBehaviour
     {
         if(firstMovementDone)
         {
-            arrow.SetActive(false);
+            hand.SetActive(false);
             Debug.Log("tutorial completed");
             tutorialDone = true;
 
@@ -178,9 +197,9 @@ public class TutorialLevel : MonoBehaviour
     public void ChangeMovementDone()
     {
         firstMovementDone = true;
-        arrow.SetActive(false);
-        arrow.transform.position = new Vector3(1.2f, 0, 0);
-        arrow.transform.rotation = Quaternion.Euler(0, 0, 270);
+        hand.SetActive(false);
+        hand.transform.position = new Vector3(1.2f, 0, 0);
+        hand.transform.rotation = Quaternion.Euler(0, 0, 270);
 
     }
 }
