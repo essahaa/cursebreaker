@@ -44,9 +44,6 @@ public class TutorialLevel : MonoBehaviour
     public bool firstMovementDone = false;
     public bool tutorialDone = false;
 
-    public int gridSizeX = 10; //number of columns, width of the grid
-    public int gridSizeY = 10; //number of rows, height of the grid
-
     private Transform[,] currentMovableTiles;
     private Transform[,] movableTiles;
     public Vector3[,] initialTilePositions;
@@ -58,7 +55,7 @@ public class TutorialLevel : MonoBehaviour
     private void Start()
     {
         backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
-        backgroundGrid.GenerateBackgroundGrid(7, 7);
+        backgroundGrid.GenerateBackgroundGrid(10, 10);
 
         GameObject overlayObject = GameObject.Find("Overlay");
         overlay = overlayObject.GetComponent<Image>();
