@@ -114,7 +114,7 @@ public class TutorialLevel : MonoBehaviour
         TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
         number = number + 1;
 
-        
+        GameObject arrow = GameObject.Find("icon_arrow");
         GameObject tilemoving = GameObject.Find("TileMovingAnimation");
         if (tilemoving != null)
         {
@@ -151,6 +151,7 @@ public class TutorialLevel : MonoBehaviour
                 tmp.text = dialogue7;
                 break;
             case 8:
+                arrow.transform.rotation = Quaternion.Euler(0, 0, 90);
                 tmp.text = dialogue8;
                 break;
             case 9:
@@ -163,6 +164,7 @@ public class TutorialLevel : MonoBehaviour
                 break;
             case 11:
                 tmp.text = dialogue11;
+                EndLevel();
                 break;
             default:
                 tmp.text = dialogue1;
