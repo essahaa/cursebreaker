@@ -37,7 +37,7 @@ public class MovableTileGrid : MonoBehaviour
     private bool backgroundGenerated = false;
     private bool[,] visited;
     public bool levelFailed = false;
-
+    public bool canPlay;
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
     public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
@@ -835,6 +835,11 @@ public class MovableTileGrid : MonoBehaviour
         FindObjectOfType<AudioManager>().Play("youfail");
         heartSystem.LoseHeart();
         FirebaseAnalytics.LogEvent("level_failed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+        canPlay = heartSystem.CanPlay();
+        if (!canPlay)
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     private List<Transform> DepthFirstSearch(Transform tile, bool[,] visited)
