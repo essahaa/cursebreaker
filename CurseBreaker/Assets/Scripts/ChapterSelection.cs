@@ -11,6 +11,7 @@ public class ChapterSelectionController : MonoBehaviour
     public MovableTileGrid movableTileGrid;
     private int currentLevel; //latest completed level
     private int selectedCharacter;
+    public HeartSystem heartSystem;
 
     void Awake()
     {
@@ -89,7 +90,16 @@ public class ChapterSelectionController : MonoBehaviour
 
     private void HandleLevelSelection(int levelNumber)
     {
-        movableTileGrid.LoadSceneAndLevel(levelNumber);
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        if (heartSystem.CanPlay())
+        {
+            movableTileGrid.LoadSceneAndLevel(levelNumber);
+        }
+        else
+        {
+            Debug.Log("No hearts left! Watch an ad or wait.");
+        }
+            
     }
 
     private void SetupStarsForLevels()
