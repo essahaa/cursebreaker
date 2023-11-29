@@ -158,6 +158,12 @@ public class TutorialLevel : MonoBehaviour
                 tutorial_animator.SetTrigger("tutorial_vertical");
                 tmp.text = dialogue9;
                 break;
+            case 10:
+                tmp.text = dialogue10;
+                break;
+            case 11:
+                tmp.text = dialogue11;
+                break;
             default:
                 tmp.text = dialogue1;
                 break;
