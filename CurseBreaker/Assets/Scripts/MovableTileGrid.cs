@@ -53,7 +53,7 @@ public class MovableTileGrid : MonoBehaviour
         if (FindObjectOfType<LevelManager>() != null)
         {
             levelManager = FindObjectOfType<LevelManager>();
-            levelManager.getSideCharacter();
+            levelManager.GetSideCharacter();
 
             if (selectedLevel > 0)
             {
