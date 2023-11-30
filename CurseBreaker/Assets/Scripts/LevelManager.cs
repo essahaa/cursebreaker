@@ -309,7 +309,8 @@ public class LevelManager : MonoBehaviour
 
     public void GetSideCharacter()
     {
-        int charIndex = PlayerPrefs.GetInt("currentCharacter");
+        int selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        int currentCharacter = PlayerPrefs.GetInt("currentCharacter");
         GameObject charObject = GameObject.FindWithTag("SideCharacter");
         charImage = charObject.GetComponent<Image>();
         Sprite[] spritesheet = null;
@@ -317,6 +318,24 @@ public class LevelManager : MonoBehaviour
         string spriteName = "";
         string altSpriteName = "";
         Sprite charSprite = null;
+        int charIndex = 0;
+
+        if(selectedLevel <= 5)
+        {
+            charIndex = 0;
+        }else if(selectedLevel > 5 && selectedLevel <= 15)
+        {
+            charIndex = 1;
+        }else if(selectedLevel > 15 && selectedLevel <= 25)
+        {
+            charIndex = 2;
+        }else if(selectedLevel > 25 && selectedLevel <= 35)
+        {
+            charIndex = 3;
+        }else if(selectedLevel > 35 && selectedLevel <= 45)
+        {
+            charIndex = 4;
+        }
 
         switch(charIndex)
         {
@@ -375,7 +394,13 @@ public class LevelManager : MonoBehaviour
             }
         }
 
-        charImage.sprite = charSprite;
+        if(currentCharacter > charIndex)
+        {
+            charImage.sprite = curedCharSprite;
+        }else
+        {
+            charImage.sprite = charSprite;
+        }
     }
 
     private void UpdateCharacter(int characterIndex)
@@ -386,18 +411,18 @@ public class LevelManager : MonoBehaviour
 
     public void PlayCharacterCompleteSequence(int charIndex)
     {
-        GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
+        //GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
 
-        countTaps = true;
-        tapCounter = 1;
+        //countTaps = true;
+        //tapCounter = 1;
 
-        dialogBubble = GameObject.FindWithTag("DialogBox");
-        SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
-        image.enabled = true;
-        Debug.Log("image enabled: " + image);
+        //dialogBubble = GameObject.FindWithTag("DialogBox");
+        //SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
+        //image.enabled = true;
+        //Debug.Log("image enabled: " + image);
 
         charImage.sprite = curedCharSprite;
-        ShowNextSpeechBubble();
+        //ShowNextSpeechBubble();
     }
 
     public void ShowNextSpeechBubble()
