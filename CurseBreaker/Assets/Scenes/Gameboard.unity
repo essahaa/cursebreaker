@@ -3962,75 +3962,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 950845952}
   m_CullTransparentMesh: 1
---- !u!1 &954021169
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 954021171}
-  - component: {fileID: 954021170}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &954021170
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954021169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 436abc53a32636249b8ddedfc078d376, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sounds:
-  - name: liik
-    description: 
-    clip: {fileID: 8300000, guid: efb03895e5dbb16498645dc5418ea4fc, type: 3}
-    duration: 1
-    volume: 0.693
-    pitch: 2.23
-    loop: 0
-    source: {fileID: 0}
-  - name: riddedred
-    description: 
-    clip: {fileID: 8300000, guid: 94635f9b024156148b035f30f8a63c89, type: 3}
-    duration: 1
-    volume: 0.693
-    pitch: 1.01
-    loop: 0
-    source: {fileID: 0}
-  - name: youfail
-    description: 
-    clip: {fileID: 8300000, guid: 3a2da7a14c8109d498781dd73457c314, type: 3}
-    duration: 1
-    volume: 0
-    pitch: 1.41
-    loop: 0
-    source: {fileID: 0}
---- !u!4 &954021171
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954021169}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &954962605
 GameObject:
   m_ObjectHideFlags: 0
@@ -5297,6 +5228,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: ContinueButtonEnd
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1484253798}
+        m_TargetAssemblyTypeName: MovableTileGrid, Assembly-CSharp
+        m_MethodName: playmusa
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1228748032
@@ -10153,5 +10096,4 @@ SceneRoots:
   - {fileID: 1600852988}
   - {fileID: 634075431}
   - {fileID: 1993243420}
-  - {fileID: 954021171}
   - {fileID: 510407680}
