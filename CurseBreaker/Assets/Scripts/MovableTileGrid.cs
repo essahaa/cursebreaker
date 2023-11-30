@@ -79,7 +79,8 @@ public class MovableTileGrid : MonoBehaviour
     private void GenerateArrowPrefab()
     {
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
-        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);    
+        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
+        arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
     }
 
     public void RotateArrow(int rotation)
