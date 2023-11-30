@@ -348,7 +348,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 46
   m_TargetDisplay: 0
 --- !u!224 &85842963
 RectTransform:
@@ -9444,6 +9444,10 @@ PrefabInstance:
       value: DialogBubble
       objectReference: {fileID: 0}
     - target: {fileID: 2595521990548659669, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2595521990548659669, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
       propertyPath: m_TagString
       value: DialogBox
       objectReference: {fileID: 0}
@@ -9454,6 +9458,10 @@ PrefabInstance:
     - target: {fileID: 6599320864474452976, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6599320864474452976, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
+      propertyPath: m_SortingOrder
+      value: 79
       objectReference: {fileID: 0}
     - target: {fileID: 6967048545080911288, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
       propertyPath: m_Pivot.x
@@ -9534,6 +9542,10 @@ PrefabInstance:
     - target: {fileID: 6967048545080911288, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7954462348383571085, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

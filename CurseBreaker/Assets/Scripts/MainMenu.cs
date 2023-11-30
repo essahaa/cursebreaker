@@ -12,7 +12,6 @@ public class MainMenu : MonoBehaviour
     {
         Scene currentScene = SceneManager.GetActiveScene();
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        Debug.Log("currentLevel: " + currentLevel + " currentScene: " + currentScene.name);
         if (currentScene.name == "MainMenu" && currentLevel <= 0)
         {
             GameObject levelSelectionObject = GameObject.Find("LevelSelectButton");

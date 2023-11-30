@@ -18,6 +18,7 @@ TagManager:
   - SelectLevelButton
   - LevelSelector
   - DialogBox
+  - Cutscene
   layers:
   - Default
   - TransparentFX
