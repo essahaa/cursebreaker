@@ -36,8 +36,9 @@ public class TutorialLevel : MonoBehaviour
     private string dialogue11 = "Now that you've mastered the basics, it's time to tackle more challenging puzzles!";
 
     public BackgroundGrid backgroundGrid;
-    GameObject animation_hand;
-    GameObject yellow_glow;
+    private GameObject animation_hand;
+    private GameObject yellow_glow;
+    private GameObject tilemoving;
 
     public Animator animator;
     public Animator tutorial_animator;
@@ -89,7 +90,7 @@ public class TutorialLevel : MonoBehaviour
 
     private void LogTutorialStartEvent()
     {
-        Firebase.Analytics.FirebaseAnalytics.LogEvent("tutorial_started");   
+        FirebaseAnalytics.LogEvent("tutorial_started");   
     }
 
     void GeneratePrefabs()
@@ -116,7 +117,7 @@ public class TutorialLevel : MonoBehaviour
         number = number + 1;
 
         GameObject arrow = GameObject.Find("icon_arrow");
-        GameObject tilemoving = GameObject.Find("TileMovingAnimation");
+        tilemoving = GameObject.Find("TileMovingAnimation");
         if (tilemoving != null)
         {
             tutorial_animator = tilemoving.GetComponent<Animator>();
@@ -187,6 +188,7 @@ public class TutorialLevel : MonoBehaviour
 
     public void EndLevel()
     {
+        tilemoving.SetActive(false);
         GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
         if (levelCompletedBox != null)
         {
