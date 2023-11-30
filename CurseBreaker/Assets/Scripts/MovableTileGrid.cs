@@ -76,12 +76,6 @@ public class MovableTileGrid : MonoBehaviour
         return selectedLevel;
     }
 
-    public void TriggerUpdateProgression()
-    {
-        //for testing purposes
-        levelManager.UpdateProgression(selectedLevel);
-    }
-
     private void GenerateArrowPrefab()
     {
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
@@ -134,7 +128,10 @@ public class MovableTileGrid : MonoBehaviour
             case 26:
             case 36:
             case 46:
-                levelManager.PlayCharacterCompleteSequence(currentCharacter);
+                if(selectedLevel > currentLevel)
+                {
+                    levelManager.PlayCharacterCompleteSequence(currentCharacter);
+                }
                 break;
             default:
                 animator.SetTrigger("ContinueButtonEnd");
@@ -816,7 +813,13 @@ public class MovableTileGrid : MonoBehaviour
         levelManager.GetSideCharacter();
         manager.OnShowStarsButtonClick();
         animator.SetTrigger("LevelEnd");
-        levelManager.UpdateProgression(selectedLevel);
+
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        if(selectedLevel > currentLevel)
+        {
+            levelManager.UpdateProgression(selectedLevel);
+        }
+        
         FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
         FindObjectOfType<AudioManager>().Play("winner");
     }
