@@ -390,6 +390,7 @@ public class MovableTileDrag : MonoBehaviour
 
             if (isSnappedToNewPlace)
             {
+                movableTileGrid.IsMovableTilesGroupConnected();
                 //Update movableTiles array with new snapped positions
                 movableTiles = movableTileGrid.UpdateMovableTilesArray();
                 levelFailed = movableTileGrid.levelFailed;
@@ -399,7 +400,7 @@ public class MovableTileDrag : MonoBehaviour
                 {
                     // Toggle between "horizontal" and "vertical" move types.
                     currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-                    movableTileGrid.IsMovableTilesGroupConnected();
+                    
 
                     if(currentMoveType == "horizontal")
                     {

@@ -791,10 +791,18 @@ public class MovableTileGrid : MonoBehaviour
         {
             // Logic to handle level failure
             Debug.Log("Game Over: MovableTiles group is not connected.");
+            levelFailed = true;
             HandleLevelFailure();
             return false;
         }
-        else if (evilTileDestroyed)
+        else if(movableTileDestroyed && evilTileDestroyed)
+        {
+            Debug.Log("Game Over: MovableTiles group is not connected.");
+            levelFailed = true;
+            HandleLevelFailure();
+            return false;
+        }
+        else if (evilTileDestroyed && !movableTileDestroyed)
         {
             // Continue gameplay if only EvilTiles are destroyed
             Debug.Log("The disconnected group contains only EvilTiles.");
