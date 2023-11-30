@@ -23,6 +23,7 @@ public class MainMenu : MonoBehaviour
 
     public void Play()
     {
+        FindObjectOfType<AudioManager>().Play("musa");
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
         if (heartSystem.CanPlay())
         {
