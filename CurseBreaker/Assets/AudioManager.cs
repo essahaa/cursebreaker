@@ -41,7 +41,8 @@ public class AudioManager : MonoBehaviour
         s.source.Play();
     }
 
-    public void StopPlaying(string sound)
+    
+    public void MuteSound(string sound)
     {
         Sound s = Array.Find(sounds, item => item.name == sound);
         if (s == null)
@@ -50,10 +51,21 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        s.source.volume = s.volume * (1f + UnityEngine.Random.Range(-s.volume / 2f, s.volume / 2f));
-        //s.source.pitch = s.pitch * (1f + UnityEngine.Random.Range(-s.pitch / 2f, s.pitch / 2f));
+        // Set the volume to zero to mute the sound
+        s.source.volume = 0f;
+    }
 
-        s.source.Stop();
+    public void UnMuteSound(string sound)
+    {
+        Sound s = Array.Find(sounds, item => item.name == sound);
+        if (s == null)
+        {
+            Debug.LogWarning("Sound: " + name + " not found!");
+            return;
+        }
+
+        // Set the volume to zero to mute the sound
+        s.source.volume = 0.2f;
     }
     //FindObjectOfType<AudioManager>().StopPlaying("sound string name");
 
