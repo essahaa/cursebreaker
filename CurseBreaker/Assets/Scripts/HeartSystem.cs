@@ -7,7 +7,7 @@ public class HeartSystem : MonoBehaviour
     public int maxHearts = 5;
     private int currentHearts;
     private DateTime nextHeartTime;
-    private TimeSpan heartRegenTime = TimeSpan.FromMinutes(0.5);
+    private TimeSpan heartRegenTime = TimeSpan.FromMinutes(0.1);
 
     public TextMeshProUGUI heartsText; // Public field to assign the TextMeshPro UI element
     public TextMeshProUGUI timerText; // Public field for the Timer TextMeshPro UI element
