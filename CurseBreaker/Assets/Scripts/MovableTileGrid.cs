@@ -110,6 +110,7 @@ public class MovableTileGrid : MonoBehaviour
             return; // Do nothing if the button has already been clicked
         }
 
+        FindObjectOfType<AudioManager>().Play("musa");
         // If not clicked, proceed with the next level logic
         int newSelectedLevel = selectedLevel + 1;
         PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
@@ -123,16 +124,20 @@ public class MovableTileGrid : MonoBehaviour
         switch (currentLevel)
         {
             //trigger when this level is about to begin
-            case 6:
-            case 16:
-            case 26:
-            case 36:
-            case 46:
-                if(selectedLevel > currentLevel)
-                {
-                    levelManager.PlayCharacterCompleteSequence(currentCharacter);
-                }
-                break;
+            ////case 6:
+            ////case 16:
+            ////case 26:
+            ////case 36:
+            ////case 46:
+            ////    if(selectedLevel > currentLevel)
+            ////    {
+            ////        levelManager.PlayCharacterCompleteSequence(currentCharacter);
+            ////        //seuraavat väliaikaisesti kunnes shownextspeechbubble taas käytössä
+            ////        animator.SetTrigger("ContinueButtonEnd");
+            ////        DestroyExistingMovableTiles();
+            ////        ShowLevelText();
+            ////    }
+            ////    break;
             default:
                 animator.SetTrigger("ContinueButtonEnd");
                 DestroyExistingMovableTiles();
@@ -348,6 +353,10 @@ public class MovableTileGrid : MonoBehaviour
         
     }
 
+    public void playmusa()
+    {
+        FindObjectOfType<AudioManager>().Play("musa");
+    }
     public void EmptyMovableTilesArrayRowOrColumn(Transform[,] currentMovableTiles)
     {
         //empty row or column that has been moved
@@ -821,6 +830,8 @@ public class MovableTileGrid : MonoBehaviour
         }
         
         FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+
+        FindObjectOfType<AudioManager>().StopPlaying("musa");
         FindObjectOfType<AudioManager>().Play("winner");
     }
 
@@ -835,6 +846,8 @@ public class MovableTileGrid : MonoBehaviour
         }
         levelManager.GetSideCharacter();
         animator.SetTrigger("LevelEnd");
+
+        FindObjectOfType<AudioManager>().StopPlaying("musa");
         FindObjectOfType<AudioManager>().Play("youfail");
         heartSystem.LoseHeart();
         FirebaseAnalytics.LogEvent("level_failed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());

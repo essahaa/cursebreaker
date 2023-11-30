@@ -1,11 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
     public HeartSystem heartSystem;
+
+    private void Start()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        Debug.Log("currentLevel: " + currentLevel + " currentScene: " + currentScene.name);
+        if (currentScene.name == "MainMenu" && currentLevel <= 0)
+        {
+            GameObject levelSelectionObject = GameObject.Find("LevelSelectButton");
+            levelSelectionObject.GetComponent<Image>().color = new Color32(140, 140, 140, 255);
+            levelSelectionObject.GetComponent<Button>().interactable = false;
+        }
+    }
+
     public void Play()
     {
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
