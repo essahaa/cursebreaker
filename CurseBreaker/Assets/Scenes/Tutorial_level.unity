@@ -433,7 +433,7 @@ GameObject:
   - component: {fileID: 79890481}
   - component: {fileID: 79890482}
   m_Layer: 5
-  m_Name: TIleMovingAnimation
+  m_Name: TileMovingAnimation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
