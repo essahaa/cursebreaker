@@ -123,16 +123,20 @@ public class MovableTileGrid : MonoBehaviour
         switch (currentLevel)
         {
             //trigger when this level is about to begin
-            case 6:
-            case 16:
-            case 26:
-            case 36:
-            case 46:
-                if(selectedLevel > currentLevel)
-                {
-                    levelManager.PlayCharacterCompleteSequence(currentCharacter);
-                }
-                break;
+            ////case 6:
+            ////case 16:
+            ////case 26:
+            ////case 36:
+            ////case 46:
+            ////    if(selectedLevel > currentLevel)
+            ////    {
+            ////        levelManager.PlayCharacterCompleteSequence(currentCharacter);
+            ////        //seuraavat väliaikaisesti kunnes shownextspeechbubble taas käytössä
+            ////        animator.SetTrigger("ContinueButtonEnd");
+            ////        DestroyExistingMovableTiles();
+            ////        ShowLevelText();
+            ////    }
+            ////    break;
             default:
                 animator.SetTrigger("ContinueButtonEnd");
                 DestroyExistingMovableTiles();
