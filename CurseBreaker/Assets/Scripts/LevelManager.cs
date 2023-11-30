@@ -411,18 +411,18 @@ public class LevelManager : MonoBehaviour
 
     public void PlayCharacterCompleteSequence(int charIndex)
     {
-        GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
+        //GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
 
-        countTaps = true;
-        tapCounter = 1;
+        //countTaps = true;
+        //tapCounter = 1;
 
-        dialogBubble = GameObject.FindWithTag("DialogBox");
-        SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
-        image.enabled = true;
-        Debug.Log("image enabled: " + image);
+        //dialogBubble = GameObject.FindWithTag("DialogBox");
+        //SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
+        //image.enabled = true;
+        //Debug.Log("image enabled: " + image);
 
         charImage.sprite = curedCharSprite;
-        ShowNextSpeechBubble();
+        //ShowNextSpeechBubble();
     }
 
     public void ShowNextSpeechBubble()
