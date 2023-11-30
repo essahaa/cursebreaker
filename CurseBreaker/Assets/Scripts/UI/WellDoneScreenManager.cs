@@ -91,23 +91,68 @@ public class WellDoneScreenManager : MonoBehaviour
         switch (selectedLevel)
         {
             case 1:
-                if (moveCount <= 3) return 3;
-                else if (moveCount <= 5) return 2; 
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 4) return 2; 
                 else return 1; 
 
             case 2:
-                if (moveCount <= 3) return 3;
+                if (moveCount <= 1) return 3;
                 else if (moveCount <= 5) return 2;
                 else return 1;
             
             case 3:
-                if (moveCount <= 3) return 3;
+                if (moveCount <= 2) return 3;
                 else if (moveCount <= 5) return 2;
                 else return 1;
             case 4:
-                if (moveCount <= 5) return 3;
-                else if (moveCount <= 7) return 2;
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
                 else return 1;
+            case 5:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 6:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 7:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 8:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 9:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 10:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 11:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 12:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 13:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 14:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 15:
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
                 return 1; // Default to 1 star if level not recognized
