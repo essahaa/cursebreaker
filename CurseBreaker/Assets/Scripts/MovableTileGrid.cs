@@ -21,6 +21,7 @@ public class MovableTileGrid : MonoBehaviour
     LevelManager levelManager;
 
     private GameObject arrow;
+    private GameObject restartButton;
 
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
@@ -101,6 +102,7 @@ public class MovableTileGrid : MonoBehaviour
         FirebaseAnalytics.LogEvent("level_started", "level_number", levelNumber.ToString());
         //T�H�N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
+        restartButton = GameObject.Find("RestartButton");
     }
 
     public void NextLevel()
@@ -118,27 +120,26 @@ public class MovableTileGrid : MonoBehaviour
         selectedLevel = newSelectedLevel;
 
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        int currentCharacter = PlayerPrefs.GetInt("currentCharacter"); //one larger than the onscreen characters index
         GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-        animator = levelCompletedBox.GetComponent<Animator>(); 
+        animator = levelCompletedBox.GetComponent<Animator>();
         
         switch (currentLevel)
         {
             //trigger when this level is about to begin
-            ////case 6:
-            ////case 16:
-            ////case 26:
-            ////case 36:
-            ////case 46:
-            ////    if(selectedLevel > currentLevel)
-            ////    {
-            ////        levelManager.PlayCharacterCompleteSequence(currentCharacter);
-            ////        //seuraavat väliaikaisesti kunnes shownextspeechbubble taas käytössä
-            ////        animator.SetTrigger("ContinueButtonEnd");
-            ////        DestroyExistingMovableTiles();
-            ////        ShowLevelText();
-            ////    }
-            ////    break;
+            case 6:
+            case 16:
+            case 26:
+            case 36:
+            case 46:
+                if(selectedLevel > currentLevel)
+                {
+                    levelManager.PlayCharacterCompleteSequence();
+                    //seuraavat väliaikaisesti kunnes shownextspeechbubble taas käytössä
+                    //animator.SetTrigger("ContinueButtonEnd");
+                    //DestroyExistingMovableTiles();
+                    //ShowLevelText();
+                }
+                break;
             default:
                 animator.SetTrigger("ContinueButtonEnd");
                 DestroyExistingMovableTiles();
@@ -351,7 +352,7 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         ReadLevelDataFromCSV();
-        
+        restartButton.SetActive(true);
     }
 
     public void playmusa()
@@ -831,6 +832,7 @@ public class MovableTileGrid : MonoBehaviour
         levelManager.GetSideCharacter();
         manager.OnShowStarsButtonClick();
         animator.SetTrigger("LevelEnd");
+        restartButton.SetActive(false);
 
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
         if(selectedLevel > currentLevel)
@@ -855,6 +857,7 @@ public class MovableTileGrid : MonoBehaviour
         }
         levelManager.GetSideCharacter();
         animator.SetTrigger("LevelEnd");
+        restartButton.SetActive(false);
 
         FindObjectOfType<AudioManager>().MuteSound("musa");
         FindObjectOfType<AudioManager>().Play("youfail");
