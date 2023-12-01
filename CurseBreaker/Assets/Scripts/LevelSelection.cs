@@ -18,6 +18,7 @@ public class LevelSelection : MonoBehaviour
     private void CheckCharacterProgression()
     {
         currentCharacter = PlayerPrefs.GetInt("currentCharacter");
+        Debug.Log("current character: " + currentCharacter);
         GameObject[] charAvatars = GameObject.FindGameObjectsWithTag("CharSelectionAvatar");
 
         foreach (GameObject charAvatar in charAvatars)
