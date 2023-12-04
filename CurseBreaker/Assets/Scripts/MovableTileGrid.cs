@@ -99,7 +99,7 @@ public class MovableTileGrid : MonoBehaviour
     {
         PlayerPrefs.SetInt("selectedLevel", levelNumber);
         selectedLevel = levelNumber;
-        FirebaseAnalytics.LogEvent("level_started", "level_number", levelNumber.ToString());
+        
         //T�H�N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
         ReadLevelDataFromCSV();
         restartButton = GameObject.Find("RestartButton");
@@ -163,6 +163,7 @@ public class MovableTileGrid : MonoBehaviour
 
     public void ReadLevelDataFromCSV()
     {
+        FirebaseAnalytics.LogEvent("level_started", "level_number", selectedLevel.ToString());
         levelFailed = false;
         bool arraySizeSet = false; // Add a flag to track if array size is set.
         bool noMoreLevels = true; // Flag to check if there are no more levels.
