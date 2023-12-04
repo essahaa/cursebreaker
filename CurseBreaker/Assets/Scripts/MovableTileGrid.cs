@@ -833,7 +833,8 @@ public class MovableTileGrid : MonoBehaviour
         animator.SetTrigger("LevelEnd");
 
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        if(selectedLevel > currentLevel)
+        int nextLevel = selectedLevel + 1;
+        if(nextLevel > currentLevel)
         {
             levelManager.UpdateProgression(selectedLevel);
         }

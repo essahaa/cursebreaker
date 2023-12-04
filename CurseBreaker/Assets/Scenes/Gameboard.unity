@@ -6687,6 +6687,7 @@ GameObject:
   - component: {fileID: 1532073310}
   - component: {fileID: 1532073309}
   - component: {fileID: 1532073308}
+  - component: {fileID: 1532073312}
   m_Layer: 5
   m_Name: ContinueButton
   m_TagString: Untagged
@@ -6784,6 +6785,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1532073312}
+        m_TargetAssemblyTypeName: ChapterSelectionController, Assembly-CSharp
+        m_MethodName: AssignStarsToCurrentLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1532073310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6822,6 +6835,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1532073306}
   m_CullTransparentMesh: 1
+--- !u!114 &1532073312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532073306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 494e3770c01d9ef4994e4109596683bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelButtons: []
+  movableTileGrid: {fileID: 0}
+  heartSystem: {fileID: 0}
+  starDisplayPrefab: {fileID: 7421359052174739049, guid: 067b4f4e697d8c749a350fa76ef532f0, type: 3}
 --- !u!1001 &1548459672
 PrefabInstance:
   m_ObjectHideFlags: 0

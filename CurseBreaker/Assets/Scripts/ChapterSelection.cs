@@ -102,7 +102,7 @@ public class ChapterSelectionController : MonoBehaviour
             
     }
 
-    private void SetupStarsForLevels()
+    public void SetupStarsForLevels()
     {
         for (int i = 0; i < levelButtons.Length; i++)
         {
@@ -131,4 +131,36 @@ public class ChapterSelectionController : MonoBehaviour
             }
         }
     }
+
+    public void AssignStarsToCurrentLevel()
+    {
+        levelButtons = GameObject.FindGameObjectsWithTag("SelectLevelButton");
+        foreach (GameObject button in levelButtons)
+        {
+            // Extract the level number from the button
+            Debug.Log("Jtainvaikka");
+            TextMeshProUGUI levelText = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (levelText != null && int.TryParse(levelText.text, out int levelNumber))
+            {
+                Debug.Log("levelNumber in CS" + levelNumber);
+                // Check if this button's level number matches the current level
+                if (levelNumber == currentLevel)
+                {
+                    // Get the number of stars earned for this level
+                    int starsEarned = PlayerPrefs.GetInt("Level_" + levelNumber + "_Stars", 0);
+                    Debug.Log("currentLevel in CS" + currentLevel);
+                    // Find the star placeholder in this button
+                    Transform starPlaceholder = button.transform.Find("StarPlaceholder");
+                    if (starPlaceholder != null)
+                    {
+                        // Instantiate or update the star display with the earned stars
+                        GameObject starDisplay = Instantiate(starDisplayPrefab, starPlaceholder.position, Quaternion.identity, starPlaceholder);
+                        starDisplay.GetComponent<StarDisplayUpdater>().UpdateStars(starsEarned);
+                    }
+                    break; // Exit the loop as we've found and updated the current level's button
+                }
+            }
+        }
+    }
+
 }

@@ -77,13 +77,8 @@ public class WellDoneScreenManager : MonoBehaviour
     {
         StartCoroutine(ShowStarsRoutine(numberOfStars));
 
-        string key = "Level_" + selectedLevel + "_Stars";
-        int currentHighScore = PlayerPrefs.GetInt(key, 0);
-
-        if (numberOfStars > currentHighScore)
-        {
-            PlayerPrefs.SetInt(key, numberOfStars);
-        }
+        // Save the stars with a level-specific key
+        PlayerPrefs.SetInt("Level_" + selectedLevel + "_Stars", numberOfStars);
     }
 
     public int CalculateStarsBasedOnMoves()
