@@ -22,6 +22,10 @@ public class LevelManager : MonoBehaviour
     public GameObject arrow;
     */
     private GameObject dialogBubble;
+    private Image dialogBubbleImage;
+    public Sprite bubbleLeft;
+    public Sprite bubbleRight;
+
     private Image charImage;
     private Sprite curedCharSprite;
 
@@ -30,14 +34,20 @@ public class LevelManager : MonoBehaviour
 
     private string dialogue1_1 = "You have completed all of my levels!";
     private string dialogue1_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue1_3 = "Please cure me Lynara!";
+    private string dialogue1_4 = "Let's break Sir Sausages curse!";
     private string dialogue2_1 = "You have completed all of my levels!";
     private string dialogue2_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue2_3 = "Please cure me Lynara!";
+    private string dialogue2_4 = "Let's break Dr. Owls curse!";
     private string dialogue3_1 = "You have completed all of my levels!";
     private string dialogue3_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue3_3 = "Please cure me Lynara!";
+    private string dialogue3_4 = "Let's break Mr Melon Cat's curse!";
     private string dialogue4_1 = "You have completed all of my levels!";
     private string dialogue4_2 = "Thank you breaking my curse! I feel much better.";
-    private string dialogue5_1 = "You have completed all of my levels!";
-    private string dialogue5_2 = "Thank you breaking my curse! I feel much better.";
+    private string dialogue4_3 = "Please cure me Lynara!";
+    private string dialogue4_4 = "Let's break the Great Ox's curse!";
 
     private void Start()
     {
@@ -409,26 +419,31 @@ public class LevelManager : MonoBehaviour
         PlayerPrefs.SetInt("currentCharacter", newCharacterIndex);
     }
 
-    public void PlayCharacterCompleteSequence(int charIndex)
+    private void TemporarySpriteChange(int charIndex)
+    {
+        UpdateCharacter(charIndex);
+        GetSideCharacter();
+        PlayerPrefs.SetInt("currentCharacter", charIndex);
+    }
+
+    public void PlayCharacterCompleteSequence()
     {
         //GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
 
-        //countTaps = true;
-        //tapCounter = 1;
+        countTaps = true;
+        tapCounter = 1;
 
-        //dialogBubble = GameObject.FindWithTag("DialogBox");
-        //SpriteRenderer image = dialogBubble.GetComponent<SpriteRenderer>();
-        //image.enabled = true;
-        //Debug.Log("image enabled: " + image);
+        dialogBubble = GameObject.FindWithTag("DialogBox");
+        dialogBubbleImage = dialogBubble.GetComponent<Image>();
+        dialogBubbleImage.enabled = true;
 
         charImage.sprite = curedCharSprite;
-        //ShowNextSpeechBubble();
+        ShowNextSpeechBubble();
     }
 
     public void ShowNextSpeechBubble()
     {
-        TextMeshPro tmp = dialogBubble.GetComponentInChildren<TextMeshPro>();
-        tmp.text = "";
+        TextMeshProUGUI tmp = dialogBubble.GetComponentInChildren<TextMeshProUGUI>();
         int charIndex = PlayerPrefs.GetInt("currentCharacter");
 
         GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
@@ -440,14 +455,27 @@ public class LevelManager : MonoBehaviour
                 switch(tapCounter)
                 {
                     case 1:
+                        dialogBubbleImage.sprite = bubbleRight;
                         tmp.text = dialogue1_1;
                         break;
                     case 2:
                         tmp.text = dialogue1_2;
                         break;
+                    case 3:
+                        tmp.text = "";
+                        animator.SetBool("CharacterDown", true);
+                        TemporarySpriteChange(charIndex);
+                        animator.SetBool("CharacterDown", false);
+                        tmp.text = dialogue1_3;
+                        break;
+                    case 4:
+                        dialogBubbleImage.sprite = bubbleLeft;
+                        tmp.text = dialogue1_4;
+                        break;
                     default:
+                        tmp.text = "";
                         animator.SetTrigger("ContinueButtonEnd");
-                        Destroy(dialogBubble);
+                        dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
                         break;
@@ -457,14 +485,27 @@ public class LevelManager : MonoBehaviour
                 switch (tapCounter)
                 {
                     case 1:
+                        dialogBubbleImage.sprite = bubbleRight;
                         tmp.text = dialogue2_1;
                         break;
                     case 2:
                         tmp.text = dialogue2_2;
                         break;
+                    case 3:
+                        tmp.text = "";
+                        animator.SetBool("CharacterDown", true);
+                        TemporarySpriteChange(charIndex);
+                        animator.SetBool("CharacterDown", false);
+                        tmp.text = dialogue2_3;
+                        break;
+                    case 4:
+                        dialogBubbleImage.sprite = bubbleLeft;
+                        tmp.text = dialogue2_4;
+                        break;
                     default:
+                        tmp.text = "";
                         animator.SetTrigger("ContinueButtonEnd");
-                        Destroy(dialogBubble);
+                        dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
                         break;
@@ -474,14 +515,27 @@ public class LevelManager : MonoBehaviour
                 switch (tapCounter)
                 {
                     case 1:
-                        tmp.text = dialogue3_1;
+                        dialogBubbleImage.sprite = bubbleRight;
+                        tmp.text = dialogue2_1;
                         break;
                     case 2:
-                        tmp.text = dialogue3_2;
+                        tmp.text = dialogue2_2;
+                        break;
+                    case 3:
+                        tmp.text = "";
+                        animator.SetBool("CharacterDown", true);
+                        TemporarySpriteChange(charIndex);
+                        animator.SetBool("CharacterDown", false);
+                        tmp.text = dialogue2_3;
+                        break;
+                    case 4:
+                        dialogBubbleImage.sprite = bubbleLeft;
+                        tmp.text = dialogue2_4;
                         break;
                     default:
+                        tmp.text = "";
                         animator.SetTrigger("ContinueButtonEnd");
-                        Destroy(dialogBubble);
+                        dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
                         break;
@@ -491,31 +545,27 @@ public class LevelManager : MonoBehaviour
                 switch (tapCounter)
                 {
                     case 1:
-                        tmp.text = dialogue4_1;
+                        dialogBubbleImage.sprite = bubbleRight;
+                        tmp.text = dialogue2_1;
                         break;
                     case 2:
-                        tmp.text = dialogue4_2;
+                        tmp.text = dialogue2_2;
+                        break;
+                    case 3:
+                        tmp.text = "";
+                        animator.SetBool("CharacterDown", true);
+                        TemporarySpriteChange(charIndex);
+                        animator.SetBool("CharacterDown", false);
+                        tmp.text = dialogue2_3;
+                        break;
+                    case 4:
+                        dialogBubbleImage.sprite = bubbleLeft;
+                        tmp.text = dialogue2_4;
                         break;
                     default:
+                        tmp.text = "";
                         animator.SetTrigger("ContinueButtonEnd");
-                        Destroy(dialogBubble);
-                        countTaps = false;
-                        movableTileGrid.DestroyExistingMovableTiles();
-                        break;
-                }
-                break;
-            case 5:
-                switch (tapCounter)
-                {
-                    case 1:
-                        tmp.text = dialogue5_1;
-                        break;
-                    case 2:
-                        tmp.text = dialogue5_2;
-                        break;
-                    default:
-                        animator.SetTrigger("ContinueButtonEnd");
-                        Destroy(dialogBubble);
+                        dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
                         break;
