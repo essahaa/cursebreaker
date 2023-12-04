@@ -166,6 +166,7 @@ public class TutorialLevel : MonoBehaviour
                 break;
             case 11:
                 tmp.text = dialogue11;
+                PlayerPrefs.SetInt("tutorialDone", 1);
                 EndLevel();
                 break;
             default:
@@ -207,7 +208,6 @@ public class TutorialLevel : MonoBehaviour
 
     public void LoadGameboard()
     {
-        Debug.Log("attempting load");
         SceneManager.LoadScene("Gameboard");
     }
 }
