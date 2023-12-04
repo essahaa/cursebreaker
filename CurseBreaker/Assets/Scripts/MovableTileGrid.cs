@@ -108,48 +108,45 @@ public class MovableTileGrid : MonoBehaviour
     public void NextLevel()
     {
         // Check if the button has already been clicked
-        if (nextLevelButtonClicked)
+        if (!nextLevelButtonClicked)
         {
-            return; // Do nothing if the button has already been clicked
-        }
+            // Set the flag to true to indicate that the button has been clicked
+            nextLevelButtonClicked = true;
+            Invoke("ResetButtonClickedFlag", 5f);
 
-        FindObjectOfType<AudioManager>().UnMuteSound("musa");
-        // If not clicked, proceed with the next level logic
-        int newSelectedLevel = selectedLevel + 1;
-        PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
-        selectedLevel = newSelectedLevel;
+            FindObjectOfType<AudioManager>().UnMuteSound("musa");
+            // If not clicked, proceed with the next level logic
+            int newSelectedLevel = selectedLevel + 1;
+            PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+            selectedLevel = newSelectedLevel;
 
-        int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-        animator = levelCompletedBox.GetComponent<Animator>();
-        
-        switch (currentLevel)
+            int currentLevel = PlayerPrefs.GetInt("currentLevel");
+            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+            animator = levelCompletedBox.GetComponent<Animator>();
+
+            switch (currentLevel)
+            {
+                //trigger when this level is about to begin
+                case 6:
+                case 16:
+                case 26:
+                case 36:
+                case 46:
+                    if (selectedLevel >= currentLevel)
+                    {
+                        levelManager.PlayCharacterCompleteSequence();
+                    }
+                    break;
+                default:
+                    animator.SetTrigger("ContinueButtonEnd");
+                    DestroyExistingMovableTiles();
+                    ShowLevelText();
+                    break;
+            }
+        }else
         {
-            //trigger when this level is about to begin
-            case 6:
-            case 16:
-            case 26:
-            case 36:
-            case 46:
-                if(selectedLevel > currentLevel)
-                {
-                    levelManager.PlayCharacterCompleteSequence();
-                    //seuraavat väliaikaisesti kunnes shownextspeechbubble taas käytössä
-                    //animator.SetTrigger("ContinueButtonEnd");
-                    //DestroyExistingMovableTiles();
-                    //ShowLevelText();
-                }
-                break;
-            default:
-                animator.SetTrigger("ContinueButtonEnd");
-                DestroyExistingMovableTiles();
-                ShowLevelText();
-                break;
+            Debug.Log("button click not allowed");
         }
-
-        // Set the flag to true to indicate that the button has been clicked
-        nextLevelButtonClicked = true;
-        Invoke("ResetButtonClickedFlag", 5f);
     }
 
     // Method to reset the nextLevelButtonClicked flag to false
@@ -1052,7 +1049,7 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
-    private void ShowLevelText()
+    public void ShowLevelText()
     {
         GameObject textObject = GameObject.Find("ShowLevelText");
         // Update TextMeshPro UI
