@@ -201,7 +201,13 @@ public class MovableTileGrid : MonoBehaviour
         if (noMoreLevels)
         {
             Debug.Log("No more levels in the CSV file.");
-            SceneManager.LoadScene("MainMenu");
+            GameObject gameCompleteBox = GameObject.Find("GameComplete");
+            animator = gameCompleteBox.GetComponent<Animator>();
+            animator.SetTrigger("GameCompleted");
+            GameObject restartButton = GameObject.Find("RestartButton");
+            restartButton.SetActive(false);
+            GameObject levelText = GameObject.Find("ShowLevelText");
+            levelText.SetActive(false);
         }
     }
 

@@ -554,24 +554,12 @@ public class LevelManager : MonoBehaviour
                     case 2:
                         tmp.text = dialogue2_2;
                         break;
-                    case 3:
-                        tmp.text = "";
-                        animator.SetBool("CharacterDown", true);
-                        TemporarySpriteChange(charIndex);
-                        animator.SetBool("CharacterDown", false);
-                        tmp.text = dialogue2_3;
-                        break;
-                    case 4:
-                        dialogBubbleImage.sprite = bubbleLeft;
-                        tmp.text = dialogue2_4;
-                        break;
                     default:
                         tmp.text = "";
                         animator.SetTrigger("ContinueButtonEnd");
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        movableTileGrid.ShowLevelText();
                         break;
                 }
                 break;
