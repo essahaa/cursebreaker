@@ -478,6 +478,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
+                        movableTileGrid.ShowLevelText();
                         break;
                 }
                 break;
@@ -508,6 +509,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
+                        movableTileGrid.ShowLevelText();
                         break;
                 }
                 break;
@@ -538,6 +540,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
+                        movableTileGrid.ShowLevelText();
                         break;
                 }
                 break;
@@ -568,6 +571,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
+                        movableTileGrid.ShowLevelText();
                         break;
                 }
                 break;
