@@ -813,7 +813,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &160807925
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1351,6 +1351,7 @@ GameObject:
   - component: {fileID: 266828488}
   - component: {fileID: 266828491}
   - component: {fileID: 266828492}
+  - component: {fileID: 266828493}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1445,6 +1446,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 266828492}
 --- !u!114 &266828492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1461,6 +1463,25 @@ MonoBehaviour:
   dialogBoxLeft: {fileID: 21300000, guid: 24b426e207fbaf2488a5bbb5026fee0e, type: 3}
   beginningText1: Evil sorcerer Keilith has cursed the town of Lumina and its villagers.
   beginningText2: Only the young healer Lyrana can save the village.
+  beginningText3: Can you help her?
+  beginningText4: I have been cursed. Please cure me Lynara.
+  beginningText5: Hello stranger! Help me break Ms. Bunnies curse.
+--- !u!114 &266828493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266828487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5880a4405120e214380c5a3b2446fb83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beginningCutscenePrefab: {fileID: 0}
+  dialogBoxLeft: {fileID: 0}
+  beginningText1: Evil sorcerer Keilith has cursed the town of Lumina and its villagers.
+  beginningText2: Only the young healer Lynara can save the village.
   beginningText3: Can you help her?
   beginningText4: I have been cursed. Please cure me Lynara.
   beginningText5: Hello stranger! Help me break Ms. Bunnies curse.
@@ -7088,6 +7109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 0}
 --- !u!1 &2122761179
 GameObject:
   m_ObjectHideFlags: 0

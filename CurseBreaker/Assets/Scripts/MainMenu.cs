@@ -7,9 +7,15 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     public HeartSystem heartSystem;
+    public Cutscenes cutscenes;
 
     private void Start()
     {
+        if (PlayerPrefs.GetInt("tutorialDone") != 1)
+        {
+            cutscenes.PlayBeginningCutscene();
+        }
+
         Scene currentScene = SceneManager.GetActiveScene();
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
         if (currentScene.name == "MainMenu" && currentLevel <= 0)
@@ -26,15 +32,8 @@ public class MainMenu : MonoBehaviour
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
         if (heartSystem.CanPlay())
         {
-            if (PlayerPrefs.GetInt("selectedLevel") < 1)
-            {
-                SceneManager.LoadScene("Tutorial_level");
-            }
-            else
-            {
-                UseLatestLevel();
-                SceneManager.LoadScene("Gameboard");
-            }
+            UseLatestLevel();
+            SceneManager.LoadScene("Gameboard");
         }
         else
         {
