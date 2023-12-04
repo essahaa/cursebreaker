@@ -7,10 +7,13 @@ public class HeartSystem : MonoBehaviour
     public int maxHearts = 5;
     private int currentHearts;
     private DateTime nextHeartTime;
-    private TimeSpan heartRegenTime = TimeSpan.FromMinutes(0.1);
+    private TimeSpan heartRegenTime = TimeSpan.FromMinutes(0.2);
 
     public TextMeshProUGUI heartsText; // Public field to assign the TextMeshPro UI element
     public TextMeshProUGUI timerText; // Public field for the Timer TextMeshPro UI element
+
+    private float lastHeartLossTime = 0f; // Field to store the last time a heart was lost
+    private const float HeartLossCooldown = 2f; // Cooldown time in seconds
 
 
     void Start()
@@ -37,12 +40,20 @@ public class HeartSystem : MonoBehaviour
 
     public void LoseHeart()
     {
+        // Check if enough time has passed since the last heart was lost
+        if (Time.time - lastHeartLossTime < HeartLossCooldown)
+        {
+            return; // If not enough time has passed, just return
+        }
+
         if (currentHearts > 0)
         {
             currentHearts--;
             SaveHearts();
             UpdateHeartDisplay(); // Update display when a heart is lost
         }
+
+        lastHeartLossTime = Time.time; // Update the lastHeartLossTime
     }
 
     private void UpdateTimerDisplay()
