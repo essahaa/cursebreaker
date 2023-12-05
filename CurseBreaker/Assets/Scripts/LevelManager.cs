@@ -15,8 +15,13 @@ public class LevelManager : MonoBehaviour
     public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
     private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
 
+    public GameObject movableTilePrefab;
+    public GameObject evilTilePrefab;
+    public GameObject arrowPrefab;
+
     private Animator animator;
     private GameObject restartButton;
+    private GameObject arrow;
 
     private GameObject dialogBubble;
     private Image dialogBubbleImage;
@@ -54,10 +59,7 @@ public class LevelManager : MonoBehaviour
 
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
         ReadCSV();
-
-        
-        ShowLevelText();       
-        
+        ShowLevelText();             
     }
 
     private void Update()
@@ -142,6 +144,50 @@ public class LevelManager : MonoBehaviour
             GameObject levelText = GameObject.Find("ShowLevelText");
             levelText.SetActive(false);
         }
+    }
+
+    public GameObject GetTilePrefab(string tileType)
+    {
+        // Choose the appropriate prefab based on the tileType.
+        switch (tileType)
+        {
+            case "Normal":
+                return movableTilePrefab;
+            case "Evil":
+                return evilTilePrefab;
+            default:
+                return movableTilePrefab;
+        }
+    }
+
+    public string GetAnimationController(string tileType)
+    {
+        switch (tileType)
+        {
+            case "Normal":
+                return "TileController";
+            case "Evil":
+                return "EvilTileController";
+            default:
+                return null;
+        }
+    }
+
+    public void GenerateArrowPrefab()
+    {
+        Vector3 arrowposition = new Vector3(0f, 3f, 0);
+        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
+        arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
+    }
+
+    public void RotateArrow(int rotation)
+    {
+        arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
+    }
+
+    public void DestroyArrow()
+    {
+        Destroy(arrow);
     }
 
     public void UpdateProgression(int completedLevel)
@@ -441,4 +487,3 @@ public class LevelManager : MonoBehaviour
         }
     }
 }
-
