@@ -12,8 +12,6 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
-        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
-
         if (PlayerPrefs.GetInt("tutorialDone") != 1)
         {
             cutscenes.PlayBeginningCutscene();
