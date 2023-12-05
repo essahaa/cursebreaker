@@ -89,11 +89,11 @@ public class MovableTileGrid : MonoBehaviour
             nextLevelButtonClicked = true;
             Invoke("ResetButtonClickedFlag", 5f);
 
-            FindObjectOfType<AudioManager>().UnMuteSound("musa");
-            // If not clicked, proceed with the next level logic
-            int newSelectedLevel = selectedLevel + 1;
-            PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
-            selectedLevel = newSelectedLevel;
+        //FindObjectOfType<AudioManager>().UnMuteSound("musa");
+        // If not clicked, proceed with the next level logic
+        int newSelectedLevel = selectedLevel + 1;
+        PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+        selectedLevel = newSelectedLevel;
 
             int currentLevel = PlayerPrefs.GetInt("currentLevel");
             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
@@ -974,5 +974,55 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
+<<<<<<< Updated upstream
+=======
+
+  
+    private void ShowLevelText()
+    {
+        GameObject textObject = GameObject.Find("ShowLevelText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = selectedLevel.ToString();
+
+            }
+        }
+    }
+
+    public void DeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().DeafenSound("youfail");
+        FindObjectOfType<AudioManager>().DeafenSound("musa");
+        FindObjectOfType<AudioManager>().DeafenSound("winner");
+        FindObjectOfType<AudioManager>().DeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().DeafenSound("liik");
+    }
+    public void UnDeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().UnDeafenSound("youfail");
+        FindObjectOfType<AudioManager>().UnDeafenSound("musa");
+        FindObjectOfType<AudioManager>().UnDeafenSound("winner");
+        FindObjectOfType<AudioManager>().UnDeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().UnDeafenSound("liik");
+    }
+    private void ShowLevelFailedText()
+    {
+        GameObject textObject = GameObject.Find("MoveText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = "Yellow tile dropped.";
+
+            }
+        }
+    }
+>>>>>>> Stashed changes
 }
 
