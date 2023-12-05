@@ -269,6 +269,8 @@ GameObject:
   - component: {fileID: 23069846}
   - component: {fileID: 23069845}
   - component: {fileID: 23069844}
+  - component: {fileID: 23069847}
+  - component: {fileID: 23069848}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -342,10 +344,10 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 9100000, guid: be2e7974cb3a1754ca233e47d4d1aaf8, type: 2}
-        m_TargetAssemblyTypeName: Mute, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 23069847}
+        m_TargetAssemblyTypeName: Soundcontroller, Assembly-CSharp
+        m_MethodName: ToggleMuteSounds
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -393,6 +395,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 23069842}
   m_CullTransparentMesh: 1
+--- !u!114 &23069847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23069842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0973bddd5334b5646bd632d09d1968c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &23069848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23069842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a767ff7cf1e8619459e7e1a4ed04f79d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  muteToggle: {fileID: 23069844}
+  soundController: {fileID: 23069847}
 --- !u!1 &43887395
 GameObject:
   m_ObjectHideFlags: 0
@@ -1313,7 +1341,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 272460186}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TransitionDisableBG, Assembly-CSharp
         m_MethodName: DisableCanvas
         m_Mode: 1
@@ -1597,7 +1625,6 @@ GameObject:
   - component: {fileID: 272460184}
   - component: {fileID: 272460183}
   - component: {fileID: 272460182}
-  - component: {fileID: 272460186}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
