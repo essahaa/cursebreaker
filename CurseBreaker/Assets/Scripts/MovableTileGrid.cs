@@ -790,7 +790,10 @@ public class MovableTileGrid : MonoBehaviour
         canPlay = heartSystem.CanPlay();
         if (!canPlay)
         {
-            SceneManager.LoadScene("MainMenu");
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
+            Debug.Log(canPlay);
         }
     }
 
