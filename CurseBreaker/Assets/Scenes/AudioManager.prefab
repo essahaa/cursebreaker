@@ -74,7 +74,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: ee63761b6e31edd42b8392051b50004b, type: 3}
     duration: 1
     volume: 0.098
-    pitch: 0.93
+    pitch: 3
     loop: 0
     source: {fileID: 0}
   - name: winner

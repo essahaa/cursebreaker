@@ -19,7 +19,41 @@ public class HeartSystem : MonoBehaviour
     void Start()
     {
         LoadHearts();
-        UpdateHeartDisplay(); // Update display on start
+        UpdateHeartDisplay();
+        RegenerateHearts();
+    }
+
+    private void RegenerateHearts()
+    {
+        DateTime lastUpdateTime = DateTime.Parse(PlayerPrefs.GetString("LastUpdateTime", DateTime.Now.ToString()));
+        TimeSpan timeElapsed = DateTime.Now - lastUpdateTime;
+
+        int heartsToRegenerate = (int)(timeElapsed.TotalMinutes / heartRegenTime.TotalMinutes);
+        currentHearts = Math.Min(currentHearts + heartsToRegenerate, maxHearts);
+
+        // Only update nextHeartTime if hearts have been regenerated
+        if (heartsToRegenerate > 0 && currentHearts < maxHearts)
+        {
+            nextHeartTime = DateTime.Now + heartRegenTime - TimeSpan.FromMinutes(timeElapsed.TotalMinutes % heartRegenTime.TotalMinutes);
+        }
+        else if (currentHearts >= maxHearts)
+        {
+            // Reset nextHeartTime as no timer is needed when hearts are full
+            nextHeartTime = DateTime.Now;
+        }
+        // else keep the existing nextHeartTime
+
+        SaveHearts();
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveHearts();
+    }
+
+    void OnDestroy()
+    {
+        SaveHearts();
     }
 
     void Update()
@@ -51,6 +85,11 @@ public class HeartSystem : MonoBehaviour
             currentHearts--;
             SaveHearts();
             UpdateHeartDisplay(); // Update display when a heart is lost
+        }
+
+        if (currentHearts == maxHearts - 1)
+        {
+            nextHeartTime = DateTime.Now + heartRegenTime;
         }
 
         lastHeartLossTime = Time.time; // Update the lastHeartLossTime
@@ -93,13 +132,13 @@ public class HeartSystem : MonoBehaviour
     {
         PlayerPrefs.SetInt("Hearts", currentHearts);
         PlayerPrefs.SetString("NextHeartTime", nextHeartTime.ToString());
+        PlayerPrefs.SetString("LastUpdateTime", DateTime.Now.ToString());
     }
 
     private void LoadHearts()
     {
         currentHearts = PlayerPrefs.GetInt("Hearts", maxHearts);
         nextHeartTime = DateTime.Parse(PlayerPrefs.GetString("NextHeartTime", DateTime.Now.ToString()));
-        UpdateHeartDisplay(); // Update display after loading the hearts
     }
 
     private void UpdateHeartDisplay()

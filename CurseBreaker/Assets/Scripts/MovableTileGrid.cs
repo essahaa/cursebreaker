@@ -5,33 +5,24 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
-using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using Firebase.Analytics;
 
-
 public class MovableTileGrid : MonoBehaviour
 {
-    public GameObject movableTilePrefab;
-    public GameObject evilTilePrefab;
     public GameObject lockTilePrefab;
     public GameObject keyTilePrefab;
-    public GameObject arrowPrefab;
     public HeartSystem heartSystem;
     LevelManager levelManager;
 
-    private GameObject arrow;
     private GameObject restartButton;
-
-    public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
     public Animator animator;
-    
-    public int gridSizeX; //number of columns, width of the grid
-    public int gridSizeY; //number of rows, height of the grid
 
     public int selectedLevel; // The level you want to generate.
+    private int gridSizeX;
+    private int gridSizeY;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -39,17 +30,13 @@ public class MovableTileGrid : MonoBehaviour
     private bool[,] visited;
     public bool levelFailed = false;
     public bool canPlay;
-    private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
-
-    public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
-    public TextMeshProUGUI levelFailedText; // Reference to your TextMeshPro UI component
 
     private bool nextLevelButtonClicked = false;
 
     void Start()
     {
-        ReadCSV(); // Read the CSV file.
-
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        restartButton = GameObject.Find("RestartButton");
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
 
         if (FindObjectOfType<LevelManager>() != null)
@@ -58,51 +45,22 @@ public class MovableTileGrid : MonoBehaviour
 
             if (selectedLevel > 0)
             {
-                LoadLevel(selectedLevel);
+                levelManager.LoadLevel(selectedLevel);
             }
             else
             {
                 PlayerPrefs.SetInt("selectedLevel", 1);
                 selectedLevel = 1;
-                LoadLevel(selectedLevel);
+                levelManager.LoadLevel(selectedLevel);
             }
-            ShowLevelText();
-        }
-
-        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        }          
     }
 
-    public int CheckSelectedLevel()
+    public void SetMovableTilesArray(int gridSizex, int gridSizey)
     {
-        return selectedLevel;
-    }
-
-    private void GenerateArrowPrefab()
-    {
-        Vector3 arrowposition = new Vector3(0f, 3f, 0);
-        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
-    }
-
-    public void RotateArrow(int rotation)
-    {  
-        arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
-    }
-
-    public void LoadSceneAndLevel(int levelNumber)
-    {
-        PlayerPrefs.SetInt("selectedLevel", levelNumber);
-        SceneManager.LoadScene("Gameboard");
-    }
-
-    public void LoadLevel(int levelNumber)
-    {
-        PlayerPrefs.SetInt("selectedLevel", levelNumber);
-        selectedLevel = levelNumber;
-        
-        //T�H�N TILALLE LEVELMANAGERIN LEVELDATAN KAUTTA TIEDOT 
-        ReadLevelDataFromCSV();
-        restartButton = GameObject.Find("RestartButton");
+        movableTiles = new Transform[gridSizex, gridSizey];
+        gridSizeX = gridSizex;
+        gridSizeY = gridSizey;
     }
 
     public void NextLevel()
@@ -114,11 +72,11 @@ public class MovableTileGrid : MonoBehaviour
             nextLevelButtonClicked = true;
             Invoke("ResetButtonClickedFlag", 5f);
 
-            FindObjectOfType<AudioManager>().UnMuteSound("musa");
-            // If not clicked, proceed with the next level logic
-            int newSelectedLevel = selectedLevel + 1;
-            PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
-            selectedLevel = newSelectedLevel;
+        //FindObjectOfType<AudioManager>().UnMuteSound("musa");
+        // If not clicked, proceed with the next level logic
+        int newSelectedLevel = selectedLevel + 1;
+        PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+        selectedLevel = newSelectedLevel;
 
             int currentLevel = PlayerPrefs.GetInt("currentLevel");
             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
@@ -140,7 +98,7 @@ public class MovableTileGrid : MonoBehaviour
                 default:
                     animator.SetTrigger("ContinueButtonEnd");
                     DestroyExistingMovableTiles();
-                    ShowLevelText();
+                    levelManager.ShowLevelText();
                     break;
             }
         }else
@@ -155,101 +113,19 @@ public class MovableTileGrid : MonoBehaviour
         nextLevelButtonClicked = false;
     }
 
-    private void ReadCSV()
-    {
-        string[] lines = csvFile.text.Split('\n');
-        csvLines.AddRange(lines);
-    }
-
-    public void ReadLevelDataFromCSV()
-    {
-        FirebaseAnalytics.LogEvent("level_started", "level_number", selectedLevel.ToString());
-        levelFailed = false;
-        bool arraySizeSet = false; // Add a flag to track if array size is set.
-        bool noMoreLevels = true; // Flag to check if there are no more levels.
-
-        if (csvLines.Count > 0)
-        {
-            foreach (string line in csvLines)
-            {
-                string[] values = line.Split(';'); // Split each line into values.
-
-                // Check if the current line corresponds to the target level.
-                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
-                {
-                    noMoreLevels = false; // We found a matching level.
-                    // Parse data from the CSV line.
-                    int column = int.Parse(values[1]);
-                    int row = int.Parse(values[2]);
-                    string tileType = values[3];
-                    gridSizeX = int.Parse(values[4]);
-                    gridSizeY = int.Parse(values[5]);
-                    string isLockedStr = values[6].ToLower(); // Convert to lowercase to handle case-insensitivity
-                    bool isLocked = isLockedStr == "true";
-                    bool isKey = values[7].ToLower() == "true";
-
-                    // Set the array size only once.
-                    if (!arraySizeSet)
-                    {
-                        movableTiles = new Transform[gridSizeX, gridSizeY];
-                        arraySizeSet = true; // Update the flag.
-                    }
-                    GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY, isLocked, isKey);
-                }
-            }
-        }
-        if (noMoreLevels)
-        {
-            Debug.Log("No more levels in the CSV file.");
-            GameObject gameCompleteBox = GameObject.Find("GameComplete");
-            animator = gameCompleteBox.GetComponent<Animator>();
-            animator.SetTrigger("GameCompleted");
-            GameObject restartButton = GameObject.Find("RestartButton");
-            restartButton.SetActive(false);
-            GameObject levelText = GameObject.Find("ShowLevelText");
-            levelText.SetActive(false);
-        }
-    }
-
-    private GameObject GetTilePrefab(string tileType, bool isLocked, bool isKey)
-    {
-        // Choose the appropriate prefab based on the tileType.
-        switch (tileType)
-        {
-            case "Normal":
-                        return movableTilePrefab;
-            case "Evil":
-                        return evilTilePrefab;
-            default:
-                return movableTilePrefab;
-        }
-    }
-
-    private string GetAnimationController(string tileType)
-    {
-        switch (tileType)
-        {
-            case "Normal":
-                return "TileController";
-            case "Evil":
-                return "EvilTileController";
-            default:
-                return null;
-        }
-    }
-
-    void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked, bool isKey)
+    public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked, bool isKey)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
+        levelFailed = false;
 
         if (!backgroundGenerated)
         {
             backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
             backgroundGenerated = true;
-            GenerateArrowPrefab();
+            levelManager.GenerateArrowPrefab();
         }
         
-        GameObject tilePrefab = GetTilePrefab(tileType, isLocked, isKey);
+        GameObject tilePrefab = levelManager.GetTilePrefab(tileType);
 
         if (column < gridSizeX && row < gridSizeY)
         {
@@ -266,7 +142,7 @@ public class MovableTileGrid : MonoBehaviour
                 // add individual Animator controllers
                 tile.AddComponent<Animator>(); 
                 Animator animator = tile.GetComponent<Animator>();
-                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(GetAnimationController(tileType));
+                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(levelManager.GetAnimationController(tileType));
 
                 MovableTile tileData = tile.GetComponent<MovableTile>();
                 tileData.Level = selectedLevel;
@@ -345,7 +221,7 @@ public class MovableTileGrid : MonoBehaviour
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
-        Destroy(arrow);
+        levelManager.DestroyArrow();
 
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
@@ -355,7 +231,7 @@ public class MovableTileGrid : MonoBehaviour
 
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
-        ReadLevelDataFromCSV();
+        levelManager.ReadLevelDataFromCSV();
         restartButton.SetActive(true);
     }
 
@@ -478,7 +354,6 @@ public class MovableTileGrid : MonoBehaviour
         }
         return count;
     }
-
 
     private bool CheckNeighbours(int col, int row)
     {
@@ -673,7 +548,7 @@ public class MovableTileGrid : MonoBehaviour
         return tilesInColumn;
     }
 
-        private bool HasChildLockTile(Transform parentTile)
+    private bool HasChildLockTile(Transform parentTile)
     {
         // Iterate through child objects of the parentTile.
         foreach (Transform child in parentTile)
@@ -792,16 +667,9 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        if (movableTileDestroyed)
+        if (movableTileDestroyed || movableTileDestroyed && evilTileDestroyed)
         {
             // Logic to handle level failure
-            Debug.Log("Game Over: MovableTiles group is not connected.");
-            levelFailed = true;
-            HandleLevelFailure();
-            return false;
-        }
-        else if(movableTileDestroyed && evilTileDestroyed)
-        {
             Debug.Log("Game Over: MovableTiles group is not connected.");
             levelFailed = true;
             HandleLevelFailure();
@@ -858,7 +726,7 @@ public class MovableTileGrid : MonoBehaviour
         if (levelFailedBox != null)
         {
             animator = levelFailedBox.GetComponent<Animator>();
-            ShowLevelFailedText();
+            levelManager.ShowLevelFailedText();
         }
         levelManager.GetSideCharacter();
         animator.SetTrigger("LevelEnd");
@@ -871,7 +739,10 @@ public class MovableTileGrid : MonoBehaviour
         canPlay = heartSystem.CanPlay();
         if (!canPlay)
         {
-            SceneManager.LoadScene("MainMenu");
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
+            Debug.Log(canPlay);
         }
     }
 
@@ -1020,10 +891,8 @@ public class MovableTileGrid : MonoBehaviour
                 }
             }
         }
-
         return false; // Coordinates are out of bounds or no LockTile found.
     }
-
 
     private void DestroyChildTiles(Transform parentTile)
     {
@@ -1055,8 +924,7 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
-
-    public void ShowLevelText()
+    private void ShowLevelText()
     {
         GameObject textObject = GameObject.Find("ShowLevelText");
         // Update TextMeshPro UI
@@ -1071,6 +939,22 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    public void DeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().DeafenSound("youfail");
+        FindObjectOfType<AudioManager>().DeafenSound("musa");
+        FindObjectOfType<AudioManager>().DeafenSound("winner");
+        FindObjectOfType<AudioManager>().DeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().DeafenSound("liik");
+    }
+    public void UnDeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().UnDeafenSound("youfail");
+        FindObjectOfType<AudioManager>().UnDeafenSound("musa");
+        FindObjectOfType<AudioManager>().UnDeafenSound("winner");
+        FindObjectOfType<AudioManager>().UnDeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().UnDeafenSound("liik");
+    }
     private void ShowLevelFailedText()
     {
         GameObject textObject = GameObject.Find("MoveText");
@@ -1085,5 +969,6 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
+
 }
 

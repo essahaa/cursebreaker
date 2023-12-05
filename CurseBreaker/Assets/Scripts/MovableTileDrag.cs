@@ -400,15 +400,15 @@ public class MovableTileDrag : MonoBehaviour
                 {
                     // Toggle between "horizontal" and "vertical" move types.
                     currentMoveType = (currentMoveType == "horizontal") ? "vertical" : "horizontal";
-                    
+                    LevelManager levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
 
                     if(currentMoveType == "horizontal")
                     {
-                        movableTileGrid.RotateArrow(0);
+                        levelManager.RotateArrow(0);
                     }
                     else
                     {
-                        movableTileGrid.RotateArrow(90);
+                        levelManager.RotateArrow(90);
                     }
                     
 
