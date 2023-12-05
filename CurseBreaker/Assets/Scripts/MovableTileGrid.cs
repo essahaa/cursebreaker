@@ -10,15 +10,11 @@ using Firebase.Analytics;
 
 public class MovableTileGrid : MonoBehaviour
 {
-    public GameObject movableTilePrefab;
-    public GameObject evilTilePrefab;
     public GameObject lockTilePrefab;
     public GameObject keyTilePrefab;
-    public GameObject arrowPrefab;
     public HeartSystem heartSystem;
     LevelManager levelManager;
 
-    private GameObject arrow;
     private GameObject restartButton;
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
@@ -57,8 +53,7 @@ public class MovableTileGrid : MonoBehaviour
                 selectedLevel = 1;
                 levelManager.LoadLevel(selectedLevel);
             }
-        }
-          
+        }          
     }
 
     public void SetMovableTilesArray(int gridSizex, int gridSizey)
@@ -66,18 +61,6 @@ public class MovableTileGrid : MonoBehaviour
         movableTiles = new Transform[gridSizex, gridSizey];
         gridSizeX = gridSizex;
         gridSizeY = gridSizey;
-    }
-
-    private void GenerateArrowPrefab()
-    {
-        Vector3 arrowposition = new Vector3(0f, 3f, 0);
-        arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
-        arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
-    }
-
-    public void RotateArrow(int rotation)
-    {  
-        arrow.transform.rotation = Quaternion.Euler(0, 0, rotation);
     }
 
     public void NextLevel()
@@ -89,11 +72,11 @@ public class MovableTileGrid : MonoBehaviour
             nextLevelButtonClicked = true;
             Invoke("ResetButtonClickedFlag", 5f);
 
-            FindObjectOfType<AudioManager>().UnMuteSound("musa");
-            // If not clicked, proceed with the next level logic
-            int newSelectedLevel = selectedLevel + 1;
-            PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
-            selectedLevel = newSelectedLevel;
+        //FindObjectOfType<AudioManager>().UnMuteSound("musa");
+        // If not clicked, proceed with the next level logic
+        int newSelectedLevel = selectedLevel + 1;
+        PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+        selectedLevel = newSelectedLevel;
 
             int currentLevel = PlayerPrefs.GetInt("currentLevel");
             GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
@@ -130,33 +113,6 @@ public class MovableTileGrid : MonoBehaviour
         nextLevelButtonClicked = false;
     }
 
-    private GameObject GetTilePrefab(string tileType, bool isLocked, bool isKey)
-    {
-        // Choose the appropriate prefab based on the tileType.
-        switch (tileType)
-        {
-            case "Normal":
-                        return movableTilePrefab;
-            case "Evil":
-                        return evilTilePrefab;
-            default:
-                return movableTilePrefab;
-        }
-    }
-
-    private string GetAnimationController(string tileType)
-    {
-        switch (tileType)
-        {
-            case "Normal":
-                return "TileController";
-            case "Evil":
-                return "EvilTileController";
-            default:
-                return null;
-        }
-    }
-
     public void GenerateTileFromCSV(int column, int row, string tileType, int gridSizeX, int gridSizeY, bool isLocked, bool isKey)
     {
         BackgroundGrid backgroundGrid = GameObject.FindGameObjectWithTag("Background").GetComponent<BackgroundGrid>();
@@ -166,10 +122,10 @@ public class MovableTileGrid : MonoBehaviour
         {
             backgroundGrid.GenerateBackgroundGrid(gridSizeX, gridSizeY);
             backgroundGenerated = true;
-            GenerateArrowPrefab();
+            levelManager.GenerateArrowPrefab();
         }
         
-        GameObject tilePrefab = GetTilePrefab(tileType, isLocked, isKey);
+        GameObject tilePrefab = levelManager.GetTilePrefab(tileType);
 
         if (column < gridSizeX && row < gridSizeY)
         {
@@ -186,7 +142,7 @@ public class MovableTileGrid : MonoBehaviour
                 // add individual Animator controllers
                 tile.AddComponent<Animator>(); 
                 Animator animator = tile.GetComponent<Animator>();
-                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(GetAnimationController(tileType));
+                animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>(levelManager.GetAnimationController(tileType));
 
                 MovableTile tileData = tile.GetComponent<MovableTile>();
                 tileData.Level = selectedLevel;
@@ -265,7 +221,7 @@ public class MovableTileGrid : MonoBehaviour
         GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag("MovableTile");
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("EvilTile")).ToArray();
         objectsToDestroy = objectsToDestroy.Concat(GameObject.FindGameObjectsWithTag("BackgroundTile")).ToArray();
-        Destroy(arrow);
+        levelManager.DestroyArrow();
 
         // Loop through and destroy each GameObject
         foreach (GameObject obj in objectsToDestroy)
@@ -276,7 +232,7 @@ public class MovableTileGrid : MonoBehaviour
         backgroundGenerated = false;
         // Generate new movable tiles (and evil tiles if needed).
         levelManager.ReadLevelDataFromCSV();
-        //restartButton.SetActive(true);
+        restartButton.SetActive(true);
     }
 
     public void playmusa()
@@ -711,16 +667,9 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
 
-        if (movableTileDestroyed)
+        if (movableTileDestroyed || movableTileDestroyed && evilTileDestroyed)
         {
             // Logic to handle level failure
-            Debug.Log("Game Over: MovableTiles group is not connected.");
-            levelFailed = true;
-            HandleLevelFailure();
-            return false;
-        }
-        else if(movableTileDestroyed && evilTileDestroyed)
-        {
             Debug.Log("Game Over: MovableTiles group is not connected.");
             levelFailed = true;
             HandleLevelFailure();
@@ -942,10 +891,8 @@ public class MovableTileGrid : MonoBehaviour
                 }
             }
         }
-
         return false; // Coordinates are out of bounds or no LockTile found.
     }
-
 
     private void DestroyChildTiles(Transform parentTile)
     {
@@ -977,5 +924,51 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
     }
+    private void ShowLevelText()
+    {
+        GameObject textObject = GameObject.Find("ShowLevelText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = selectedLevel.ToString();
+
+            }
+        }
+    }
+
+    public void DeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().DeafenSound("youfail");
+        FindObjectOfType<AudioManager>().DeafenSound("musa");
+        FindObjectOfType<AudioManager>().DeafenSound("winner");
+        FindObjectOfType<AudioManager>().DeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().DeafenSound("liik");
+    }
+    public void UnDeafenSounds()
+    {
+        FindObjectOfType<AudioManager>().UnDeafenSound("youfail");
+        FindObjectOfType<AudioManager>().UnDeafenSound("musa");
+        FindObjectOfType<AudioManager>().UnDeafenSound("winner");
+        FindObjectOfType<AudioManager>().UnDeafenSound("riddedred");
+        FindObjectOfType<AudioManager>().UnDeafenSound("liik");
+    }
+    private void ShowLevelFailedText()
+    {
+        GameObject textObject = GameObject.Find("MoveText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = "Yellow tile dropped.";
+
+            }
+        }
+    }
+
 }
 
