@@ -9,6 +9,7 @@ public class ChapterSelectionController : MonoBehaviour
 {
     public GameObject[] levelButtons;
     public MovableTileGrid movableTileGrid;
+    public LevelManager levelManager;
     private int currentLevel; //latest completed level
     private int selectedCharacter;
     public HeartSystem heartSystem;
@@ -91,7 +92,6 @@ public class ChapterSelectionController : MonoBehaviour
     private void HandleLevelSelection(int levelNumber)
     {
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
-        LevelManager levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
         if (heartSystem.CanPlay())
         {
             levelManager.LoadSceneAndLevel(levelNumber);

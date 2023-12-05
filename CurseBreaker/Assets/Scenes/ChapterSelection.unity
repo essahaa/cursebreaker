@@ -2033,6 +2033,7 @@ GameObject:
   - component: {fileID: 1028632347}
   - component: {fileID: 1028632348}
   - component: {fileID: 1028632349}
+  - component: {fileID: 1028632350}
   m_Layer: 0
   m_Name: LevelSelector
   m_TagString: LevelSelector
@@ -2067,21 +2068,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e8b77cfef3d8134395a43ce4085806b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movableTilePrefab: {fileID: 1227834004184806325, guid: 28bb514d19801a046a88fd075b01e46a, type: 3}
-  evilTilePrefab: {fileID: 8340316894529563072, guid: 890320a7e537bbc47a70ee8a0c1b55e8, type: 3}
   lockTilePrefab: {fileID: 6779172287901570810, guid: 35bfd5311b84d2047af40ad84c874ff9, type: 3}
   keyTilePrefab: {fileID: 6379398962969502475, guid: 29cc90c9b71da7440b3b6b0a05ad3722, type: 3}
-  arrowPrefab: {fileID: 6811776559167334232, guid: 3263169fa0dd9c447a6daa5433bfc7fa, type: 3}
   heartSystem: {fileID: 0}
-  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   movableTileSize: 1
   animator: {fileID: 0}
-  gridSizeX: 0
-  gridSizeY: 0
   selectedLevel: 0
   levelFailed: 0
-  myText: {fileID: 0}
-  levelFailedText: {fileID: 0}
+  canPlay: 0
 --- !u!114 &1028632349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2096,8 +2090,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelButtons: []
   movableTileGrid: {fileID: 1028632348}
+  levelManager: {fileID: 1028632350}
   heartSystem: {fileID: 0}
   starDisplayPrefab: {fileID: 7421359052174739049, guid: 067b4f4e697d8c749a350fa76ef532f0, type: 3}
+--- !u!114 &1028632350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028632346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fdba22aca54a004eb9954eacc8a2101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  csvFile: {fileID: 0}
+  movableTilePrefab: {fileID: 0}
+  evilTilePrefab: {fileID: 0}
+  arrowPrefab: {fileID: 0}
+  bubbleLeft: {fileID: 0}
+  bubbleRight: {fileID: 0}
 --- !u!1 &1083117953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,6 +3010,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!1 &1423156066
 GameObject:
   m_ObjectHideFlags: 0
