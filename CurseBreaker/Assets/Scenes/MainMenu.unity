@@ -8704,7 +8704,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHearts: 5
   heartsText: {fileID: 0}
-  timerText: {fileID: 0}
+  timerText: {fileID: 1686947781}
 --- !u!114 &2060002516
 MonoBehaviour:
   m_ObjectHideFlags: 0
