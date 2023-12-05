@@ -610,8 +610,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1694561185}
   m_HandleRect: {fileID: 1694561184}
   m_Direction: 2
-  m_Value: 0.99618834
-  m_Size: 0.46809766
+  m_Value: 0.9961886
+  m_Size: 0.46809772
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4248,6 +4248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdba22aca54a004eb9954eacc8a2101, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   bubbleLeft: {fileID: 21300000, guid: 24b426e207fbaf2488a5bbb5026fee0e, type: 3}
   bubbleRight: {fileID: 21300000, guid: 34a6359dc656ccc4b8e5556988724214, type: 3}
 --- !u!4 &510407680
@@ -10316,16 +10317,11 @@ MonoBehaviour:
   keyTilePrefab: {fileID: 6379398962969502475, guid: 29cc90c9b71da7440b3b6b0a05ad3722, type: 3}
   arrowPrefab: {fileID: 6811776559167334232, guid: 3263169fa0dd9c447a6daa5433bfc7fa, type: 3}
   heartSystem: {fileID: 0}
-  csvFile: {fileID: 4900000, guid: d924d0c817599d947b8793115d270b95, type: 3}
   movableTileSize: 1
   animator: {fileID: 0}
-  gridSizeX: 0
-  gridSizeY: 0
   selectedLevel: 0
   levelFailed: 0
   canPlay: 0
-  myText: {fileID: 0}
-  levelFailedText: {fileID: 0}
 --- !u!4 &1484253799
 Transform:
   m_ObjectHideFlags: 0
