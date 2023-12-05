@@ -310,13 +310,6 @@ public class LevelManager : MonoBehaviour
         PlayerPrefs.SetInt("currentCharacter", newCharacterIndex);
     }
 
-    private void TemporarySpriteChange(int charIndex)
-    {
-        UpdateCharacter(charIndex);
-        GetSideCharacter();
-        PlayerPrefs.SetInt("currentCharacter", charIndex);
-    }
-
     public void PlayCharacterCompleteSequence()
     {
         //GameObject levelCompletedBox = GameObject.FindWithTag("LevelCompletedBox");
@@ -355,7 +348,7 @@ public class LevelManager : MonoBehaviour
                     case 3:
                         tmp.text = "";
                         animator.SetBool("CharacterDown", true);
-                        TemporarySpriteChange(charIndex);
+                        GetSideCharacter();
                         animator.SetBool("CharacterDown", false);
                         tmp.text = dialogue1_3;
                         break;
@@ -386,7 +379,7 @@ public class LevelManager : MonoBehaviour
                     case 3:
                         tmp.text = "";
                         animator.SetBool("CharacterDown", true);
-                        TemporarySpriteChange(charIndex);
+                        GetSideCharacter();
                         animator.SetBool("CharacterDown", false);
                         tmp.text = dialogue2_3;
                         break;
@@ -417,7 +410,7 @@ public class LevelManager : MonoBehaviour
                     case 3:
                         tmp.text = "";
                         animator.SetBool("CharacterDown", true);
-                        TemporarySpriteChange(charIndex);
+                        GetSideCharacter();
                         animator.SetBool("CharacterDown", false);
                         tmp.text = dialogue2_3;
                         break;
