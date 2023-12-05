@@ -53,6 +53,11 @@ public class HeartSystem : MonoBehaviour
             UpdateHeartDisplay(); // Update display when a heart is lost
         }
 
+        if (currentHearts == maxHearts - 1)
+        {
+            nextHeartTime = DateTime.Now + heartRegenTime;
+        }
+
         lastHeartLossTime = Time.time; // Update the lastHeartLossTime
     }
 

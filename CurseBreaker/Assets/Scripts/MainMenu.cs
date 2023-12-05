@@ -27,12 +27,6 @@ public class MainMenu : MonoBehaviour
             levelSelectionObject.GetComponent<Image>().color = new Color32(140, 140, 140, 255);
             levelSelectionObject.GetComponent<Button>().interactable = false;
         }
-        if (!heartSystem.CanPlay())
-        {
-            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
-            animator = NoMoreLivesPanel.GetComponent<Animator>();
-            animator.SetTrigger("NoMoreHearts");
-        }
     }
 
     public void Play()
