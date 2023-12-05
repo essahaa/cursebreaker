@@ -100,11 +100,39 @@ public class HeartSystem : MonoBehaviour
         PlayerPrefs.SetString("NextHeartTime", nextHeartTime.ToString());
     }
 
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            SaveCloseTime();
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveCloseTime();
+    }
+
+    private void SaveCloseTime()
+    {
+        PlayerPrefs.SetString("LastCloseTime", DateTime.Now.ToString());
+    }
+
     private void LoadHearts()
     {
         currentHearts = PlayerPrefs.GetInt("Hearts", maxHearts);
+        var lastCloseTimeStr = PlayerPrefs.GetString("LastCloseTime", DateTime.Now.ToString());
+        var lastCloseTime = DateTime.Parse(lastCloseTimeStr);
+
+        UpdateHeartCountBasedOnElapsedTime(DateTime.Now - lastCloseTime);
         nextHeartTime = DateTime.Parse(PlayerPrefs.GetString("NextHeartTime", DateTime.Now.ToString()));
         UpdateHeartDisplay(); // Update display after loading the hearts
+    }
+
+    private void UpdateHeartCountBasedOnElapsedTime(TimeSpan elapsedTime)
+    {
+        int heartsToRegenerate = (int)(elapsedTime.TotalMinutes / heartRegenTime.TotalMinutes);
+        currentHearts = Math.Min(currentHearts + heartsToRegenerate, maxHearts);
     }
 
     private void UpdateHeartDisplay()
