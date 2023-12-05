@@ -8,9 +8,12 @@ public class MainMenu : MonoBehaviour
 {
     public HeartSystem heartSystem;
     public Cutscenes cutscenes;
+    public Animator animator;
 
     private void Start()
     {
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+
         if (PlayerPrefs.GetInt("tutorialDone") != 1)
         {
             cutscenes.PlayBeginningCutscene();
@@ -23,6 +26,12 @@ public class MainMenu : MonoBehaviour
             GameObject levelSelectionObject = GameObject.Find("LevelSelectButton");
             levelSelectionObject.GetComponent<Image>().color = new Color32(140, 140, 140, 255);
             levelSelectionObject.GetComponent<Button>().interactable = false;
+        }
+        if (!heartSystem.CanPlay())
+        {
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
         }
     }
 
@@ -37,7 +46,9 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            Debug.Log("No hearts left! Watch an ad or wait.");
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
         }
         
         //loads next scene in build queue:
