@@ -91,9 +91,10 @@ public class ChapterSelectionController : MonoBehaviour
     private void HandleLevelSelection(int levelNumber)
     {
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        LevelManager levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
         if (heartSystem.CanPlay())
         {
-            movableTileGrid.LoadSceneAndLevel(levelNumber);
+            levelManager.LoadSceneAndLevel(levelNumber);
         }
         else
         {

@@ -7,20 +7,17 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Firebase.Analytics;
 
 public class LevelManager : MonoBehaviour
 {
     private MovableTileGrid movableTileGrid;
-    //public TextAsset csvFile;
-    //private List<LevelData> levels = new List<LevelData>();
-    /*
-    public GameObject movableTilePrefab;
-    public GameObject evilTilePrefab;
-    public GameObject lockTilePrefab;
-    public GameObject keyTilePrefab;
-    public GameObject arrowPrefab;
-    public GameObject arrow;
-    */
+    public TextAsset csvFile; // Reference to your CSV file in Unity (assign it in the Inspector).
+    private List<string> csvLines = new List<string>(); // Store CSV lines in a list.
+
+    private Animator animator;
+    private GameObject restartButton;
+
     private GameObject dialogBubble;
     private Image dialogBubbleImage;
     public Sprite bubbleLeft;
@@ -28,6 +25,8 @@ public class LevelManager : MonoBehaviour
 
     private Image charImage;
     private Sprite curedCharSprite;
+
+    private int selectedLevel;
 
     private int tapCounter;
     private bool countTaps = false;
@@ -52,7 +51,13 @@ public class LevelManager : MonoBehaviour
     private void Start()
     {
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
-        //LoadLevels();
+
+        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        ReadCSV();
+
+        
+        ShowLevelText();       
+        
     }
 
     private void Update()
@@ -66,6 +71,76 @@ public class LevelManager : MonoBehaviour
                 tapCounter++;
                 ShowNextSpeechBubble();
             }
+        }
+    }
+
+    public void LoadSceneAndLevel(int levelNumber)
+    {
+        PlayerPrefs.SetInt("selectedLevel", levelNumber);
+        SceneManager.LoadScene("Gameboard");
+    }
+
+    public void LoadLevel(int levelNumber)
+    {
+        PlayerPrefs.SetInt("selectedLevel", levelNumber);
+        selectedLevel = levelNumber;
+
+        ReadLevelDataFromCSV();
+    }
+
+    public void ReadCSV()
+    {
+        string[] lines = csvFile.text.Split('\n');
+        csvLines.AddRange(lines);
+    }
+
+    public void ReadLevelDataFromCSV()
+    {
+        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        FirebaseAnalytics.LogEvent("level_started", "level_number", selectedLevel.ToString());
+        bool arraySizeSet = false; // Add a flag to track if array size is set.
+        bool noMoreLevels = true; // Flag to check if there are no more levels.
+
+        if (csvLines.Count > 0)
+        {
+            foreach (string line in csvLines)
+            {
+                string[] values = line.Split(';'); // Split each line into values.
+
+                // Check if the current line corresponds to the target level.
+                if (values.Length >= 1 && int.TryParse(values[0], out int level) && level == selectedLevel)
+                {
+                    noMoreLevels = false; // We found a matching level.
+                    // Parse data from the CSV line.
+                    int column = int.Parse(values[1]);
+                    int row = int.Parse(values[2]);
+                    string tileType = values[3];
+                    int gridSizeX = int.Parse(values[4]);
+                    int gridSizeY = int.Parse(values[5]);
+                    string isLockedStr = values[6].ToLower(); // Convert to lowercase to handle case-insensitivity
+                    bool isLocked = isLockedStr == "true";
+                    bool isKey = values[7].ToLower() == "true";
+
+                    // Set the array size only once.
+                    if (!arraySizeSet)
+                    {
+                        movableTileGrid.SetMovableTilesArray(gridSizeX, gridSizeY);
+                        arraySizeSet = true; // Update the flag.
+                    }
+                    movableTileGrid.GenerateTileFromCSV(column, row, tileType, gridSizeX, gridSizeY, isLocked, isKey);
+                }
+            }
+        }
+        if (noMoreLevels)
+        {
+            Debug.Log("No more levels in the CSV file.");
+            GameObject gameCompleteBox = GameObject.Find("GameComplete");
+            animator = gameCompleteBox.GetComponent<Animator>();
+            animator.SetTrigger("GameCompleted");
+            GameObject restartButton = GameObject.Find("RestartButton");
+            restartButton.SetActive(false);
+            GameObject levelText = GameObject.Find("ShowLevelText");
+            levelText.SetActive(false);
         }
     }
 
@@ -248,7 +323,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        movableTileGrid.ShowLevelText();
+                        ShowLevelText();
                         break;
                 }
                 break;
@@ -279,7 +354,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        movableTileGrid.ShowLevelText();
+                        ShowLevelText();
                         break;
                 }
                 break;
@@ -310,7 +385,7 @@ public class LevelManager : MonoBehaviour
                         dialogBubbleImage.enabled = false;
                         countTaps = false;
                         movableTileGrid.DestroyExistingMovableTiles();
-                        movableTileGrid.ShowLevelText();
+                        ShowLevelText();
                         break;
                 }
                 break;
@@ -333,6 +408,36 @@ public class LevelManager : MonoBehaviour
                         break;
                 }
                 break;
+        }
+    }
+
+    public void ShowLevelText()
+    {
+        GameObject textObject = GameObject.Find("ShowLevelText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = selectedLevel.ToString();
+
+            }
+        }
+    }
+
+    public void ShowLevelFailedText()
+    {
+        GameObject textObject = GameObject.Find("MoveText");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = "Yellow tile dropped.";
+
+            }
         }
     }
 }
