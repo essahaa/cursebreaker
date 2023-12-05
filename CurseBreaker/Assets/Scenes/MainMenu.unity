@@ -1352,6 +1352,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
   cutscenes: {fileID: 266828492}
+  animator: {fileID: 0}
 --- !u!114 &266828492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7635,7 +7636,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHearts: 5
   heartsText: {fileID: 0}
-  timerText: {fileID: 0}
+  timerText: {fileID: 1686947781}
 --- !u!114 &2060002516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8018,6 +8019,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
   cutscenes: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!1 &2122761179
 GameObject:
   m_ObjectHideFlags: 0
