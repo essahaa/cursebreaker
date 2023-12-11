@@ -712,8 +712,8 @@ public class MovableTileGrid : MonoBehaviour
         {
             levelManager.UpdateProgression(selectedLevel);
         }
-        
-        FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+
+        FirebaseAnalytics.LogEvent("level_completed", new Parameter("level_number", selectedLevel.ToString()));
 
         FindObjectOfType<AudioManager>().MuteSound("musa");
         FindObjectOfType<AudioManager>().Play("winner");
@@ -735,7 +735,7 @@ public class MovableTileGrid : MonoBehaviour
         FindObjectOfType<AudioManager>().MuteSound("musa");
         FindObjectOfType<AudioManager>().Play("youfail");
         heartSystem.LoseHeart();
-        FirebaseAnalytics.LogEvent("level_failed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+        FirebaseAnalytics.LogEvent("level_failed", new Parameter("level_number", PlayerPrefs.GetInt("selectedLevel").ToString()));
         canPlay = heartSystem.CanPlay();
         if (!canPlay)
         {
