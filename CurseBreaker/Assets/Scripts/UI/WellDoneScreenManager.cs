@@ -45,7 +45,7 @@ public class WellDoneScreenManager : MonoBehaviour
     public void OnShowStarsButtonClick()
     {
         // Call ShowStars after a delay
-        StartCoroutine(StartStarsWithDelay(1f));
+        StartCoroutine(StartStarsWithDelay(0.1f));
     }
 
 
@@ -54,13 +54,17 @@ public class WellDoneScreenManager : MonoBehaviour
     {
         foreach (Star star in Stars)
         {
-            star.YellowStar.transform.localScale = Vector3.zero;
+            star.YellowStar.enabled = false;
         }
+
+        // Add a delay before starting the star animations
+        yield return new WaitForSeconds(1f); // Adjust the delay duration as needed
 
         // Ensure the number of stars does not exceed the length of the array
         int maxIndex = Mathf.Min(numberOfStars, Stars.Length);
         for (int i = 0; i < maxIndex; i++)
         {
+            Stars[i].YellowStar.enabled = true; // Enable the Image component before the animation
             yield return StartCoroutine(EnlargeAndShrinkStar(Stars[i]));
         }
     }
