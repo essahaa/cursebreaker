@@ -31,7 +31,7 @@ public class WellDoneScreenManager : MonoBehaviour
         // Set current level
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
         Debug.Log("Current level: " + selectedLevel);
-        
+
     }
 
     public void SetCounter()
@@ -45,7 +45,7 @@ public class WellDoneScreenManager : MonoBehaviour
     public void OnShowStarsButtonClick()
     {
         // Call ShowStars after a delay
-        StartCoroutine(StartStarsWithDelay(1f));
+        StartCoroutine(StartStarsWithDelay(0.1f));
     }
 
 
@@ -54,13 +54,17 @@ public class WellDoneScreenManager : MonoBehaviour
     {
         foreach (Star star in Stars)
         {
-            star.YellowStar.transform.localScale = Vector3.zero;
+            star.YellowStar.enabled = false;
         }
+
+        // Add a delay before starting the star animations
+        yield return new WaitForSeconds(1f); // Adjust the delay duration as needed
 
         // Ensure the number of stars does not exceed the length of the array
         int maxIndex = Mathf.Min(numberOfStars, Stars.Length);
         for (int i = 0; i < maxIndex; i++)
         {
+            Stars[i].YellowStar.enabled = true; // Enable the Image component before the animation
             yield return StartCoroutine(EnlargeAndShrinkStar(Stars[i]));
         }
     }
@@ -69,7 +73,7 @@ public class WellDoneScreenManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        
+
         ShowStars(CalculateStarsBasedOnMoves()); // Pass the move counter here
     }
 
@@ -85,7 +89,7 @@ public class WellDoneScreenManager : MonoBehaviour
     public int CalculateStarsBasedOnMoves()
     {
         SetCounter();
-        
+
         Debug.Log($"Calculating stars for {moveCount} moves.");
 
         // Switch case for different levels
@@ -93,14 +97,14 @@ public class WellDoneScreenManager : MonoBehaviour
         {
             case 1:
                 if (moveCount <= 2) return 3;
-                else if (moveCount <= 4) return 2; 
-                else return 1; 
+                else if (moveCount <= 4) return 2;
+                else return 1;
 
             case 2:
                 if (moveCount <= 1) return 3;
                 else if (moveCount <= 5) return 2;
                 else return 1;
-            
+
             case 3:
                 if (moveCount <= 2) return 3;
                 else if (moveCount <= 5) return 2;
@@ -146,23 +150,23 @@ public class WellDoneScreenManager : MonoBehaviour
                 else if (moveCount <= 6) return 2;
                 else return 1;
             case 14:
-                if (moveCount <= 4) return 3;
+                if (moveCount <= 3) return 3;
                 else if (moveCount <= 5) return 2;
                 else return 1;
             case 15:
-                if (moveCount <= 5) return 3;
+                if (moveCount <= 4) return 3;
                 else if (moveCount <= 7) return 2;
                 else return 1;
             case 16:
-                if (moveCount <= 4) return 3;
+                if (moveCount <= 5) return 3;
                 else if (moveCount <= 6) return 2;
                 else return 1;
             case 17:
-                if (moveCount <= 4) return 3;
-                else if (moveCount <= 7) return 2;
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
                 else return 1;
             case 18:
-                if (moveCount <= 4) return 3;
+                if (moveCount <= 3) return 3;
                 else if (moveCount <= 6) return 2;
                 else return 1;
             case 19:
@@ -170,8 +174,8 @@ public class WellDoneScreenManager : MonoBehaviour
                 else if (moveCount <= 7) return 2;
                 else return 1;
             case 20:
-                if (moveCount <= 4) return 3;
-                else if (moveCount <= 7) return 2;
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
                 else return 1;
             case 21:
                 if (moveCount <= 4) return 3;
@@ -182,55 +186,118 @@ public class WellDoneScreenManager : MonoBehaviour
                 else if (moveCount <= 7) return 2;
                 else return 1;
             case 23:
-                if (moveCount <= 2) return 3;
-                else if (moveCount <= 7) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 6) return 2;
                 else return 1;
             case 24:
-                if (moveCount <= 5) return 3;
-                else if (moveCount <= 7) return 2;
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 6) return 2;
                 else return 1;
             case 25:
                 if (moveCount <= 5) return 3;
                 else if (moveCount <= 7) return 2;
                 else return 1;
             case 26:
-                if (moveCount <= 5) return 3;
-                else if (moveCount <= 8) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 6) return 2;
                 else return 1;
             case 27:
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 6) return 2;
+                else return 1;
+            case 28:
                 if (moveCount <= 5) return 3;
                 else if (moveCount <= 8) return 2;
                 else return 1;
-            case 28:
-                if (moveCount <= 4) return 3;
-                else if (moveCount <= 7) return 2;
-                else return 1;
             case 29:
-                if (moveCount <= 3) return 3;
+                if (moveCount <= 5) return 3;
                 else if (moveCount <= 9) return 2;
                 else return 1;
             case 30:
-                if (moveCount <= 7) return 3;
-                else if (moveCount <= 10) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 7) return 2;
                 else return 1;
             case 31:
-                if (moveCount <= 6) return 3;
-                else if (moveCount <= 10) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 8) return 2;
                 else return 1;
             case 32:
-                if (moveCount <= 7) return 3;
-                else if (moveCount <= 10) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 8) return 2;
                 else return 1;
             case 33:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 34:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 7) return 2;
+                else return 1;
+            case 35:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 36:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 37:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 38:
                 if (moveCount <= 6) return 3;
                 else if (moveCount <= 9) return 2;
                 else return 1;
-
+            case 39:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 40:
+                if (moveCount <= 3) return 3;
+                else if (moveCount <= 7) return 2;
+                else return 1;
+            case 41:
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 7) return 2;
+                else return 1;
+            case 42:
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 7) return 2;
+                else return 1;
+            case 43:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 44:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 10) return 2;
+                else return 1;
+            case 45:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 8) return 2;
+                else return 1;
+            case 46:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 47:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 48:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
+            case 49:
+                if (moveCount <= 2) return 3;
+                else if (moveCount <= 5) return 2;
+                else return 1;
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
                 return 1; // Default to 1 star if level not recognized
-                
-                
+
+
         }
     }
 
