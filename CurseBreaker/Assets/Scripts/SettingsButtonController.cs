@@ -11,7 +11,7 @@ public class SettingsButtonController : MonoBehaviour
         // Ensure the muteToggle and soundController references are set in the Unity Editor
         if (muteToggle == null || soundController == null)
         {
-            Debug.LogError("muteToggle or soundController is not set in the Unity Editor.");
+            Debug.Log("muteToggle or soundController is not set in the Unity Editor.");
             return;
         }
 

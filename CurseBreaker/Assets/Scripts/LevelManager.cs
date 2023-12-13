@@ -99,7 +99,7 @@ public class LevelManager : MonoBehaviour
     public void ReadLevelDataFromCSV()
     {
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        FirebaseAnalytics.LogEvent("level_started", "level_number", selectedLevel.ToString());
+        FirebaseAnalytics.LogEvent("level_started", new Parameter("level_number", selectedLevel.ToString()));
         bool arraySizeSet = false; // Add a flag to track if array size is set.
         bool noMoreLevels = true; // Flag to check if there are no more levels.
 
@@ -340,6 +340,7 @@ public class LevelManager : MonoBehaviour
                 {
                     case 1:
                         dialogBubbleImage.sprite = bubbleRight;
+                        animator.SetTrigger("LiftCharacters");
                         tmp.text = dialogue1_1;
                         break;
                     case 2:
@@ -371,6 +372,7 @@ public class LevelManager : MonoBehaviour
                 {
                     case 1:
                         dialogBubbleImage.sprite = bubbleRight;
+                        animator.SetTrigger("LiftCharacters");
                         tmp.text = dialogue2_1;
                         break;
                     case 2:
@@ -402,21 +404,22 @@ public class LevelManager : MonoBehaviour
                 {
                     case 1:
                         dialogBubbleImage.sprite = bubbleRight;
-                        tmp.text = dialogue2_1;
+                        animator.SetTrigger("LiftCharacters");
+                        tmp.text = dialogue3_1;
                         break;
                     case 2:
-                        tmp.text = dialogue2_2;
+                        tmp.text = dialogue3_2;
                         break;
                     case 3:
                         tmp.text = "";
                         animator.SetBool("CharacterDown", true);
                         GetSideCharacter();
                         animator.SetBool("CharacterDown", false);
-                        tmp.text = dialogue2_3;
+                        tmp.text = dialogue3_3;
                         break;
                     case 4:
                         dialogBubbleImage.sprite = bubbleLeft;
-                        tmp.text = dialogue2_4;
+                        tmp.text = dialogue3_4;
                         break;
                     default:
                         tmp.text = "";
@@ -433,10 +436,11 @@ public class LevelManager : MonoBehaviour
                 {
                     case 1:
                         dialogBubbleImage.sprite = bubbleRight;
-                        tmp.text = dialogue2_1;
+                        animator.SetTrigger("LiftCharacters");
+                        tmp.text = dialogue4_1;
                         break;
                     case 2:
-                        tmp.text = dialogue2_2;
+                        tmp.text = dialogue4_2;
                         break;
                     default:
                         tmp.text = "";
