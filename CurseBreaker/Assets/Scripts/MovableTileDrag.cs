@@ -166,6 +166,9 @@ public class MovableTileDrag : MonoBehaviour
     {
         if (!allElementsNull)
         {
+            int [] firstMovableTile = getFirstAndLastMovableTile();
+            
+
             // Iterate through the tiles in the row or column.
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
@@ -186,7 +189,7 @@ public class MovableTileDrag : MonoBehaviour
                         if (currentMoveType == "horizontal")
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(offset.x, 0f, 0f);
-                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX + backgroundGrid.backgroundTileSize, backgroundGrid.maxX - backgroundGrid.backgroundTileSize);
+                            targetPosition.x = Mathf.Clamp(targetPosition.x, backgroundGrid.minX, backgroundGrid.maxX);
 
                             if (offset.x >= 0)
                             {
@@ -202,7 +205,7 @@ public class MovableTileDrag : MonoBehaviour
                         else
                         {
                             targetPosition = initialTilePositions[col, row] + new Vector3(0f, offset.y, 0f);
-                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY + backgroundGrid.backgroundTileSize, backgroundGrid.maxY - backgroundGrid.backgroundTileSize);
+                            targetPosition.y = Mathf.Clamp(targetPosition.y, backgroundGrid.minY, backgroundGrid.maxY);
 
                             if (offset.y >= 0)
                             {
@@ -228,15 +231,15 @@ public class MovableTileDrag : MonoBehaviour
                             if (otherTile != null && otherTile != tile)
                             {
                                 Vector3 otherTilePosition = otherTile.position;
-                                BoxCollider2D collider = otherTile.GetComponent<BoxCollider2D>();
 
-                                if (collider.bounds.Contains(targetPosition))
+                                if (otherTilePosition == targetPosition)
                                 {
                                     tileInSamePosition = true;
                                     Debug.Log("There is a tile at the target snapped position.");
                                 }
                             }
                         }
+
 
                         if (!tileInSamePosition && !targetPositionInLock)
                         {
@@ -261,6 +264,25 @@ public class MovableTileDrag : MonoBehaviour
         }
     }
 
+    private int[] getFirstAndLastMovableTile()
+    {
+        //Array allTiles = new Array();
+        for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+        {
+            for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+            {
+                Transform tile = currentMovableTiles[col, row];
+
+                if (tile != null)
+                {
+                    int[] newArray = { row, col };
+                    return newArray;
+                }
+            }
+        }
+        return null;
+    }
+
     private bool CheckForLockCollition(Vector3 targetPosition)
     {
         foreach (BoxCollider2D collider in lockTileColliders)
@@ -275,8 +297,7 @@ public class MovableTileDrag : MonoBehaviour
 
     private List<BoxCollider2D> GetLockColliders()
     {
-        lockTileColliders.Clear();
-        movableTiles = movableTileGrid.movableTiles;
+        lockTileColliders.Clear(); 
         foreach (Transform tileInGrid in movableTiles)
         {
             //Debug.Log("tileInGrid: " + tileInGrid);
@@ -344,8 +365,8 @@ public class MovableTileDrag : MonoBehaviour
                         float targetY = movableTileComponent.Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
 
                         // Ensure the snapped position stays within the background grid boundaries.
-                        targetX = Mathf.Clamp(targetX, backgroundGrid.minX + backgroundGrid.backgroundTileSize, backgroundGrid.maxX - backgroundGrid.backgroundTileSize);
-                        targetY = Mathf.Clamp(targetY, backgroundGrid.minY + backgroundGrid.backgroundTileSize, backgroundGrid.maxY - backgroundGrid.backgroundTileSize);
+                        targetX = Mathf.Clamp(targetX, backgroundGrid.minX, backgroundGrid.maxX);
+                        targetY = Mathf.Clamp(targetY, backgroundGrid.minY, backgroundGrid.maxY);
 
                         // Set the tile's position to the target position.
                         tile.position = new Vector3(targetX, targetY, 0f);
@@ -373,6 +394,7 @@ public class MovableTileDrag : MonoBehaviour
                 //Update movableTiles array with new snapped positions
                 movableTiles = movableTileGrid.UpdateMovableTilesArray();
                 levelFailed = movableTileGrid.levelFailed;
+                Debug.Log("level failed on drag " + levelFailed);
 
                 if(!levelFailed)
                 {
@@ -389,6 +411,7 @@ public class MovableTileDrag : MonoBehaviour
                         levelManager.RotateArrow(90);
                     }
                     
+
                     moveCounter++; // Increment the counter here
                     SaveCounter();
                     GameObject textObject = GameObject.Find("GameMovesText");
@@ -402,6 +425,7 @@ public class MovableTileDrag : MonoBehaviour
                         }
                     }
                 }             
+
             }
             else if (!isSnappedToNewPlace)
             {
@@ -435,5 +459,6 @@ public class MovableTileDrag : MonoBehaviour
     {
         PlayerPrefs.SetInt("counter", moveCounter);
     }
-  
+
+    
 }
