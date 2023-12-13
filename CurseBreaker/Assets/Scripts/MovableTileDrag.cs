@@ -275,7 +275,8 @@ public class MovableTileDrag : MonoBehaviour
 
     private List<BoxCollider2D> GetLockColliders()
     {
-        lockTileColliders.Clear(); 
+        lockTileColliders.Clear();
+        movableTiles = movableTileGrid.movableTiles;
         foreach (Transform tileInGrid in movableTiles)
         {
             //Debug.Log("tileInGrid: " + tileInGrid);
@@ -372,7 +373,6 @@ public class MovableTileDrag : MonoBehaviour
                 //Update movableTiles array with new snapped positions
                 movableTiles = movableTileGrid.UpdateMovableTilesArray();
                 levelFailed = movableTileGrid.levelFailed;
-                Debug.Log("level failed on drag " + levelFailed);
 
                 if(!levelFailed)
                 {
