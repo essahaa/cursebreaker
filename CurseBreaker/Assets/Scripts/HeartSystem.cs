@@ -141,7 +141,7 @@ public class HeartSystem : MonoBehaviour
         nextHeartTime = DateTime.Parse(PlayerPrefs.GetString("NextHeartTime", DateTime.Now.ToString()));
     }
 
-    private void UpdateHeartDisplay()
+    public void UpdateHeartDisplay()
     {
         if (heartsText != null)
         {

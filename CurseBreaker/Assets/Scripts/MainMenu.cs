@@ -25,6 +25,8 @@ public class MainMenu : MonoBehaviour
             levelSelectionObject.GetComponent<Image>().color = new Color32(140, 140, 140, 255);
             levelSelectionObject.GetComponent<Button>().interactable = false;
         }
+        heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        heartSystem.UpdateHeartDisplay();
     }
 
     public void Play()
