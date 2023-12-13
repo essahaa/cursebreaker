@@ -7,7 +7,7 @@ public class BackgroundGrid : MonoBehaviour
 {
     public Transform[,] backgroundGrid;
     public GameObject backgroundTilePrefab;
-    
+
     public float gridMargin = 5.0f; //margin in percentages of screen width
     public float backgroundTileSize; //Calculated based on screen size
     private float gridWidth;
@@ -24,7 +24,7 @@ public class BackgroundGrid : MonoBehaviour
     {
         Camera mainCamera = Camera.main;
 
-        if(mainCamera != null)
+        if (mainCamera != null)
         {
             //calculate screen width in world units
             float screenWorldWidth = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - mainCamera.ScreenToWorldPoint(Vector3.zero).x;
@@ -74,10 +74,30 @@ public class BackgroundGrid : MonoBehaviour
 
                 // Store the tile in the grid array
                 backgroundGrid[x, y] = tile.transform;
+
+                if ((x == 0) || (y == 0) || (x == gridSizeX - 1) || (y == gridSizeY - 1))
+                {
+                    SetSpriteTransparency(backgroundGrid[x, y].transform);
+                }
             }
         }
     }
 
-    
+    void SetSpriteTransparency(Transform tile)
+    {
+        SpriteRenderer spriteRenderer = tile.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            // Get the current color from the material
+            Color currentColor = spriteRenderer.material.color;
+
+            // Set the new alpha value
+            currentColor.a = 0.2f;
+
+            // Update the material color with the new alpha value
+            spriteRenderer.material.color = currentColor;
+        }
+    }
 
 }

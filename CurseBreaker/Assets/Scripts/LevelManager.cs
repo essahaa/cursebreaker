@@ -99,7 +99,7 @@ public class LevelManager : MonoBehaviour
     public void ReadLevelDataFromCSV()
     {
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        FirebaseAnalytics.LogEvent("level_started", "level_number", selectedLevel.ToString());
+        FirebaseAnalytics.LogEvent("level_started", new Parameter("level_number", selectedLevel.ToString()));
         bool arraySizeSet = false; // Add a flag to track if array size is set.
         bool noMoreLevels = true; // Flag to check if there are no more levels.
 
