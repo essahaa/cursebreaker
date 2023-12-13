@@ -19,6 +19,9 @@ TagManager:
   - LevelSelector
   - DialogBox
   - Cutscene
+  - TutorialLevel
+  - Transition
+  - UI
   layers:
   - Default
   - TransparentFX
