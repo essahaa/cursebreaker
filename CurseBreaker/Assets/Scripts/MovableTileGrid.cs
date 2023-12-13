@@ -276,6 +276,7 @@ public class MovableTileGrid : MonoBehaviour
 
     public Transform[,] UpdateMovableTilesArray()
     {
+
         for (int row = 0; row < gridSizeY; row++)
         {
             for (int col = 0; col < gridSizeX; col++)
@@ -292,134 +293,42 @@ public class MovableTileGrid : MonoBehaviour
                 {
                     movableTiles[col, row] = null;
                 }
+
+                if (tile != null && (tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile")) && CheckNeighbours(col, row) != true)
+                {
+                    if (!HasChildLockTile(tile))
+                    {
+                        //no neighbors found, destroy tile
+                        FindObjectOfType<AudioManager>().Play("riddedred");
+                        movableTiles[col, row] = null;
+
+                        GameObject tileToDestroy = tile.gameObject; // Get the GameObject.
+                        Destroy(tileToDestroy);
+
+                        if (tile.CompareTag("MovableTile"))
+                        {
+                            Debug.Log("level failed koska yks tippu");
+                            HandleLevelFailure();
+                        }
+                        else
+                        {
+                            if (CountEvilTiles() == 0 && !levelFailed)
+                            {
+                                Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                                HandleLevelCompleted();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //locked tile cannot be destroyed, level fails if it is left alone
+                        Debug.Log("level failed locked");
+                        HandleLevelFailure();
+                    }
+                }
             }
         }
         return movableTiles;
-    }
-
-    public bool IsMovableTilesGroupConnected()
-    {
-        visited = new bool[gridSizeX, gridSizeY];
-        List<Transform> largestGroupTiles = new List<Transform>();
-        bool movableTileDestroyed = false;
-        bool evilTileDestroyed = false;
-
-        // Iterate over all tiles to find the largest connected group
-        for (int x = 0; x < gridSizeX; x++)
-        {
-            for (int y = 0; y < gridSizeY; y++)
-            {
-                Transform tile = movableTiles[x, y];
-                if (tile != null && !visited[x, y] && IsRelevantTile(tile))
-                {
-                    List<Transform> currentGroupTiles = DepthFirstSearch(tile, visited);
-                    if (currentGroupTiles.Count > largestGroupTiles.Count)
-                    {
-                        largestGroupTiles = currentGroupTiles;
-                    }
-                }
-            }
-        }
-
-        // Destroy tiles not in the largest group and check their types
-        for (int x = 0; x < gridSizeX; x++)
-        {
-            for (int y = 0; y < gridSizeY; y++)
-            {
-                Transform tile = movableTiles[x, y];
-                if (tile != null && !largestGroupTiles.Contains(tile) && !HasChildLockTile(tile))
-                {
-                    if (tile.CompareTag("MovableTile") || HasChildLockTile(tile))
-                    {
-                        movableTileDestroyed = true;
-                    }
-                    else if (tile.CompareTag("EvilTile"))
-                    {
-                        evilTileDestroyed = true;
-                    }
-                    Destroy(tile.gameObject);
-                    FindObjectOfType<AudioManager>().Play("riddedred");
-                    movableTiles[x, y] = null;
-                }
-            }
-        }
-
-        if (movableTileDestroyed || movableTileDestroyed && evilTileDestroyed)
-        {
-            // Logic to handle level failure
-            Debug.Log("Game Over: MovableTiles group is not connected.");
-            levelFailed = true;
-            HandleLevelFailure();
-            return false;
-        }
-        else if (evilTileDestroyed && !movableTileDestroyed)
-        {
-            // Continue gameplay if only EvilTiles are destroyed
-            Debug.Log("The disconnected group contains only EvilTiles.");
-            if (CountEvilTiles() == 0)
-            {
-                Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
-                HandleLevelCompleted();
-            }
-            return true;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-    private void HandleLevelCompleted()
-    {
-        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
-        if (levelCompletedBox != null)
-        {
-            animator = levelCompletedBox.GetComponent<Animator>();
-        }
-        WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
-        levelManager.GetSideCharacter();
-        manager.OnShowStarsButtonClick();
-        animator.SetTrigger("LevelEnd");
-        restartButton.SetActive(false);
-
-        int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        int nextLevel = selectedLevel + 1;
-        if (nextLevel > currentLevel)
-        {
-            levelManager.UpdateProgression(selectedLevel);
-        }
-
-        FirebaseAnalytics.LogEvent("level_completed", new Parameter("level_number", selectedLevel.ToString()));
-
-        FindObjectOfType<AudioManager>().MuteSound("musa");
-        FindObjectOfType<AudioManager>().Play("winner");
-    }
-
-    private void HandleLevelFailure()
-    {
-        levelFailed = true;
-        GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
-        if (levelFailedBox != null)
-        {
-            animator = levelFailedBox.GetComponent<Animator>();
-            levelManager.ShowLevelFailedText();
-        }
-        levelManager.GetSideCharacter();
-        animator.SetTrigger("LevelEnd");
-        restartButton.SetActive(false);
-
-        FindObjectOfType<AudioManager>().MuteSound("musa");
-        FindObjectOfType<AudioManager>().Play("youfail");
-        heartSystem.LoseHeart();
-        FirebaseAnalytics.LogEvent("level_failed", new Parameter("level_number", PlayerPrefs.GetInt("selectedLevel").ToString()));
-        canPlay = heartSystem.CanPlay();
-        if (!canPlay)
-        {
-            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
-            animator = NoMoreLivesPanel.GetComponent<Animator>();
-            animator.SetTrigger("NoMoreHearts");
-            Debug.Log(canPlay);
-        }
     }
 
     private int CountEvilTiles()
@@ -710,6 +619,131 @@ public class MovableTileGrid : MonoBehaviour
     private bool IsRelevantTile(Transform tile)
     {
         return tile.CompareTag("MovableTile") || tile.CompareTag("EvilTile") || tile.CompareTag("LockTile");
+    }
+
+    public bool IsMovableTilesGroupConnected()
+    {
+        visited = new bool[gridSizeX, gridSizeY];
+        List<Transform> largestGroupTiles = new List<Transform>();
+        bool movableTileDestroyed = false;
+        bool evilTileDestroyed = false;
+
+        // Iterate over all tiles to find the largest connected group
+        for (int x = 0; x < gridSizeX; x++)
+        {
+            for (int y = 0; y < gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null && !visited[x, y] && IsRelevantTile(tile))
+                {
+                    List<Transform> currentGroupTiles = DepthFirstSearch(tile, visited);
+                    if (currentGroupTiles.Count > largestGroupTiles.Count)
+                    {
+                        largestGroupTiles = currentGroupTiles;
+                    }
+                }
+            }
+        }
+
+        // Destroy tiles not in the largest group and check their types
+        for (int x = 0; x < gridSizeX; x++)
+        {
+            for (int y = 0; y < gridSizeY; y++)
+            {
+                Transform tile = movableTiles[x, y];
+                if (tile != null && !largestGroupTiles.Contains(tile))
+                {
+                    if (tile.CompareTag("MovableTile"))
+                    {
+                        movableTileDestroyed = true;
+                    }
+                    else if (tile.CompareTag("EvilTile"))
+                    {
+                        evilTileDestroyed = true;
+                    } 
+                    Destroy(tile.gameObject);
+                    movableTiles[x, y] = null;
+                }
+            }
+        }
+
+        if (movableTileDestroyed || movableTileDestroyed && evilTileDestroyed)
+        {
+            // Logic to handle level failure
+            Debug.Log("Game Over: MovableTiles group is not connected.");
+            levelFailed = true;
+            HandleLevelFailure();
+            return false;
+        }
+        else if (evilTileDestroyed && !movableTileDestroyed)
+        {
+            // Continue gameplay if only EvilTiles are destroyed
+            Debug.Log("The disconnected group contains only EvilTiles.");
+            if (CountEvilTiles() == 0)
+            {
+                Debug.Log("level completed, evil tiles count: " + CountEvilTiles());
+                HandleLevelCompleted();
+
+            }
+            return true;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private void HandleLevelCompleted()
+    {
+        GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+        if (levelCompletedBox != null)
+        {
+            animator = levelCompletedBox.GetComponent<Animator>();
+        }
+        WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
+        levelManager.GetSideCharacter();
+        manager.OnShowStarsButtonClick();
+        animator.SetTrigger("LevelEnd");
+        restartButton.SetActive(false);
+
+        int currentLevel = PlayerPrefs.GetInt("currentLevel");
+        int nextLevel = selectedLevel + 1;
+        if(nextLevel > currentLevel)
+        {
+            levelManager.UpdateProgression(selectedLevel);
+        }
+        
+        FirebaseAnalytics.LogEvent("level_completed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+
+        FindObjectOfType<AudioManager>().MuteSound("musa");
+        FindObjectOfType<AudioManager>().Play("winner");
+    }
+
+    private void HandleLevelFailure()
+    {
+        levelFailed = true;
+        GameObject levelFailedBox = GameObject.Find("LevelFailedBox");
+        if (levelFailedBox != null)
+        {
+            animator = levelFailedBox.GetComponent<Animator>();
+            levelManager.ShowLevelFailedText();
+        }
+        levelManager.GetSideCharacter();
+        animator.SetTrigger("LevelEnd");
+        restartButton.SetActive(false);
+
+        FindObjectOfType<AudioManager>().MuteSound("musa");
+        FindObjectOfType<AudioManager>().Play("youfail");
+        heartSystem.LoseHeart();
+        FirebaseAnalytics.LogEvent("level_failed", "level_number", PlayerPrefs.GetInt("selectedLevel").ToString());
+        canPlay = heartSystem.CanPlay();
+        if (!canPlay)
+        {
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
+            Debug.Log(canPlay);
+        }
     }
 
     private List<Transform> DepthFirstSearch(Transform tile, bool[,] visited)

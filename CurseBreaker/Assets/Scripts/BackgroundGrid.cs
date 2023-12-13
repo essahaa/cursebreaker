@@ -74,30 +74,10 @@ public class BackgroundGrid : MonoBehaviour
 
                 // Store the tile in the grid array
                 backgroundGrid[x, y] = tile.transform;
-
-                if((x == 0) || (y == 0) || (x == gridSizeX - 1) || (y == gridSizeY - 1))
-                {
-                    SetSpriteTransparency(backgroundGrid[x, y].transform);
-                }
             }
         }
     }
 
-    void SetSpriteTransparency(Transform tile)
-    {
-        SpriteRenderer spriteRenderer = tile.GetComponent<SpriteRenderer>();
-
-        if (spriteRenderer != null)
-        {
-            // Get the current color from the material
-            Color currentColor = spriteRenderer.material.color;
-
-            // Set the new alpha value
-            currentColor.a = 0.2f;
-
-            // Update the material color with the new alpha value
-            spriteRenderer.material.color = currentColor;
-        }
-    }
+    
 
 }
