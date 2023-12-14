@@ -103,9 +103,9 @@ public class TutorialLevel : MonoBehaviour
         hand.GetComponent<SpriteRenderer>().sortingOrder = 2;
         hand.SetActive(false);
 
-        Vector3 lynaraPosition = new Vector3(-0.6f, -2.4f, 0);
+        Vector3 lynaraPosition = new Vector3(-0.7f, -2.4f, 0);
         lynara = Instantiate(lynaraPrefab, lynaraPosition, Quaternion.identity);
-        lynara.transform.localScale = new Vector3(0.9f, 0.9f, 1);
+        lynara.transform.localScale = new Vector3(0.7f, 0.7f, 1);
 
         Vector3 dialogPosition = new Vector3(0.4f, -4f, 0);
         dialogBubble = Instantiate(dialogBubblePrefab, dialogPosition, Quaternion.identity);
