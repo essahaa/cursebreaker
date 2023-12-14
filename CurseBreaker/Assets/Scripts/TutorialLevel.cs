@@ -17,6 +17,7 @@ public class TutorialLevel : MonoBehaviour
     public GameObject handPrefab;
     public GameObject lynaraPrefab;
     public GameObject dialogBubblePrefab;
+    public Cutscenes cutscenes;
 
     public GameObject hand;
     private GameObject lynara;
@@ -170,7 +171,7 @@ public class TutorialLevel : MonoBehaviour
                 EndLevel();
                 break;
             default:
-                tmp.text = dialogue1;
+                tmp.text = "";
                 break;
         }
     }
@@ -206,9 +207,9 @@ public class TutorialLevel : MonoBehaviour
 
     }
 
-    public void LoadGameboard()
+    public void PlayCutscene()
     {
-        SceneManager.LoadScene("Gameboard");
+        cutscenes.PlayBeginningCutscene();
     }
 }
 

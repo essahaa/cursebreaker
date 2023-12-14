@@ -83,7 +83,7 @@ public class Cutscenes : MonoBehaviour
                 animator.SetTrigger("GoToCottage");
                 break;
             default:
-                SceneManager.LoadScene("tutorial_level");
+                SceneManager.LoadScene("Gameboard");
                 break;
         }
     }

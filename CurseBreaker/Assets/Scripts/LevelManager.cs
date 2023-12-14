@@ -202,7 +202,7 @@ public class LevelManager : MonoBehaviour
         int currentCharacter = PlayerPrefs.GetInt("currentCharacter");
         switch (newCurrentLevel)
         {
-            case 6: case 16: case 26: case 36: case 46:
+            case 9: case 22: case 35: case 48: case 61:
                 UpdateCharacter(currentCharacter);
                 break;
         }
@@ -221,19 +221,19 @@ public class LevelManager : MonoBehaviour
         Sprite charSprite = null;
         int charIndex = 0;
 
-        if(selectedLevel <= 5)
+        if(selectedLevel <= 8)
         {
             charIndex = 0;
-        }else if(selectedLevel > 5 && selectedLevel <= 15)
+        }else if(selectedLevel > 8 && selectedLevel <= 21)
         {
             charIndex = 1;
-        }else if(selectedLevel > 15 && selectedLevel <= 25)
+        }else if(selectedLevel > 21 && selectedLevel <= 34)
         {
             charIndex = 2;
-        }else if(selectedLevel > 25 && selectedLevel <= 35)
+        }else if(selectedLevel > 34 && selectedLevel <= 47)
         {
             charIndex = 3;
-        }else if(selectedLevel > 35 && selectedLevel <= 45)
+        }else if(selectedLevel > 47 && selectedLevel <= 60)
         {
             charIndex = 4;
         }
@@ -437,6 +437,17 @@ public class LevelManager : MonoBehaviour
                         break;
                     case 2:
                         tmp.text = dialogue2_2;
+                        break;
+                    case 3:
+                        tmp.text = "";
+                        animator.SetBool("CharacterDown", true);
+                        GetSideCharacter();
+                        animator.SetBool("CharacterDown", false);
+                        tmp.text = dialogue4_3;
+                        break;
+                    case 4:
+                        dialogBubbleImage.sprite = bubbleLeft;
+                        tmp.text = dialogue4_4;
                         break;
                     default:
                         tmp.text = "";
