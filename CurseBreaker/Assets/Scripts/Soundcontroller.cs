@@ -1,7 +1,11 @@
 using UnityEngine;
+using UnityEngine.UI;
 public class Soundcontroller : MonoBehaviour
 {
     private bool isMuted = false;
+
+    public Sprite soundOnImage;
+    public Sprite soundOffImage;
 
     public void ToggleMuteSounds(bool isMuted)
     {
@@ -9,10 +13,14 @@ public class Soundcontroller : MonoBehaviour
 
         if (isMuted)
         {
+            FindObjectOfType<AudioManager>().buttonImage.sprite = soundOffImage;
+            FindObjectOfType<AudioManager>().buttonSprite = soundOffImage;
             DeafenSounds();
         }
         else
         {
+            FindObjectOfType<AudioManager>().buttonImage.sprite = soundOnImage;
+            FindObjectOfType<AudioManager>().buttonSprite = soundOnImage;
             UnDeafenSounds();
         }
     }

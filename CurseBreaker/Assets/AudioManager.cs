@@ -1,5 +1,6 @@
 using UnityEngine.Audio;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using Unity.VisualScripting;
 
@@ -8,6 +9,9 @@ public class AudioManager : MonoBehaviour
     public Sound[] sounds;
     public static AudioManager instance;
     public bool isMuteAllSounds = false;
+
+    public Image buttonImage;
+    public Sprite buttonSprite = null;
     void Awake()
     {
 
@@ -30,11 +34,22 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        GameObject muteButton = GameObject.Find("MuteButton");
+        buttonImage = muteButton.GetComponent<Image>();
+        
+        if(buttonSprite != null)
+        {
+            buttonImage.sprite = buttonSprite;
+        }
+    }
+
     // Update is called once per frame
-   
-         
-       
-        public void Play(string name)
+
+
+
+    public void Play(string name)
         {
             Sound s = Array.Find(sounds, sound => sound.name == name);
             if (s == null)
