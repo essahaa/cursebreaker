@@ -237,6 +237,7 @@ MonoBehaviour:
     pitch: 2.23
     loop: 0
     source: {fileID: 0}
+    isPlaying: 0
   - name: riddedred
     description: 
     clip: {fileID: 8300000, guid: 7a3f51a7f6e63b54da33f5fc8a84f38a, type: 3}
@@ -245,6 +246,7 @@ MonoBehaviour:
     pitch: 2.23
     loop: 0
     source: {fileID: 0}
+    isPlaying: 0
   - name: youfail
     description: 
     clip: {fileID: 8300000, guid: 3a2da7a14c8109d498781dd73457c314, type: 3}
@@ -253,6 +255,8 @@ MonoBehaviour:
     pitch: 1.58
     loop: 0
     source: {fileID: 0}
+    isPlaying: 0
+  isMuteAllSounds: 0
 --- !u!4 &35921517
 Transform:
   m_ObjectHideFlags: 0
@@ -1885,6 +1889,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!114 &955253974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1929,9 +1935,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2034798786}
-        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: Gameboard
+      - m_Target: {fileID: 1900735027}
+        m_TargetAssemblyTypeName: TutorialLevel, Assembly-CSharp
+        m_MethodName: PlayCutscene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2442,6 +2448,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!114 &1082305080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3562,6 +3570,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1900735028}
   - component: {fileID: 1900735027}
+  - component: {fileID: 1900735029}
   m_Layer: 0
   m_Name: TutorialLevelGenerator
   m_TagString: TutorialLevel
@@ -3586,6 +3595,7 @@ MonoBehaviour:
   handPrefab: {fileID: 1116196204006266678, guid: c54891ec82a5f5041b70c00c5563ef7e, type: 3}
   lynaraPrefab: {fileID: 642847183060046940, guid: 7d22c4f824c8a294fba6ee79ba7fa15d, type: 3}
   dialogBubblePrefab: {fileID: 2595521990548659669, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
+  cutscenes: {fileID: 1900735029}
   hand: {fileID: 0}
   overlay: {fileID: 0}
   backgroundGrid: {fileID: 68879168}
@@ -3609,6 +3619,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1900735029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900735026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5880a4405120e214380c5a3b2446fb83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beginningCutscenePrefab: {fileID: 9120364223275449667, guid: bcc2ec5a71bf1ec468821618b18a4d97, type: 3}
+  dialogBoxLeft: {fileID: 21300000, guid: 24b426e207fbaf2488a5bbb5026fee0e, type: 3}
+  beginningText1: Evil sorcerer Keilith has cursed the town of Lumina and its villagers.
+  beginningText2: Only the young healer Lynara can save the village.
+  beginningText3: Can you help her?
+  beginningText4: I have been cursed. Please cure me Lynara.
+  beginningText5: Hello stranger! Help me break Ms. Bunnies curse.
 --- !u!1 &1909923323
 GameObject:
   m_ObjectHideFlags: 0
@@ -4143,6 +4172,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartSystem: {fileID: 0}
+  cutscenes: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!1 &2050504632
 GameObject:
   m_ObjectHideFlags: 0

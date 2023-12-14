@@ -12,11 +12,6 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
-        if (PlayerPrefs.GetInt("tutorialDone") != 1)
-        {
-            cutscenes.PlayBeginningCutscene();
-        }
-
         Scene currentScene = SceneManager.GetActiveScene();
         int currentLevel = PlayerPrefs.GetInt("currentLevel");
         if (currentScene.name == "MainMenu" && currentLevel <= 0)
@@ -31,7 +26,12 @@ public class MainMenu : MonoBehaviour
     {
         FindObjectOfType<AudioManager>().Play("musa");
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
-        if (heartSystem.CanPlay())
+
+        if (PlayerPrefs.GetInt("tutorialDone") != 1)
+        {
+            PlayTutorial();
+        }
+        else if (heartSystem.CanPlay())
         {
             UseLatestLevel();
             SceneManager.LoadScene("Gameboard");

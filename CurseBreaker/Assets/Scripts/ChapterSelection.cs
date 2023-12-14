@@ -43,19 +43,19 @@ public class ChapterSelectionController : MonoBehaviour
         switch (selectedCharacter)
         {
             case 0:
-                levelsToGenerate = new int[] { 1, 2, 3, 4, 5 };
+                levelsToGenerate = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
                 break;
             case 1:
-                levelsToGenerate = new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                levelsToGenerate = new int[] { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 };
                 break;
             case 2:
-                levelsToGenerate = new int[] { 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+                levelsToGenerate = new int[] { 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34 };
                 break;
             case 3:
-                levelsToGenerate = new int[] { 26, 27, 28, 29, 30, 31, 32, 33, 34, 35 };
+                levelsToGenerate = new int[] { 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 };
                 break;
             case 4:
-                levelsToGenerate = new int[] { 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 };
+                levelsToGenerate = new int[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 };
                 break;
         }
 
@@ -63,8 +63,8 @@ public class ChapterSelectionController : MonoBehaviour
         {
             GameObject parent = button.transform.parent.gameObject;
             string name = parent.name;
-            char lastCharacter = name[name.Length - 1];
-            int i = (int)char.GetNumericValue(lastCharacter);
+            string indexString = name.Substring(5);
+            int i = int.Parse(indexString);
 
             if (levelsToGenerate.Length > i && levelsToGenerate[i] > 0 && levelsToGenerate[i] <= currentLevel)
             {

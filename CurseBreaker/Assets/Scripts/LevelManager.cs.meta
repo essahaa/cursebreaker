@@ -3,10 +3,7 @@ guid: 3fdba22aca54a004eb9954eacc8a2101
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - movableTileGrid: {instanceID: 0}
-  - movableTileDrag: {instanceID: 0}
-  - dialogBubblePrefab: {fileID: 2367951043776471772, guid: 50118e835d9d5b9468530c5d2ffe9125, type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
