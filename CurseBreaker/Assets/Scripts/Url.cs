@@ -6,10 +6,10 @@ public class Url : MonoBehaviour
 {
    public void OpenTermsOfService()
     {
-        Application.OpenURL("https://1drv.ms/b/s!As9lMVGyrtP8aa76tMSFn6AIRwY?e=BGBoKb");
+        Application.OpenURL("https://windowgames21.wixsite.com/ikkuna-games");
     }
     public void OpenPrivacyPolicy()
     {
-        Application.OpenURL("https://1drv.ms/b/s!As9lMVGyrtP8ahCQZ5D9W3JS5Es?e=8EmaYJ");
+        Application.OpenURL("https://windowgames21.wixsite.com/ikkuna-games");
     }
 }
