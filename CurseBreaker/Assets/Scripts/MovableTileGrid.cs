@@ -107,6 +107,51 @@ public class MovableTileGrid : MonoBehaviour
         }
     }
 
+    public void TryAgain()
+    {
+        // Check if the button has already been clicked
+        if (!nextLevelButtonClicked)
+        {
+            // Set the flag to true to indicate that the button has been clicked
+            nextLevelButtonClicked = true;
+            Invoke("ResetButtonClickedFlag", 5f);
+
+            //FindObjectOfType<AudioManager>().UnMuteSound("musa");
+            // If not clicked, proceed with the next level logic
+            int newSelectedLevel = selectedLevel;
+            PlayerPrefs.SetInt("selectedLevel", newSelectedLevel);
+            selectedLevel = newSelectedLevel;
+
+            int currentLevel = PlayerPrefs.GetInt("currentLevel");
+            GameObject levelCompletedBox = GameObject.Find("LevelCompletedBox");
+            animator = levelCompletedBox.GetComponent<Animator>();
+
+            switch (currentLevel)
+            {
+                //trigger when this level is about to begin
+                case 9:
+                case 22:
+                case 35:
+                case 48:
+                case 61:
+                    if (selectedLevel >= currentLevel)
+                    {
+                        levelManager.PlayCharacterCompleteSequence();
+                    }
+                    break;
+                default:
+                    animator.SetTrigger("ContinueButtonEnd");
+                    DestroyExistingMovableTiles();
+                    levelManager.ShowLevelText();
+                    break;
+            }
+        }
+        else
+        {
+            Debug.Log("button click not allowed");
+        }
+    }
+
     // Method to reset the nextLevelButtonClicked flag to false
     private void ResetButtonClickedFlag()
     {
