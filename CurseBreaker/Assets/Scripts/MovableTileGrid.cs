@@ -14,6 +14,7 @@ public class MovableTileGrid : MonoBehaviour
     public GameObject keyTilePrefab;
     public HeartSystem heartSystem;
     LevelManager levelManager;
+    public ChapterSelectionController chapterSelection;
 
     private GameObject restartButton;
 
@@ -89,7 +90,6 @@ public class MovableTileGrid : MonoBehaviour
                 case 22:
                 case 35:
                 case 48:
-                case 61:
                     if (selectedLevel >= currentLevel)
                     {
                         levelManager.PlayCharacterCompleteSequence();
@@ -133,7 +133,6 @@ public class MovableTileGrid : MonoBehaviour
                 case 22:
                 case 35:
                 case 48:
-                case 61:
                     if (selectedLevel >= currentLevel)
                     {
                         levelManager.PlayCharacterCompleteSequence();
@@ -422,6 +421,9 @@ public class MovableTileGrid : MonoBehaviour
         {
             animator = levelCompletedBox.GetComponent<Animator>();
         }
+        GameObject setStars = GameObject.Find("setStars");
+        chapterSelection = setStars.GetComponent<ChapterSelectionController>();
+        chapterSelection.SetupStarsForLevels();
         WellDoneScreenManager manager = GameObject.Find("UI Canvas").GetComponent<WellDoneScreenManager>();
         levelManager.GetSideCharacter();
         manager.OnShowStarsButtonClick();
@@ -490,53 +492,6 @@ public class MovableTileGrid : MonoBehaviour
             }
         }
         return count;
-    }
-
-    private bool CheckNeighbours(int col, int row)
-    {
-        bool hasMovableTile = false;
-
-        // Check the right neighbor
-        if (col < gridSizeX - 1)
-        {
-            Transform rightNeighbor = movableTiles[col + 1, row];
-            if (rightNeighbor != null && (rightNeighbor.CompareTag("MovableTile") || rightNeighbor.CompareTag("EvilTile")))
-            {
-                hasMovableTile = true;
-            }
-        }
-
-        // Check the left neighbor
-        if (col > 0)
-        {
-            Transform leftNeighbor = movableTiles[col - 1, row];
-            if (leftNeighbor != null && (leftNeighbor.CompareTag("MovableTile") || leftNeighbor.CompareTag("EvilTile")))
-            {
-                hasMovableTile = true;
-            }
-        }
-
-        // Check the upper neighbor
-        if (row < gridSizeY - 1)
-        {
-            Transform upperNeighbor = movableTiles[col, row + 1];
-            if (upperNeighbor != null && (upperNeighbor.CompareTag("MovableTile") || upperNeighbor.CompareTag("EvilTile")))
-            {
-                hasMovableTile = true;
-            }
-        }
-
-        // Check the lower neighbor
-        if (row > 0)
-        {
-            Transform lowerNeighbor = movableTiles[col, row - 1];
-            if (lowerNeighbor != null && (lowerNeighbor.CompareTag("MovableTile") || lowerNeighbor.CompareTag("EvilTile")))
-            {
-                hasMovableTile = true;
-            }
-        }
-
-        return hasMovableTile;
     }
 
     public Transform[,] FindAdjacentMovableTilesInRow(int rowIndex)
