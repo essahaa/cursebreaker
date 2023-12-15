@@ -44,7 +44,6 @@ public class MovableTileDrag : MonoBehaviour
         movableTiles = movableTileGrid.movableTiles;
 
     }
-
     private void Update()
     {
         if (Input.touchCount > 0)
@@ -323,6 +322,8 @@ public class MovableTileDrag : MonoBehaviour
             movableTiles = (currentMoveType == "horizontal") ? movableTileGrid.FindAllMovableTilesInRow(rowIndex) : movableTileGrid.FindAllMovableTilesInColumn(columnIndex);
             movableTileGrid.EmptyMovableTilesArrayRowOrColumn(movableTiles);
 
+            bool collisionOccurred = false;
+
             for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
             {
                 for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
@@ -347,19 +348,64 @@ public class MovableTileDrag : MonoBehaviour
                         targetX = Mathf.Clamp(targetX, backgroundGrid.minX + backgroundGrid.backgroundTileSize, backgroundGrid.maxX - backgroundGrid.backgroundTileSize);
                         targetY = Mathf.Clamp(targetY, backgroundGrid.minY + backgroundGrid.backgroundTileSize, backgroundGrid.maxY - backgroundGrid.backgroundTileSize);
 
-                        // Set the tile's position to the target position.
-                        tile.position = new Vector3(targetX, targetY, 0f);
-
-                        // Update the movableTileGrid with the new position.
-                        movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
-
-                        if (tile.position == initialTilePositions[col, row])
+                        // Check for collisions with other tiles in the loop
+                        foreach (Transform otherTile in currentMovableTiles)
                         {
-                            isSnappedToNewPlace = false;
+                            if (otherTile != null && otherTile != tile)
+                            {
+                                // Get target positions for the current tile and the other tile
+                                float otherTileTargetX = otherTile.GetComponent<MovableTile>().Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
+                                float otherTileTargetY = otherTile.GetComponent<MovableTile>().Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
+
+                                // Clamping within the range [minX + tileSize, maxX - tileSize] for both tiles
+                                otherTileTargetX = Mathf.Clamp(otherTileTargetX, backgroundGrid.minX + backgroundGrid.backgroundTileSize, backgroundGrid.maxX - backgroundGrid.backgroundTileSize);
+                                otherTileTargetY = Mathf.Clamp(otherTileTargetY, backgroundGrid.minY + backgroundGrid.backgroundTileSize, backgroundGrid.maxY - backgroundGrid.backgroundTileSize);
+
+                                // Check if there is a collision after clamping
+                                if (Mathf.Approximately(targetX, otherTileTargetX) && Mathf.Approximately(targetY, otherTileTargetY))
+                                {
+                                    collisionOccurred = true;
+                                }
+                            }
                         }
-                        else
+                        
+                        if(!collisionOccurred)
                         {
-                            isSnappedToNewPlace = true;
+                            // Set the tile's position to the target position.
+                            tile.position = new Vector3(targetX, targetY, 0f);
+
+                            // Update the movableTileGrid with the new position.
+                            movableTileGrid.UpdateMovableTile(movableTileComponent.Column, movableTileComponent.Row, tile);
+
+                            if (tile.position == initialTilePositions[col, row])
+                            {
+                                isSnappedToNewPlace = false;
+                            }
+                            else
+                            {
+                                isSnappedToNewPlace = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check if a collision occurred, and if so, reset all movable tiles to their initial positions
+            if (collisionOccurred)
+            {
+                for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
+                {
+                    for (int col = 0; col < currentMovableTiles.GetLength(1); col++)
+                    {
+                        Transform tile = currentMovableTiles[col, row];
+
+                        if (tile != null)
+                        {
+                            // Reset the tile to its initial position
+                            tile.position = initialTilePositions[col, row];
+
+                            // Update the movableTileGrid with the reset position.
+                            movableTileGrid.UpdateMovableTile(col, row, tile);
                         }
                     }
                 }
