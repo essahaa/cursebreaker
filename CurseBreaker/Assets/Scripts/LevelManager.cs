@@ -79,7 +79,8 @@ public class LevelManager : MonoBehaviour
     public void LoadSceneAndLevel(int levelNumber)
     {
         PlayerPrefs.SetInt("selectedLevel", levelNumber);
-        SceneManager.LoadScene("Gameboard");
+        SceneLoader loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("Gameboard");
     }
 
     public void LoadLevel(int levelNumber)

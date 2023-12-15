@@ -19,6 +19,9 @@ TagManager:
   - LevelSelector
   - DialogBox
   - Cutscene
+  - Transition
+  - SceneLoader
+  - LoadingScreen
   layers:
   - Default
   - TransparentFX

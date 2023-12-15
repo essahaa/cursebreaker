@@ -12,4 +12,8 @@ public class Url : MonoBehaviour
     {
         Application.OpenURL("https://windowgames21.wixsite.com/ikkuna-games");
     }
+    public void OpenStorePage()
+    {
+        Application.OpenURL("https://play.google.com/store/apps/details?id=com.WindowGames.CurseBreaker&pcampaignid=web_share");
+    }
 }
