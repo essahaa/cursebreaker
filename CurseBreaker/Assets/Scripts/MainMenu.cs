@@ -9,6 +9,7 @@ public class MainMenu : MonoBehaviour
     public HeartSystem heartSystem;
     public Cutscenes cutscenes;
     public Animator animator;
+    private SceneLoader loader;
 
     private void Start()
     {
@@ -28,6 +29,7 @@ public class MainMenu : MonoBehaviour
     {
         FindObjectOfType<AudioManager>().Play("musa");
         heartSystem = GameObject.Find("HeartBackground").GetComponent<HeartSystem>();
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
 
         if (PlayerPrefs.GetInt("tutorialDone") != 1)
         {
@@ -36,7 +38,7 @@ public class MainMenu : MonoBehaviour
         else if (heartSystem.CanPlay())
         {
             UseLatestLevel();
-            SceneManager.LoadScene("Gameboard");
+            loader.LoadScene("Gameboard");
         }
         else
         {
@@ -51,7 +53,8 @@ public class MainMenu : MonoBehaviour
 
     public void PlayTutorial()
     {
-        SceneManager.LoadScene("Tutorial_level");
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("Tutorial_level");
     }
 
     public void UseLatestLevel()
@@ -68,22 +71,26 @@ public class MainMenu : MonoBehaviour
 
     public void Gameboard()
     {
-        SceneManager.LoadScene("Gameboard");
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("Gameboard");
     }
 
     public void LevelSelection()
     {
-        SceneManager.LoadScene("LevelSelection");
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("LevelSelection");
     }
 
     public void ChapterSelection()
     {
-        SceneManager.LoadScene("ChapterSelection");
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("ChapterSelection");
     }
 
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+        loader.LoadScene("MainMenu");
     }
 }

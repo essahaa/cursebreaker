@@ -83,7 +83,8 @@ public class Cutscenes : MonoBehaviour
                 animator.SetTrigger("GoToCottage");
                 break;
             default:
-                SceneManager.LoadScene("Gameboard");
+                SceneLoader loader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+                loader.LoadScene("Gameboard");
                 break;
         }
     }
