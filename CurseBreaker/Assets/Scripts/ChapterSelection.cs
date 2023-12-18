@@ -120,15 +120,10 @@ public class ChapterSelectionController : MonoBehaviour
                     if (starPlaceholder != null)
                     {
                         GameObject starDisplay = Instantiate(starDisplayPrefab, starPlaceholder.position, Quaternion.identity, starPlaceholder);
-                        
-                        if(levelNumber == selectedLevel)
-                        {
-                            int starsEarned = PlayerPrefs.GetInt("Level_" + levelNumber + "_Stars", 0);
-                            Debug.Log("Level number" + levelNumber);
+                        int starsEarned = PlayerPrefs.GetInt("Level_" + levelNumber + "_Stars", 0);
+                        Debug.Log("Level number" + levelNumber);
 
-                            starDisplay.GetComponent<StarDisplayUpdater>().UpdateStars(starsEarned);
-                        }
-                        
+                        starDisplay.GetComponent<StarDisplayUpdater>().UpdateStars(starsEarned);
                     }
                 }
                 else
