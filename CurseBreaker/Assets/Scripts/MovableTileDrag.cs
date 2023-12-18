@@ -14,9 +14,9 @@ public class MovableTileDrag : MonoBehaviour
     private string currentMoveType = "horizontal"; // Initialize with a horizontal move
 
     private bool allElementsNull = true; //used for checking if currentmovables array has non-null tiles
-    private bool tileInSamePosition = false;
     private bool targetPositionInLock = false;
     private bool levelFailed = false;
+    private bool moveCollisionOccurred = false;
 
     private Vector3[,] initialTilePositions;
     private Transform[,] movableTiles;
@@ -221,23 +221,28 @@ public class MovableTileDrag : MonoBehaviour
                             continue;
                         }
 
+                        // Check for collisions with other tiles in the loop
                         foreach (Transform otherTile in currentMovableTiles)
                         {
-
                             if (otherTile != null && otherTile != tile)
                             {
-                                Vector3 otherTilePosition = otherTile.position;
-                                BoxCollider2D collider = otherTile.GetComponent<BoxCollider2D>();
+                                // Get target positions for the current tile and the other tile
+                                float otherTileTargetX = otherTile.GetComponent<MovableTile>().Column * backgroundGrid.backgroundTileSize + backgroundGrid.minX;
+                                float otherTileTargetY = otherTile.GetComponent<MovableTile>().Row * backgroundGrid.backgroundTileSize + backgroundGrid.minY;
 
-                                if (collider.bounds.Contains(targetPosition))
+                                // Clamping within the range [minX + tileSize, maxX - tileSize] for both tiles
+                                otherTileTargetX = Mathf.Clamp(otherTileTargetX, backgroundGrid.minX + backgroundGrid.backgroundTileSize, backgroundGrid.maxX - backgroundGrid.backgroundTileSize);
+                                otherTileTargetY = Mathf.Clamp(otherTileTargetY, backgroundGrid.minY + backgroundGrid.backgroundTileSize, backgroundGrid.maxY - backgroundGrid.backgroundTileSize);
+
+                                // Check if there is a collision after clamping
+                                if (Mathf.Approximately(targetPosition.x, otherTileTargetX) && Mathf.Approximately(targetPosition.y, otherTileTargetY))
                                 {
-                                    tileInSamePosition = true;
-                                    Debug.Log("There is a tile at the target snapped position.");
+                                    moveCollisionOccurred = true;
                                 }
                             }
                         }
 
-                        if (!tileInSamePosition && !targetPositionInLock)
+                        if (!moveCollisionOccurred && !targetPositionInLock)
                         {
                             // Update the tile's position to the target position.
                             tile.position = targetPosition;
@@ -301,7 +306,7 @@ public class MovableTileDrag : MonoBehaviour
         if (!allElementsNull)
         {
             FindObjectOfType<AudioManager>().Play("liik");
-            if (tileInSamePosition)
+            if (moveCollisionOccurred)
             {
                 for (int row = 0; row < currentMovableTiles.GetLength(0); row++)
                 {
@@ -474,7 +479,7 @@ public class MovableTileDrag : MonoBehaviour
                 }
             }
             allElementsNull = true;
-            tileInSamePosition = false;
+            moveCollisionOccurred = false;
         }
 
     }
