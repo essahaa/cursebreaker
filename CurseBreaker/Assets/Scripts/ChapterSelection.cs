@@ -12,7 +12,6 @@ public class ChapterSelectionController : MonoBehaviour
     public LevelManager levelManager;
     private int currentLevel; //latest completed level
     private int selectedCharacter;
-    private int selectedLevel;
     public HeartSystem heartSystem;
 
     void Awake()
@@ -25,9 +24,7 @@ public class ChapterSelectionController : MonoBehaviour
     private void Start()
     {
         currentLevel = PlayerPrefs.GetInt("currentLevel");
-        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
         selectedCharacter = PlayerPrefs.GetInt("selectedCharacter");
-        Debug.Log("SelectedLevel: " + selectedLevel);
 
         CheckLevelProgression();
         SetupStarsForLevels();
@@ -121,8 +118,6 @@ public class ChapterSelectionController : MonoBehaviour
                     {
                         GameObject starDisplay = Instantiate(starDisplayPrefab, starPlaceholder.position, Quaternion.identity, starPlaceholder);
                         int starsEarned = PlayerPrefs.GetInt("Level_" + levelNumber + "_Stars", 0);
-                        Debug.Log("Level number" + levelNumber);
-
                         starDisplay.GetComponent<StarDisplayUpdater>().UpdateStars(starsEarned);
                     }
                 }

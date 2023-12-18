@@ -29,8 +29,7 @@ public class WellDoneScreenManager : MonoBehaviour
         movableTileGrid = GameObject.FindGameObjectWithTag("MovableTileGrid").GetComponent<MovableTileGrid>();
 
         // Set current level
-        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
-        Debug.Log("Current level: " + selectedLevel);
+        //selectedLevel = PlayerPrefs.GetInt("selectedLevel");
 
     }
 
@@ -90,7 +89,8 @@ public class WellDoneScreenManager : MonoBehaviour
     public int CalculateStarsBasedOnMoves()
     {
         SetCounter();
-
+        selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        Debug.Log("Calculate SL" + selectedLevel);
         Debug.Log($"Calculating stars for {moveCount} moves.");
 
         // Switch case for different levels
@@ -232,7 +232,7 @@ public class WellDoneScreenManager : MonoBehaviour
                 else return 1;
             case 34:
                 if (moveCount <= 5) return 3;
-                else if (moveCount <= 7) return 2;
+                else if (moveCount <= 8) return 2;
                 else return 1;
             case 35:
                 if (moveCount <= 5) return 3;
@@ -279,20 +279,64 @@ public class WellDoneScreenManager : MonoBehaviour
                 else if (moveCount <= 8) return 2;
                 else return 1;
             case 46:
-                if (moveCount <= 2) return 3;
-                else if (moveCount <= 5) return 2;
+                if (moveCount <= 6) return 3;
+                else if (moveCount <= 9) return 2;
                 else return 1;
             case 47:
-                if (moveCount <= 2) return 3;
-                else if (moveCount <= 5) return 2;
+                if (moveCount <= 6) return 3;
+                else if (moveCount <= 9) return 2;
                 else return 1;
             case 48:
-                if (moveCount <= 2) return 3;
-                else if (moveCount <= 5) return 2;
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 7) return 2;
                 else return 1;
             case 49:
-                if (moveCount <= 2) return 3;
-                else if (moveCount <= 5) return 2;
+                if (moveCount <= 8) return 3;
+                else if (moveCount <= 12) return 2;
+                else return 1;
+            case 50:
+                if (moveCount <= 4) return 3;
+                else if (moveCount <= 12) return 2;
+                else return 1;
+            case 51:
+                if (moveCount <= 6) return 3;
+                else if (moveCount <= 9) return 2;
+                else return 1;
+            case 52:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 11) return 2;
+                else return 1;
+            case 53:
+                if (moveCount <= 6) return 3;
+                else if (moveCount <= 11) return 2;
+                else return 1;
+            case 54:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 12) return 2;
+                else return 1;
+            case 55:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 12) return 2;
+                else return 1;
+            case 56:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 12) return 2;
+                else return 1;
+            case 57:
+                if (moveCount <= 5) return 3;
+                else if (moveCount <= 10) return 2;
+                else return 1;
+            case 58:
+                if (moveCount <= 6) return 3;
+                else if (moveCount <= 11) return 2;
+                else return 1;
+            case 59:
+                if (moveCount <= 7) return 3;
+                else if (moveCount <= 11) return 2;
+                else return 1;
+            case 60:
+                if (moveCount <= 9) return 3;
+                else if (moveCount <= 14) return 2;
                 else return 1;
             default:
                 Debug.Log("Default case hit in CalculateStarsBasedOnMoves");
