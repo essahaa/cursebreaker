@@ -82,6 +82,7 @@ public class WellDoneScreenManager : MonoBehaviour
         StartCoroutine(ShowStarsRoutine(numberOfStars));
 
         selectedLevel = PlayerPrefs.GetInt("selectedLevel");
+        Debug.Log("Selected level" + selectedLevel);
         // Save the stars with a level-specific key
         PlayerPrefs.SetInt("Level_" + selectedLevel + "_Stars", numberOfStars);
     }
