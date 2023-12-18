@@ -18,10 +18,12 @@ public class LevelManager : MonoBehaviour
     public GameObject movableTilePrefab;
     public GameObject evilTilePrefab;
     public GameObject arrowPrefab;
+    public GameObject arrowBackPrefab;
 
     private Animator animator;
     private GameObject restartButton;
     private GameObject arrow;
+    private GameObject arrowBack;
 
     private GameObject dialogBubble;
     private Image dialogBubbleImage;
@@ -179,6 +181,7 @@ public class LevelManager : MonoBehaviour
         Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
         arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
+        arrowBack = Instantiate(arrowBackPrefab, arrowposition, Quaternion.identity);
     }
 
     public void RotateArrow(int rotation)
