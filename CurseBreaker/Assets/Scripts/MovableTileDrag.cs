@@ -443,6 +443,7 @@ public class MovableTileDrag : MonoBehaviour
 
                     moveCounter++; // Increment the counter here
                     SaveCounter();
+                    movableTileGrid.ShowMoves();
                     GameObject textObject = GameObject.Find("GameMovesText");
                     // Update TextMeshPro UI
                     if (textObject != null)

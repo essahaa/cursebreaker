@@ -17,6 +17,7 @@ public class MovableTileGrid : MonoBehaviour
     public ChapterSelectionController chapterSelection;
 
     private GameObject restartButton;
+    public TextMeshProUGUI myText; // Reference to your TextMeshPro UI component
 
     public float movableTileSize = 1.0f; // Adjust the size of movable tiles.
     public Animator animator;
@@ -24,6 +25,7 @@ public class MovableTileGrid : MonoBehaviour
     public int selectedLevel; // The level you want to generate.
     private int gridSizeX;
     private int gridSizeY;
+    public int moveCounter;
 
     public Transform[,] movableTiles; // Change to a Transform[,] array.
 
@@ -104,6 +106,17 @@ public class MovableTileGrid : MonoBehaviour
         }else
         {
             Debug.Log("button click not allowed");
+        }
+        moveCounter = 0;
+        GameObject textObject = GameObject.Find("GameMovesHeader");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = moveCounter.ToString();
+            }
         }
     }
 
@@ -933,6 +946,23 @@ public class MovableTileGrid : MonoBehaviour
             {
                 textComponentFromOtherObject.text = "Yellow tile dropped.";
 
+            }
+        }
+    }
+
+    public void ShowMoves()
+    {
+        int moveCounter = PlayerPrefs.GetInt("counter");
+        
+        Debug.Log("Moves= " + moveCounter);
+        GameObject textObject = GameObject.Find("GameMovesHeader");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = moveCounter.ToString();
             }
         }
     }
