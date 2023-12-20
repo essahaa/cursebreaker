@@ -178,7 +178,7 @@ public class LevelManager : MonoBehaviour
 
     public void GenerateArrowPrefab()
     {
-        Vector3 arrowposition = new Vector3(0f, 3.285f, 0);
+        Vector3 arrowposition = new Vector3(0f, 3f, 0);
         arrow = Instantiate(arrowPrefab, arrowposition, Quaternion.identity);
         arrow.GetComponent<SpriteRenderer>().sortingOrder = 2;
         arrowBack = Instantiate(arrowBackPrefab, arrowposition, Quaternion.identity);

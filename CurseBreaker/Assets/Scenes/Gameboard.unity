@@ -4350,6 +4350,7 @@ MonoBehaviour:
   movableTilePrefab: {fileID: 1227834004184806325, guid: 28bb514d19801a046a88fd075b01e46a, type: 3}
   evilTilePrefab: {fileID: 8340316894529563072, guid: 890320a7e537bbc47a70ee8a0c1b55e8, type: 3}
   arrowPrefab: {fileID: 6811776559167334232, guid: 3263169fa0dd9c447a6daa5433bfc7fa, type: 3}
+  MovesBgPrefab: {fileID: 2492279651698328492, guid: bb6aebcdee749b144bddf2373840d8b9, type: 3}
   arrowBackPrefab: {fileID: 6631467509960696949, guid: 649d3441b56e6d54da3522aa6d7f08f4, type: 3}
   bubbleLeft: {fileID: 21300000, guid: 24b426e207fbaf2488a5bbb5026fee0e, type: 3}
   bubbleRight: {fileID: 21300000, guid: 940fa9263dd35084eb09ad3bc036a9ab, type: 3}
