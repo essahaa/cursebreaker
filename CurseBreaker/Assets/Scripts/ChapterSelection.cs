@@ -13,6 +13,7 @@ public class ChapterSelectionController : MonoBehaviour
     private int currentLevel; //latest completed level
     private int selectedCharacter;
     public HeartSystem heartSystem;
+    public Animator animator;
 
     void Awake()
     {
@@ -98,7 +99,9 @@ public class ChapterSelectionController : MonoBehaviour
         }
         else
         {
-            Debug.Log("No hearts left! Watch an ad or wait.");
+            GameObject NoMoreLivesPanel = GameObject.Find("NoMoreLivesPanel");
+            animator = NoMoreLivesPanel.GetComponent<Animator>();
+            animator.SetTrigger("NoMoreHearts");
         }
             
     }
