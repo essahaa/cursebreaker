@@ -265,6 +265,18 @@ public class MovableTileGrid : MonoBehaviour
 
     public void DestroyExistingMovableTiles()
     {
+        moveCounter = 0;
+        GameObject textObject = GameObject.Find("GameMovesHeader");
+        // Update TextMeshPro UI
+        if (textObject != null)
+        {
+            TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
+            if (textComponentFromOtherObject != null)
+            {
+                textComponentFromOtherObject.text = moveCounter.ToString();
+            }
+        }
+
         // Clear the references in the movableTiles array.
         for (int x = 0; x < gridSizeX; x++)
         {

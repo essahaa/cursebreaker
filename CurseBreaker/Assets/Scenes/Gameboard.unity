@@ -250,11 +250,11 @@ RectTransform:
   m_LocalScale: {x: 0.79999995, y: 0.79999995, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 950845953}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -896, y: 1170}
+  m_AnchoredPosition: {x: 229, y: -42}
   m_SizeDelta: {x: 332.6876, y: 145.8873}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &41258796
@@ -535,6 +535,7 @@ MonoBehaviour:
   movableTileGrid: {fileID: 0}
   levelManager: {fileID: 0}
   heartSystem: {fileID: 0}
+  animator: {fileID: 0}
   starDisplayPrefab: {fileID: 7421359052174739049, guid: 067b4f4e697d8c749a350fa76ef532f0, type: 3}
 --- !u!4 &56852612
 Transform:
@@ -6666,6 +6667,7 @@ RectTransform:
   - {fileID: 505600729}
   - {fileID: 2090870673}
   - {fileID: 380488845}
+  - {fileID: 6443658}
   m_Father: {fileID: 1600852988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -15208,4 +15210,3 @@ SceneRoots:
   - {fileID: 1993243420}
   - {fileID: 510407680}
   - {fileID: 85842963}
-  - {fileID: 6443658}
