@@ -962,7 +962,7 @@ public class MovableTileGrid : MonoBehaviour
             TextMeshProUGUI textComponentFromOtherObject = textObject.GetComponent<TextMeshProUGUI>();
             if (textComponentFromOtherObject != null)
             {
-                textComponentFromOtherObject.text = moveCounter.ToString();
+                textComponentFromOtherObject.text = "Moves: " + moveCounter.ToString();
             }
         }
     }
